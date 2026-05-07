@@ -1,97 +1,275 @@
-# Autonomous Quantitative Trading System
+# Quant Trading Harness
 
-A fully autonomous, multi-agent quantitative trading system powered by Claude (Anthropic) that learns and applies trading strategies for US equities and options.
+A single-agent paper-trading harness. One Claude wakes up once per weekday,
+reads its own markdown notes from yesterday, decides whether to keep, modify,
+or rotate strategies, submits orders for tomorrow's session, and writes a
+hand-off note for the next day's Claude.
 
-**Safety first**: The system defaults to paper trading mode. Real money execution requires two explicit flags (`REAL_MONEY_ENABLED=true` AND `REAL_MONEY_CONFIRMATION=true`).
+No multi-agent network. No vector database. No daemon. Each run is a clean,
+self-contained agent loop that reads from disk, acts, writes back to disk,
+and exits. The markdown files in `quant_trading_system/knowledge_base/` are
+the only source of truth.
+
+**Safety**: paper trading by default. Live trading requires both
+`REAL_MONEY_ENABLED` *and* `REAL_MONEY_CONFIRMATION` set to `true`, and
+`ALPACA_PAPER=false`. The `SafetyGate` middleware rejects any order that
+doesn't satisfy those gates plus per-position size, per-day loss, and
+concurrent-position limits.
 
 ## Architecture
 
 ```
-SupervisorAgent (Claude Sonnet)
-├── IntradayTradingAgent        # 1-5 min bars, minutes-hours holding
-├── SwingTradingAgent           # Daily bars, 3-20 day holding
-├── PositionTradingAgent        # Weekly bars, 3+ week holding
-├── StrategyResearchAgent       # Discovers + evaluates new strategies
-├── BacktestingAgent            # VectorBT + QuantLib backtests
-├── KnowledgeBaseAgent          # ChromaDB + Markdown strategy persistence
-└── RiskManagerAgent            # Portfolio-level risk with veto power
-
-Order Flow: Trading Agent → RiskManager (veto) → SafetyGate (veto) → Broker
+       Cowork mode                       Standalone mode
+       (laptop, today)                   (Pi / cloud, later)
+       ────────────────                  ─────────────────────
+   ┌─────────────────────┐           ┌────────────────────────┐
+   │ Cowork scheduled    │           │ system cron / launchd  │
+   │ task @ 16:00 PT M-F │           │ @ 16:00 PT M-F         │
+   └──────────┬──────────┘           └──────────┬─────────────┘
+              │ fires session                   │ runs script
+              ▼                                 ▼
+   ┌─────────────────────┐           ┌────────────────────────┐
+   │ Claude in Cowork    │           │ orchestrator.py        │
+   │ + daily_prompt.md   │           │ + Anthropic API        │
+   │ (Read/Write/Edit/   │           │ (tool-use loop with    │
+   │  Bash → cli.py)     │           │  tool_registry schemas)│
+   └──────────┬──────────┘           └──────────┬─────────────┘
+              │                                 │
+              └────────────┬────────────────────┘
+                           ▼
+   ┌──────────────────────────────────────────────────────────┐
+   │ shared layer:                                            │
+   │   agent_tools.py  →  SafetyGate  →  Alpaca               │
+   │                  →  journal.py   →  trades/*.jsonl       │
+   │                  →  memory.py    →  knowledge_base/*.md  │
+   │                  →  health.py    →  (deterministic math) │
+   └──────────────────────────────────────────────────────────┘
 ```
 
-## Quick Start
+`agent_tools.py` is a set of plain Python functions. Standalone mode wraps
+them in Anthropic tool schemas (`tool_registry.py`) and exposes them to
+Claude via the API. Cowork mode wraps them in CLI subcommands (`cli.py`)
+and exposes them to Cowork-Claude via bash. Either way, every order goes
+through `brokers/safety_gate.py`, and every order is logged to
+`trades/YYYY-MM.jsonl` with a `strategy_id` so tomorrow's run can
+attribute outcomes.
+
+## Two ways to run
+
+The harness has two run modes that share the same memory layer (`knowledge_base/`),
+the same trade journal (`trades/`), the same Python helpers, and the same safety
+boundaries. The only thing that differs is *who* is doing the reasoning.
+
+| Mode | Brain | Auth | Trigger | Use when |
+|------|-------|------|---------|----------|
+| **Cowork** (this is the recommended setup right now) | Claude inside Cowork session | your Claude account | Cowork scheduled task | Running on your laptop |
+| **Standalone** | Anthropic API via `orchestrator.py` | `ANTHROPIC_API_KEY` | system cron / launchd | Running on a Pi or cloud VM (no Cowork available) |
+
+Both modes:
+- Read and write the same `knowledge_base/strategies/*.md`, `conclusions/*.md`, and `state/*.md` files.
+- Submit orders only through `SafetyGate.validate_and_submit`.
+- Write to the same `trades/YYYY-MM.jsonl` journal so health signals work across modes.
+
+### Cowork mode (laptop, no API key)
+
+In Cowork mode, Claude *is* the orchestrator: a scheduled task fires a Cowork
+session, the session is given a daily-workflow prompt, and Claude does the
+reasoning natively. Deterministic helpers (compute health, classify regime,
+submit through SafetyGate, log to journal) are exposed as a CLI:
+
+```
+.venv/bin/python -m quant_trading_system.cli <subcommand> ...
+```
+
+See `quant_trading_system/cli.py` for the full subcommand list, or run
+`python -m quant_trading_system.cli --help`.
+
+**Setup:**
 
 ```bash
-# 1. Clone and set up environment (requires Python 3.11-3.13)
+# 1. Clone and create a venv (Python 3.11+)
 git clone <repo-url> && cd Stock-Trading-Agent
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 
-# 2. Configure
+# 2. Configure — Cowork mode does NOT need ANTHROPIC_API_KEY,
+#    but DOES need Alpaca paper credentials.
 cp .env.example .env
-# Edit .env with your ALPACA_API_KEY, ALPACA_SECRET_KEY
+# Edit .env: ALPACA_API_KEY, ALPACA_SECRET_KEY, ALPACA_PAPER=true
 
-# 3. Choose LLM provider in .env:
-#    Option A (free): LLM_PROVIDER=ollama  (requires: brew install ollama && ollama pull llama3.2)
-#    Option B (paid): LLM_PROVIDER=anthropic  (requires: ANTHROPIC_API_KEY)
+# 3. Pre-flight check
+python scripts/preflight.py
+# (Will warn that ANTHROPIC_API_KEY is missing — that's fine for Cowork mode.)
 
-# 4. Seed the strategy knowledge base
-python main.py --seed-kb
-
-# 5. Run a dry run (no broker calls at all)
-python main.py --dry-run --once
-
-# 6. Run a paper trading cycle
-python main.py --once
+# 4. Smoke-test the CLI manually
+.venv/bin/python -m quant_trading_system.cli regime
+.venv/bin/python -m quant_trading_system.cli account
+.venv/bin/python -m quant_trading_system.cli list-strategies --status active
 ```
 
-## Commands
+**Schedule it:**
+
+1. Open `daily_prompt.md` in this repo and copy its contents.
+2. In Cowork, create a scheduled task that fires M-F at 4:00 PM in
+   `America/Los_Angeles`. Paste the prompt as the task's instruction.
+3. Set the working directory to `/Users/<you>/Stock-Trading-Agent` (or
+   ensure the prompt's absolute paths still match).
+
+The laptop must be **awake and on AC power** at 4 PM PST or the run won't
+fire. macOS sleeps by default on battery:
+
+```
+System Settings → Battery → "Prevent automatic sleeping on power adapter
+when display is off" = on
+```
+
+Each daily run produces a `conclusions/YYYY-MM-DD.md` and updates
+`state/last_handoff.md`. To inspect a run after it fires, read those files.
+
+### Standalone mode (Pi / cloud, with API key)
+
+In standalone mode, `orchestrator.py` is a Python script that calls the
+Anthropic API directly:
 
 ```bash
-# Trading
-python main.py --dry-run --once            # Safe test — no broker calls
-python main.py --once                      # Single paper trading cycle
-python main.py                             # Continuous mode with scheduler
-python main.py --once --agents swing       # Run specific agent(s)
+# 1. Same setup as Cowork mode, plus an API key:
+echo "ANTHROPIC_API_KEY=sk-ant-..." >> .env
 
-# Backtesting
-python main.py --backtest mean_reversion_bollinger:SPY:2020-01-01:2024-01-01
+# 2. Pre-flight check (full)
+python scripts/preflight.py
 
-# Knowledge Base
-python main.py --seed-kb                   # Load strategies into ChromaDB
+# 3. First run — dry-run, off-session is allowed for testing
+python -m quant_trading_system.orchestrator --dry-run --allow-non-session
 
-# Testing
-make test                                  # All tests
-make test-safety                           # Safety-critical tests only
-make test-cov                              # Tests with coverage
+# 4. Inspect outputs
+ls runs/                                 # full transcript of the run
+cat quant_trading_system/knowledge_base/conclusions/$(date +%F).md
+cat quant_trading_system/knowledge_base/state/last_handoff.md
 ```
 
-## Documentation
+The `--dry-run` flag forces `SafetyGate` into simulation mode — orders are
+validated and logged but never sent to Alpaca. `--allow-non-session` lets
+you test on weekends and holidays.
 
-| Document | Description |
-|----------|-------------|
-| [Architecture](docs/architecture.md) | System design, agent network, data flow, state management |
-| [Strategies](docs/strategies.md) | All 18 pre-loaded strategies with entry/exit rules and parameters |
-| [Safety](docs/safety.md) | Five-layer safety design, SafetyGate, risk limits |
-| [Configuration](docs/configuration.md) | All environment variables, model allocation, scheduling |
-| [Backtesting](docs/backtesting.md) | VectorBT equity + QuantLib options backtesting, promotion criteria |
-| [Commands](docs/commands.md) | Full CLI reference and Makefile shortcuts |
+To migrate from Cowork to standalone (e.g. moving onto the Pi), copy the
+entire repo across — the markdown memory transfers as-is — add the API key
+to `.env`, and add a crontab entry (see "Eventually: Raspberry Pi via cron"
+below).
 
-## Technology Stack
+## Memory layout
 
-| Layer | Tool |
-|---|---|
-| Agent Orchestration | LangGraph |
-| LLM Reasoning | Claude (Anthropic API) |
-| Equity Backtesting | VectorBT |
-| Options Pricing | QuantLib-Python |
-| Paper/Live Trading | Alpaca (alpaca-py) |
-| Market Data | Alpaca Data API + yfinance |
-| Knowledge Base | ChromaDB |
-| Technical Analysis | TA-Lib / pandas_ta |
-| Performance Analysis | QuantStats |
-| Scheduling | APScheduler |
-| Logging | structlog (JSON) |
+```
+quant_trading_system/knowledge_base/
+├── strategies/
+│   ├── equity/<id>.md              # 18 starter strategies (frontmatter + body)
+│   ├── options/<id>.md
+│   └── archived/                   # auto-populated when agent retires a strategy
+├── conclusions/
+│   └── YYYY-MM-DD.md               # one per run; the day's narrative log
+└── state/
+    ├── active_strategy.md          # which strategy is currently in use
+    ├── last_handoff.md             # short note from yesterday's Claude to today's
+    └── summary.md                  # rolling long-horizon takeaways
+
+trades/
+└── YYYY-MM.jsonl                   # append-only journal of all order events
+
+runs/
+└── YYYY-MM-DD-HHMM-<id>.json       # full transcript per run (debugging)
+
+.harness.lock                       # acquired during run, refused if held
+```
+
+## What the agent does each run
+
+The Cowork-mode workflow is spelled out in `daily_prompt.md` (paste that
+into the scheduled task). The standalone-mode workflow is the system prompt
+at the top of `orchestrator.py`. They describe the same procedure:
+
+1. Read yesterday's handoff and recent conclusions.
+2. Reconcile yesterday's open positions vs today's broker state; log any
+   closes to the journal so future health signals can attribute them.
+3. Read deterministic health for the active strategy (win rate, rolling
+   Sharpe, max drawdown, P&L vs SPY, breached thresholds).
+4. Classify the current regime.
+5. If the active strategy's thresholds are breached *or* the regime no
+   longer fits, rotate to a better-suited strategy.
+6. Plan tomorrow's positions using the active strategy's rules + current
+   data. Submit orders through SafetyGate (always tagged with
+   `strategy_id`, always with stop/target documented in reasoning).
+7. Write a conclusion file (`conclusions/YYYY-MM-DD.md`) with a summary
+   of what was done and a recap of the day's reasoning.
+8. Update the handoff note (`state/last_handoff.md`) with state +
+   recommendations for tomorrow's Claude.
+9. Stop. The run ends.
+
+## Migration: Cowork → Raspberry Pi
+
+When you're ready to move off the laptop, the markdown memory transfers
+as-is:
+
+```bash
+# On the laptop:
+git push
+
+# On the Pi:
+git clone <repo-url> && cd Stock-Trading-Agent
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
+# Fill in ALPACA_* and ANTHROPIC_API_KEY (Pi can't run Cowork)
+
+# Add the cron entry (local time):
+crontab -e
+# 0 16 * * 1-5  cd /home/pi/Stock-Trading-Agent && /home/pi/Stock-Trading-Agent/.venv/bin/python -m quant_trading_system.orchestrator >> /home/pi/Stock-Trading-Agent/runs/cron.log 2>&1
+```
+
+The Pi being always-on means the run never fails for "laptop was asleep"
+reasons. The harness checks the NYSE calendar and skips early on holidays
+either way — no special handling needed.
+
+## Safety model
+
+Five gates, in order:
+
+1. **Dry-run mode** — `DRY_RUN=true` short-circuits everything below.
+2. **Live-money gate** — `ALPACA_PAPER=false` requires both
+   `REAL_MONEY_ENABLED=true` and `REAL_MONEY_CONFIRMATION=true`. Default
+   config will refuse to start if these are inconsistent.
+3. **Restricted symbols** — anything in `RESTRICTED_SYMBOLS` is rejected.
+4. **Position size** — single order can't exceed `MAX_POSITION_SIZE_PCT`
+   of equity.
+5. **Daily loss + concurrent positions** — `MAX_DAILY_LOSS_PCT`,
+   `MAX_CONCURRENT_POSITIONS`.
+
+The agent has no way to bypass these. `submit_order` always routes through
+`SafetyGate.validate_and_submit`.
+
+## Cleanup notes
+
+The previous multi-agent design left a number of files that are no longer
+imported by anything. They've been overwritten with deprecation stubs and
+can be removed cleanly with:
+
+```bash
+git rm -r quant_trading_system/agents/
+git rm -r quant_trading_system/graph/
+git rm -r quant_trading_system/dashboard/
+git rm    quant_trading_system/llm_factory.py
+git rm    quant_trading_system/models/state.py
+git rm    quant_trading_system/models/strategy.py
+git rm    quant_trading_system/models/conclusion.py
+git rm    quant_trading_system/knowledge_base/chroma_client.py
+git rm    quant_trading_system/knowledge_base/strategy_loader.py
+git rm    quant_trading_system/tools/llm_callback.py
+git rm    tests/test_knowledge_base.py
+git rm    tests/test_end_to_end.py
+git rm    tests/test_risk_manager.py
+git rm -r chroma_data/
+```
+
+None of these are referenced by the harness; the orchestrator runs without
+them.
 
 ## License
 

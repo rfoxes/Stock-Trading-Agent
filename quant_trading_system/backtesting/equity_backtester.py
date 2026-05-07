@@ -12,7 +12,6 @@ from quant_trading_system.tools.quantstats_wrapper import compute_metrics
 
 if TYPE_CHECKING:
     from quant_trading_system.data.market_data_service import MarketDataService
-    from quant_trading_system.models.strategy import Strategy
 
 logger = structlog.get_logger(__name__)
 

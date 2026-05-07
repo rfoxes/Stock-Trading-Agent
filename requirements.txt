@@ -1,37 +1,36 @@
-# Core dependencies
-langgraph>=0.2,<1.0
-langgraph-checkpoint-postgres>=2.0
-langchain-anthropic>=0.3
-langchain-ollama>=0.3
-langchain-core>=0.3
+# --- LLM ---
+anthropic>=0.39
+
+# --- Broker + market data ---
 alpaca-py>=0.30
 yfinance>=0.2
-chromadb>=0.5
+exchange-calendars>=4.5
+
+# --- Data / analysis ---
 pandas>=2.1
 numpy>=1.26
 scipy>=1.11
 statsmodels>=0.14
+pandas-ta
+quantstats>=0.0.62
+vectorbt>=0.26
+
+# --- Options pricing (optional but used by options backtester) ---
+QuantLib>=1.33
+
+# --- Config / I/O ---
 pydantic>=2.5
 pydantic-settings>=2.1
+python-dotenv>=1.0
+python-frontmatter>=1.0
+PyYAML>=6.0
 structlog>=24.1
 apscheduler>=3.10,<4.0
-quantstats>=0.0.62
-python-dotenv>=1.0
-psycopg[binary]>=3.1
-pandas-ta
-vectorbt>=0.26
-python-frontmatter>=1.0
-exchange-calendars>=4.5
 
-QuantLib>=1.33
-fastapi>=0.115
-uvicorn>=0.30
-jinja2>=3.1
-
-# Native dependencies (optional, install separately)
+# --- Native dependencies (optional, install separately) ---
 # TA-Lib>=0.4.28        # Requires C library: brew install ta-lib (macOS) or apt install libta-lib-dev (Linux)
 
-# Dev dependencies
+# --- Dev ---
 pytest>=8.0
 pytest-asyncio>=0.23
 pytest-cov>=4.1

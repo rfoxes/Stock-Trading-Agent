@@ -64,42 +64,12 @@ class SafetyGate:
             self._daily_realized_loss = 0.0
             self._daily_reset_date = today
 
-    def _publish_to_dashboard(self, order: OrderRequest, result: OrderResult) -> None:
-        """Publish order to the dashboard event bus."""
-        try:
-            from quant_trading_system.dashboard.event_bus import event_bus
-
-            event_bus.publish("order", {
-                "symbol": order.symbol,
-                "side": order.side.value,
-                "qty": order.qty,
-                "order_type": order.order_type.value,
-                "status": result.status.value,
-                "mode": result.mode.value,
-                "order_id": result.order_id,
-                "agent": order.agent_name,
-                "strategy": order.strategy_name,
-                "reasoning": order.reasoning[:200],
-                "safety_checks_passed": result.safety_checks_passed,
-                "safety_checks_failed": result.safety_checks_failed,
-                "rejection_reason": result.rejection_reason,
-                "timestamp": result.submitted_at.isoformat(),
-            })
-            event_bus.publish("log", {
-                "level": "info" if result.status != OrderStatus.REJECTED else "warning",
-                "message": f"Order {result.status.value}: {order.side.value} {order.qty} {order.symbol} ({order.agent_name})",
-            })
-        except Exception:
-            pass  # Dashboard may not be running
-
     def validate_and_submit(self, order: OrderRequest) -> OrderResult:
         """Validate an order through all safety checks and submit if approved.
 
         This is the ONLY authorized path to order execution.
         """
-        result = self._validate_and_submit_inner(order)
-        self._publish_to_dashboard(order, result)
-        return result
+        return self._validate_and_submit_inner(order)
 
     def _validate_and_submit_inner(self, order: OrderRequest) -> OrderResult:
         """Internal validation logic."""
