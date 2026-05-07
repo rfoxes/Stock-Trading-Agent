@@ -27,6 +27,13 @@ if TYPE_CHECKING:
 logger = structlog.get_logger(__name__)
 
 
+def _unique_id() -> int:
+    """Monotonic-ish id for tagging client_order_id; resets per process."""
+    import time as _t
+
+    return int(_t.time() * 1000) & 0xFFFFFFFF
+
+
 class SafetyError(Exception):
     """Raised when a safety check fails in a way that should halt execution."""
 
@@ -244,11 +251,11 @@ class SafetyGate:
         try:
             alpaca_order = self._submit_to_alpaca(order)
             return OrderResult(
-                order_id=str(alpaca_order.id),
+                order_id=str(alpaca_order.get("id", "")),
                 status=OrderStatus.SUBMITTED,
                 mode=self._get_trading_mode(),
-                filled_qty=float(alpaca_order.filled_qty or 0),
-                filled_avg_price=float(alpaca_order.filled_avg_price or 0),
+                filled_qty=float(alpaca_order.get("filled_qty") or 0),
+                filled_avg_price=float(alpaca_order.get("filled_avg_price") or 0),
                 safety_checks_passed=checks_passed,
                 original_request=order,
             )
@@ -263,57 +270,41 @@ class SafetyGate:
                 original_request=order,
             )
 
-    def _submit_to_alpaca(self, order: OrderRequest):
-        """Convert OrderRequest to Alpaca request and submit."""
-        from alpaca.trading.enums import OrderSide as AlpacaSide
-        from alpaca.trading.enums import OrderType as AlpacaType
-        from alpaca.trading.enums import TimeInForce as AlpacaTIF
-        from alpaca.trading.requests import (
-            LimitOrderRequest,
-            MarketOrderRequest,
-            StopLimitOrderRequest,
-            StopOrderRequest,
-        )
-
-        side = AlpacaSide.BUY if order.side.value == "buy" else AlpacaSide.SELL
-        tif = AlpacaTIF(order.time_in_force.value)
-
-        if order.order_type.value == "market":
-            req = MarketOrderRequest(
-                symbol=order.symbol,
-                qty=order.qty,
-                side=side,
-                time_in_force=tif,
-            )
-        elif order.order_type.value == "limit":
-            req = LimitOrderRequest(
-                symbol=order.symbol,
-                qty=order.qty,
-                side=side,
-                time_in_force=tif,
-                limit_price=order.limit_price,
-            )
+    def _submit_to_alpaca(self, order: OrderRequest) -> dict:
+        """Build the Alpaca REST order body and submit. No alpaca-py needed."""
+        body: dict = {
+            "symbol": order.symbol,
+            "qty": str(order.qty),
+            "side": order.side.value,
+            "type": order.order_type.value,
+            "time_in_force": order.time_in_force.value,
+        }
+        if order.order_type.value == "limit":
+            if order.limit_price is None:
+                raise ValueError("limit order requires limit_price")
+            body["limit_price"] = str(order.limit_price)
         elif order.order_type.value == "stop":
-            req = StopOrderRequest(
-                symbol=order.symbol,
-                qty=order.qty,
-                side=side,
-                time_in_force=tif,
-                stop_price=order.stop_price,
-            )
+            if order.stop_price is None:
+                raise ValueError("stop order requires stop_price")
+            body["stop_price"] = str(order.stop_price)
         elif order.order_type.value == "stop_limit":
-            req = StopLimitOrderRequest(
-                symbol=order.symbol,
-                qty=order.qty,
-                side=side,
-                time_in_force=tif,
-                limit_price=order.limit_price,
-                stop_price=order.stop_price,
-            )
+            if order.limit_price is None or order.stop_price is None:
+                raise ValueError("stop_limit order requires limit_price and stop_price")
+            body["limit_price"] = str(order.limit_price)
+            body["stop_price"] = str(order.stop_price)
+        elif order.order_type.value == "market":
+            pass
         else:
             raise ValueError(f"Unsupported order type: {order.order_type}")
 
-        return self._client.submit_order(req)
+        # Tag the order with strategy_id so Alpaca's audit log correlates
+        # with our journal even if the journal entry is later lost.
+        if order.strategy_name:
+            # Alpaca client_order_id has length / charset limits; truncate.
+            tag = order.strategy_name[:32].replace(" ", "_")
+            body["client_order_id"] = f"{tag}-{int(_unique_id())}"
+
+        return self._client.submit_order(body)
 
     def _get_trading_mode(self) -> TradingMode:
         if self._settings.DRY_RUN:

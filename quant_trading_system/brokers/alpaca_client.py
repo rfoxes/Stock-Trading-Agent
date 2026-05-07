@@ -1,118 +1,196 @@
-"""Alpaca broker client wrapper with structured logging."""
+"""Thin Alpaca REST wrapper using `requests`.
+
+Replaces the previous `alpaca-py` SDK dependency, which isn't available in
+the Cowork Linux sandbox where the harness actually runs. Surface stays the
+same: `get_account`, `get_positions`, `submit_order`, `get_order`,
+`cancel_order`, `get_open_orders`. Return shapes are dicts (not SDK objects)
+so callers can JSON-encode them directly.
+
+This client should NEVER be called directly by the agent. All orders go
+through SafetyGate.
+"""
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import json
+import logging
+from typing import TYPE_CHECKING, Any
 
-import structlog
+import requests
 
 if TYPE_CHECKING:
-    from alpaca.trading.client import TradingClient
-    from alpaca.trading.models import Order, Position
-    from alpaca.trading.requests import (
-        GetOrdersRequest,
-        LimitOrderRequest,
-        MarketOrderRequest,
-        StopLimitOrderRequest,
-        StopOrderRequest,
-    )
-
     from quant_trading_system.config import Settings
 
-logger = structlog.get_logger(__name__)
+logger = logging.getLogger(__name__)
+
+PAPER_BASE = "https://paper-api.alpaca.markets"
+LIVE_BASE = "https://api.alpaca.markets"
+
+DEFAULT_TIMEOUT = 15  # seconds
+
+
+class AlpacaError(RuntimeError):
+    """Raised on a non-2xx response or network error."""
+
+    def __init__(self, status: int, body: str, *, url: str = "") -> None:
+        super().__init__(f"alpaca {status}: {body[:300]}")
+        self.status = status
+        self.body = body
+        self.url = url
 
 
 class AlpacaClient:
-    """Wrapper around alpaca-py TradingClient with logging.
+    """REST-only client. Same surface as the old alpaca-py wrapper."""
 
-    This client should NEVER be called directly by agents.
-    All orders must go through SafetyGate.
-    """
-
-    def __init__(self, settings: Settings) -> None:
-        from alpaca.trading.client import TradingClient
-
+    def __init__(self, settings: "Settings") -> None:
         self._settings = settings
-        self._client = TradingClient(
-            api_key=settings.ALPACA_API_KEY,
-            secret_key=settings.ALPACA_SECRET_KEY,
-            paper=settings.ALPACA_PAPER,
-        )
-        logger.info(
-            "alpaca_client_initialized",
-            paper=settings.ALPACA_PAPER,
-        )
+        self._base = PAPER_BASE if settings.ALPACA_PAPER else LIVE_BASE
+        self._session = requests.Session()
+        self._session.headers.update({
+            "APCA-API-KEY-ID": settings.ALPACA_API_KEY,
+            "APCA-API-SECRET-KEY": settings.ALPACA_SECRET_KEY,
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+        })
+        logger.info("alpaca_client_initialized paper=%s base=%s", settings.ALPACA_PAPER, self._base)
 
-    @property
-    def trading_client(self) -> TradingClient:
-        return self._client
+    # -- internal --------------------------------------------------------
+
+    def _request(self, method: str, path: str, *, json_body: dict | None = None,
+                 params: dict | None = None) -> Any:
+        url = f"{self._base}{path}"
+        try:
+            resp = self._session.request(
+                method=method,
+                url=url,
+                json=json_body,
+                params=params,
+                timeout=DEFAULT_TIMEOUT,
+            )
+        except requests.RequestException as e:
+            raise AlpacaError(0, f"network: {e}", url=url) from e
+        if resp.status_code >= 400:
+            raise AlpacaError(resp.status_code, resp.text, url=url)
+        # Some endpoints (DELETE) return empty body
+        if not resp.content:
+            return None
+        try:
+            return resp.json()
+        except json.JSONDecodeError:
+            return resp.text
+
+    # -- account / positions --------------------------------------------
 
     def get_account(self) -> dict:
-        """Get current account information."""
-        account = self._client.get_account()
-        logger.debug("account_fetched", buying_power=str(account.buying_power))
+        a = self._request("GET", "/v2/account")
         return {
-            "equity": float(account.equity),
-            "buying_power": float(account.buying_power),
-            "cash": float(account.cash),
-            "portfolio_value": float(account.portfolio_value or account.equity),
-            "day_trade_count": account.daytrade_count,
+            "equity": float(a.get("equity", 0.0)),
+            "buying_power": float(a.get("buying_power", 0.0)),
+            "cash": float(a.get("cash", 0.0)),
+            "portfolio_value": float(a.get("portfolio_value", a.get("equity", 0.0))),
+            "day_trade_count": int(a.get("daytrade_count", 0)),
         }
 
     def get_positions(self) -> list[dict]:
-        """Get all current positions."""
-        positions: list[Position] = self._client.get_all_positions()
-        result = []
-        for pos in positions:
-            result.append({
-                "symbol": pos.symbol,
-                "qty": float(pos.qty),
-                "side": pos.side.value if pos.side else "long",
-                "market_value": float(pos.market_value) if pos.market_value else 0.0,
-                "unrealized_pl": float(pos.unrealized_pl) if pos.unrealized_pl else 0.0,
-                "unrealized_plpc": float(pos.unrealized_plpc) if pos.unrealized_plpc else 0.0,
-                "current_price": float(pos.current_price) if pos.current_price else 0.0,
-                "avg_entry_price": float(pos.avg_entry_price) if pos.avg_entry_price else 0.0,
+        positions = self._request("GET", "/v2/positions") or []
+        out = []
+        for p in positions:
+            out.append({
+                "symbol": p.get("symbol", ""),
+                "qty": float(p.get("qty", 0)),
+                "side": p.get("side", "long"),
+                "market_value": float(p.get("market_value") or 0.0),
+                "unrealized_pl": float(p.get("unrealized_pl") or 0.0),
+                "unrealized_plpc": float(p.get("unrealized_plpc") or 0.0),
+                "current_price": float(p.get("current_price") or 0.0),
+                "avg_entry_price": float(p.get("avg_entry_price") or 0.0),
             })
-        logger.debug("positions_fetched", count=len(result))
-        return result
+        return out
 
-    def submit_order(
-        self,
-        order_request: MarketOrderRequest
-        | LimitOrderRequest
-        | StopOrderRequest
-        | StopLimitOrderRequest,
-    ) -> Order:
-        """Submit an order to Alpaca."""
-        logger.info(
-            "submitting_order",
-            symbol=order_request.symbol,
-            qty=str(order_request.qty),
-            side=order_request.side.value,
-            type=order_request.type.value if order_request.type else "market",
-        )
-        order = self._client.submit_order(order_request)
-        logger.info(
-            "order_submitted",
-            order_id=str(order.id),
-            status=order.status.value if order.status else "unknown",
-        )
-        return order
+    # -- orders ----------------------------------------------------------
 
-    def get_order(self, order_id: str) -> Order:
-        """Get order by ID."""
-        return self._client.get_order_by_id(order_id)
+    def submit_order(self, body: dict) -> dict:
+        """Submit an order. `body` is the raw Alpaca request payload (dict).
+
+        The harness's SafetyGate is responsible for assembling the body from
+        an OrderRequest. Returning the raw response lets SafetyGate read fields
+        like `id`, `filled_qty`, etc. without depending on SDK objects.
+        """
+        logger.info(
+            "alpaca_submit_order symbol=%s side=%s qty=%s type=%s tif=%s",
+            body.get("symbol"),
+            body.get("side"),
+            body.get("qty"),
+            body.get("type"),
+            body.get("time_in_force"),
+        )
+        return self._request("POST", "/v2/orders", json_body=body)
+
+    def get_order(self, order_id: str) -> dict:
+        return self._request("GET", f"/v2/orders/{order_id}")
 
     def cancel_order(self, order_id: str) -> None:
-        """Cancel an order."""
-        logger.info("cancelling_order", order_id=order_id)
-        self._client.cancel_order_by_id(order_id)
+        logger.info("alpaca_cancel_order order_id=%s", order_id)
+        self._request("DELETE", f"/v2/orders/{order_id}")
 
-    def get_open_orders(self) -> list[Order]:
-        """Get all open orders."""
-        from alpaca.trading.requests import GetOrdersRequest
-        from alpaca.trading.enums import QueryOrderStatus
+    def get_open_orders(self) -> list[dict]:
+        """Return all open orders. Shape mirrors the Alpaca order JSON."""
+        orders = self._request("GET", "/v2/orders", params={"status": "open"}) or []
+        return orders if isinstance(orders, list) else []
 
-        request = GetOrdersRequest(status=QueryOrderStatus.OPEN)
-        return self._client.get_orders(request)
+    # -- bars (used by MarketDataService too, but kept here for symmetry) -
+
+    def get_bars(
+        self,
+        symbol: str,
+        timeframe: str,
+        start_iso: str,
+        end_iso: str,
+        limit: int = 1000,
+    ) -> list[dict]:
+        """Fetch historical bars from Alpaca's data API.
+
+        Note: Alpaca uses a different host for market data (data.alpaca.markets),
+        but the same auth headers. Returns the raw `bars` list from the response.
+        """
+        # Override base for data API
+        url = f"https://data.alpaca.markets/v2/stocks/{symbol}/bars"
+        params = {
+            "timeframe": timeframe,
+            "start": start_iso,
+            "end": end_iso,
+            "limit": limit,
+            "adjustment": "raw",
+        }
+        try:
+            resp = self._session.get(url, params=params, timeout=DEFAULT_TIMEOUT)
+        except requests.RequestException as e:
+            raise AlpacaError(0, f"network: {e}", url=url) from e
+        if resp.status_code >= 400:
+            raise AlpacaError(resp.status_code, resp.text, url=url)
+        data = resp.json() or {}
+        return data.get("bars", []) or []
+
+    def get_latest_quote(self, symbol: str) -> dict | None:
+        url = f"https://data.alpaca.markets/v2/stocks/{symbol}/quotes/latest"
+        try:
+            resp = self._session.get(url, timeout=DEFAULT_TIMEOUT)
+        except requests.RequestException as e:
+            logger.warning("latest_quote_network_error symbol=%s err=%s", symbol, e)
+            return None
+        if resp.status_code >= 400:
+            logger.warning("latest_quote_http_error symbol=%s status=%s", symbol, resp.status_code)
+            return None
+        data = resp.json() or {}
+        q = data.get("quote") or {}
+        if not q:
+            return None
+        bid = float(q.get("bp", 0.0))
+        ask = float(q.get("ap", 0.0))
+        return {
+            "bid": bid,
+            "ask": ask,
+            "bid_size": int(q.get("bs", 0)),
+            "ask_size": int(q.get("as", 0)),
+            "mid": (bid + ask) / 2 if bid and ask else 0.0,
+        }

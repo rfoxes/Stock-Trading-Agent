@@ -1,21 +1,40 @@
-"""Market data service with Alpaca primary and yfinance fallback."""
+"""Market data via Alpaca's data REST API.
+
+No alpaca-py, no yfinance. Just `requests` against
+https://data.alpaca.markets. Uses the same key/secret as the trading API.
+
+Returns pandas DataFrames with columns Open, High, Low, Close, Volume —
+shape preserved for the existing regime classifier and indicators.
+"""
 
 from __future__ import annotations
 
+import datetime as dt
+import logging
 import time
-from datetime import datetime, timedelta
 from typing import Optional
 
 import pandas as pd
-import structlog
+import requests
 
 from quant_trading_system.config import Settings
 
-logger = structlog.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
-# Simple TTL cache
+
+_DATA_BASE = "https://data.alpaca.markets"
+_TIMEFRAME_MAP = {
+    "1Min": "1Min",
+    "5Min": "5Min",
+    "15Min": "15Min",
+    "1Hour": "1Hour",
+    "1Day": "1Day",
+    "1Week": "1Week",
+}
+
+# Simple in-process TTL cache (per get_bars argument set)
 _cache: dict[str, tuple[float, pd.DataFrame]] = {}
-_CACHE_TTL = 60  # seconds
+_CACHE_TTL_S = 60
 
 
 def _cache_key(symbol: str, timeframe: str, start: str, end: str) -> str:
@@ -23,23 +42,20 @@ def _cache_key(symbol: str, timeframe: str, start: str, end: str) -> str:
 
 
 class MarketDataService:
-    """Fetches market data from Alpaca with yfinance fallback."""
+    """Bars + latest-quote service."""
 
     def __init__(self, settings: Settings) -> None:
         self._settings = settings
-        self._alpaca_client = None
-
-        if settings.ALPACA_API_KEY:
-            try:
-                from alpaca.data.historical import StockHistoricalDataClient
-
-                self._alpaca_client = StockHistoricalDataClient(
-                    api_key=settings.ALPACA_API_KEY,
-                    secret_key=settings.ALPACA_SECRET_KEY,
-                )
-                logger.info("market_data_alpaca_initialized")
-            except Exception as e:
-                logger.warning("alpaca_data_client_failed", error=str(e))
+        self._session = requests.Session()
+        if settings.ALPACA_API_KEY and settings.ALPACA_SECRET_KEY:
+            self._session.headers.update({
+                "APCA-API-KEY-ID": settings.ALPACA_API_KEY,
+                "APCA-API-SECRET-KEY": settings.ALPACA_SECRET_KEY,
+                "Accept": "application/json",
+            })
+            logger.info("market_data_initialized")
+        else:
+            logger.warning("market_data_no_credentials")
 
     def get_bars(
         self,
@@ -49,145 +65,61 @@ class MarketDataService:
         end: Optional[str] = None,
         limit: int = 500,
     ) -> pd.DataFrame:
-        """Get OHLCV bars for a symbol.
-
-        Args:
-            symbol: Ticker symbol.
-            timeframe: "1Min", "5Min", "15Min", "1Hour", "1Day", "1Week".
-            start: Start date (YYYY-MM-DD).
-            end: End date (YYYY-MM-DD).
-            limit: Max number of bars.
-
-        Returns:
-            DataFrame with columns: Open, High, Low, Close, Volume.
-        """
         if start is None:
-            start = (datetime.utcnow() - timedelta(days=365 * 2)).strftime("%Y-%m-%d")
+            start = (dt.date.today() - dt.timedelta(days=365 * 2)).isoformat()
         if end is None:
-            end = datetime.utcnow().strftime("%Y-%m-%d")
+            end = dt.date.today().isoformat()
 
-        # Check cache
         key = _cache_key(symbol, timeframe, start, end)
         if key in _cache:
-            cached_time, cached_df = _cache[key]
-            if time.time() - cached_time < _CACHE_TTL:
-                logger.debug("cache_hit", symbol=symbol)
-                return cached_df
+            t, df = _cache[key]
+            if time.time() - t < _CACHE_TTL_S:
+                return df
 
-        # Try Alpaca first
-        df = self._get_bars_alpaca(symbol, timeframe, start, end, limit)
-        if df is not None and not df.empty:
-            _cache[key] = (time.time(), df)
-            return df
-
-        # Fallback to yfinance
-        logger.info("falling_back_to_yfinance", symbol=symbol)
-        df = self._get_bars_yfinance(symbol, timeframe, start, end)
-        if df is not None and not df.empty:
-            _cache[key] = (time.time(), df)
-            return df
-
-        logger.warning("no_data_available", symbol=symbol)
-        return pd.DataFrame(columns=["Open", "High", "Low", "Close", "Volume"])
-
-    def _get_bars_alpaca(
-        self, symbol: str, timeframe: str, start: str, end: str, limit: int
-    ) -> Optional[pd.DataFrame]:
-        """Fetch bars from Alpaca."""
-        if self._alpaca_client is None:
-            return None
-
+        tf = _TIMEFRAME_MAP.get(timeframe, "1Day")
+        url = f"{_DATA_BASE}/v2/stocks/{symbol}/bars"
+        params = {
+            "timeframe": tf,
+            "start": start,
+            "end": end,
+            "limit": limit,
+            "adjustment": "raw",
+        }
         try:
-            from alpaca.data.requests import StockBarsRequest
-            from alpaca.data.timeframe import TimeFrame, TimeFrameUnit
+            resp = self._session.get(url, params=params, timeout=15)
+        except requests.RequestException as e:
+            logger.warning("alpaca_bars_request_failed symbol=%s err=%s", symbol, e)
+            return _empty_bars()
 
-            tf_map = {
-                "1Min": TimeFrame(1, TimeFrameUnit.Minute),
-                "5Min": TimeFrame(5, TimeFrameUnit.Minute),
-                "15Min": TimeFrame(15, TimeFrameUnit.Minute),
-                "1Hour": TimeFrame(1, TimeFrameUnit.Hour),
-                "1Day": TimeFrame(1, TimeFrameUnit.Day),
-                "1Week": TimeFrame(1, TimeFrameUnit.Week),
-            }
-
-            tf = tf_map.get(timeframe)
-            if tf is None:
-                logger.warning("unsupported_timeframe_alpaca", timeframe=timeframe)
-                return None
-
-            request = StockBarsRequest(
-                symbol_or_symbols=symbol,
-                timeframe=tf,
-                start=datetime.strptime(start, "%Y-%m-%d"),
-                end=datetime.strptime(end, "%Y-%m-%d"),
-                limit=limit,
+        if resp.status_code >= 400:
+            logger.warning(
+                "alpaca_bars_http_error symbol=%s status=%s body=%s",
+                symbol,
+                resp.status_code,
+                resp.text[:200],
             )
-            bars = self._alpaca_client.get_stock_bars(request)
-            df = bars.df
+            return _empty_bars()
 
-            if df.empty:
-                return None
+        data = resp.json() or {}
+        bars = data.get("bars") or []
+        if not bars:
+            return _empty_bars()
 
-            # Normalize multi-index if present
-            if isinstance(df.index, pd.MultiIndex):
-                df = df.droplevel("symbol")
-
-            # Standardize column names
-            df = df.rename(columns={
-                "open": "Open",
-                "high": "High",
-                "low": "Low",
-                "close": "Close",
-                "volume": "Volume",
-            })
-            df = df[["Open", "High", "Low", "Close", "Volume"]]
-
-            logger.debug("alpaca_bars_fetched", symbol=symbol, rows=len(df))
-            return df
-
-        except Exception as e:
-            logger.warning("alpaca_bars_error", symbol=symbol, error=str(e))
-            return None
-
-    def _get_bars_yfinance(
-        self, symbol: str, timeframe: str, start: str, end: str
-    ) -> Optional[pd.DataFrame]:
-        """Fetch bars from yfinance as fallback."""
-        try:
-            import yfinance as yf
-
-            yf_interval_map = {
-                "1Min": "1m",
-                "5Min": "5m",
-                "15Min": "15m",
-                "1Hour": "1h",
-                "1Day": "1d",
-                "1Week": "1wk",
-            }
-            interval = yf_interval_map.get(timeframe, "1d")
-
-            ticker = yf.Ticker(symbol)
-            df = ticker.history(start=start, end=end, interval=interval)
-
-            if df.empty:
-                return None
-
-            # Standardize columns
-            df = df.rename(columns={
-                "Open": "Open",
-                "High": "High",
-                "Low": "Low",
-                "Close": "Close",
-                "Volume": "Volume",
-            })
-            df = df[["Open", "High", "Low", "Close", "Volume"]]
-
-            logger.debug("yfinance_bars_fetched", symbol=symbol, rows=len(df))
-            return df
-
-        except Exception as e:
-            logger.warning("yfinance_bars_error", symbol=symbol, error=str(e))
-            return None
+        df = pd.DataFrame(bars)
+        # Alpaca columns: t,o,h,l,c,v,n,vw
+        rename = {"o": "Open", "h": "High", "l": "Low", "c": "Close", "v": "Volume"}
+        df = df.rename(columns=rename)
+        if "t" in df.columns:
+            df["t"] = pd.to_datetime(df["t"], utc=True, errors="coerce")
+            df = df.set_index("t")
+        keep = [c for c in ["Open", "High", "Low", "Close", "Volume"] if c in df.columns]
+        df = df[keep]
+        # Coerce numeric
+        for c in keep:
+            df[c] = pd.to_numeric(df[c], errors="coerce")
+        df = df.dropna(subset=[c for c in keep if c != "Volume"])
+        _cache[key] = (time.time(), df)
+        return df
 
     def get_multiple_bars(
         self,
@@ -196,33 +128,31 @@ class MarketDataService:
         start: Optional[str] = None,
         end: Optional[str] = None,
     ) -> dict[str, pd.DataFrame]:
-        """Get bars for multiple symbols."""
-        results = {}
-        for symbol in symbols:
-            results[symbol] = self.get_bars(symbol, timeframe, start, end)
-        return results
+        return {s: self.get_bars(s, timeframe, start, end) for s in symbols}
 
     def get_latest_quote(self, symbol: str) -> Optional[dict]:
-        """Get the latest quote for a symbol."""
-        if self._alpaca_client is None:
-            return None
-
+        url = f"{_DATA_BASE}/v2/stocks/{symbol}/quotes/latest"
         try:
-            from alpaca.data.requests import StockLatestQuoteRequest
-
-            request = StockLatestQuoteRequest(symbol_or_symbols=symbol)
-            quotes = self._alpaca_client.get_stock_latest_quote(request)
-
-            if symbol in quotes:
-                q = quotes[symbol]
-                return {
-                    "bid": float(q.bid_price),
-                    "ask": float(q.ask_price),
-                    "bid_size": int(q.bid_size),
-                    "ask_size": int(q.ask_size),
-                    "mid": (float(q.bid_price) + float(q.ask_price)) / 2,
-                }
+            resp = self._session.get(url, timeout=15)
+        except requests.RequestException as e:
+            logger.warning("latest_quote_request_failed symbol=%s err=%s", symbol, e)
             return None
-        except Exception as e:
-            logger.warning("latest_quote_error", symbol=symbol, error=str(e))
+        if resp.status_code >= 400:
             return None
+        data = resp.json() or {}
+        q = data.get("quote") or {}
+        if not q:
+            return None
+        bid = float(q.get("bp", 0.0))
+        ask = float(q.get("ap", 0.0))
+        return {
+            "bid": bid,
+            "ask": ask,
+            "bid_size": int(q.get("bs", 0)),
+            "ask_size": int(q.get("as", 0)),
+            "mid": (bid + ask) / 2 if bid and ask else 0.0,
+        }
+
+
+def _empty_bars() -> pd.DataFrame:
+    return pd.DataFrame(columns=["Open", "High", "Low", "Close", "Volume"])

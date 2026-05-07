@@ -1,59 +1,46 @@
-"""Structured logging configuration using structlog."""
+"""Logging setup — stdlib only.
+
+The previous structlog-based setup needed processors and renderers that
+aren't in the Cowork sandbox. This is a thin stdlib version that covers
+the same two formats (console and json).
+"""
 
 from __future__ import annotations
 
+import json
 import logging
 import sys
-
-import structlog
+from datetime import datetime
 
 from quant_trading_system.config import Settings
 
 
+class _JsonFormatter(logging.Formatter):
+    def format(self, record: logging.LogRecord) -> str:
+        payload = {
+            "ts": datetime.utcfromtimestamp(record.created).isoformat() + "Z",
+            "level": record.levelname.lower(),
+            "logger": record.name,
+            "message": record.getMessage(),
+        }
+        if record.exc_info:
+            payload["exc_info"] = self.formatException(record.exc_info)
+        return json.dumps(payload, default=str)
+
+
+_CONSOLE_FMT = "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+
+
 def setup_logging(settings: Settings) -> None:
-    """Configure structlog with JSON or console renderer based on settings."""
-    shared_processors: list[structlog.types.Processor] = [
-        structlog.contextvars.merge_contextvars,
-        structlog.stdlib.add_log_level,
-        structlog.stdlib.add_logger_name,
-        structlog.processors.TimeStamper(fmt="iso"),
-        structlog.processors.StackInfoRenderer(),
-        structlog.processors.format_exc_info,
-    ]
-
-    if settings.LOG_FORMAT == "json":
-        renderer: structlog.types.Processor = structlog.processors.JSONRenderer()
-    else:
-        renderer = structlog.dev.ConsoleRenderer()
-
-    structlog.configure(
-        processors=[
-            *shared_processors,
-            structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
-        ],
-        logger_factory=structlog.stdlib.LoggerFactory(),
-        wrapper_class=structlog.stdlib.BoundLogger,
-        cache_logger_on_first_use=True,
-    )
-
-    formatter = structlog.stdlib.ProcessorFormatter(
-        processors=[
-            structlog.stdlib.ProcessorFormatter.remove_processors_meta,
-            renderer,
-        ],
-    )
+    """Configure root logger with the requested format and level."""
+    root = logging.getLogger()
+    root.handlers.clear()
 
     handler = logging.StreamHandler(sys.stdout)
-    handler.setFormatter(formatter)
+    if settings.LOG_FORMAT == "json":
+        handler.setFormatter(_JsonFormatter())
+    else:
+        handler.setFormatter(logging.Formatter(_CONSOLE_FMT, datefmt="%Y-%m-%dT%H:%M:%S"))
 
-    root_logger = logging.getLogger()
-    root_logger.handlers.clear()
-    root_logger.addHandler(handler)
-    root_logger.setLevel(getattr(logging, settings.LOG_LEVEL.upper(), logging.INFO))
-
-    # Bind default context
-    structlog.contextvars.clear_contextvars()
-    structlog.contextvars.bind_contextvars(
-        environment="paper" if settings.is_paper_trading else "live",
-        version="0.1.0",
-    )
+    root.addHandler(handler)
+    root.setLevel(getattr(logging, settings.LOG_LEVEL.upper(), logging.INFO))

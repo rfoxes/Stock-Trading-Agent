@@ -24,8 +24,50 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable
 
-import frontmatter
 import yaml
+
+
+# ---------------------------------------------------------------------------
+# Minimal YAML-frontmatter parser (replaces python-frontmatter dep)
+# ---------------------------------------------------------------------------
+
+_FM_DELIM = "---"
+
+
+def _parse_frontmatter(path: Path) -> tuple[dict[str, Any], str]:
+    """Return (frontmatter_dict, body_text) for a markdown file.
+
+    Accepts:
+        ---\\n
+        key: value\\n
+        ---\\n
+        body...
+    Files without leading frontmatter return ({}, full_text).
+    """
+    text = path.read_text(encoding="utf-8")
+    lines = text.split("\n")
+    if not lines or lines[0].strip() != _FM_DELIM:
+        return {}, text
+    # Find the closing delimiter
+    end = None
+    for i in range(1, len(lines)):
+        if lines[i].strip() == _FM_DELIM:
+            end = i
+            break
+    if end is None:
+        return {}, text
+    fm_text = "\n".join(lines[1:end])
+    body = "\n".join(lines[end + 1 :])
+    # Strip a single leading blank line in the body if present
+    if body.startswith("\n"):
+        body = body[1:]
+    try:
+        fm = yaml.safe_load(fm_text) or {}
+    except yaml.YAMLError:
+        fm = {}
+    if not isinstance(fm, dict):
+        fm = {}
+    return fm, body
 
 # ---------------------------------------------------------------------------
 # Paths
@@ -126,9 +168,7 @@ def _strategy_path_for(strategy_id: str, type_hint: str | None = None) -> Path |
 
 def _load_strategy_file(path: Path) -> StrategyFile:
     """Parse a strategy markdown file from disk."""
-    post = frontmatter.load(path)
-    fm = dict(post.metadata)
-    body = post.content
+    fm, body = _parse_frontmatter(path)
     sid = fm.get("id") or path.stem
     # Type from parent dir name (equity/options/archived) takes precedence
     type_from_dir = path.parent.name
@@ -333,13 +373,12 @@ def read_active_strategy() -> dict[str, Any]:
     """Return {strategy_id, since, reason} or empty dict if not set."""
     if not ACTIVE_STRATEGY_FILE.exists():
         return {}
-    post = frontmatter.load(ACTIVE_STRATEGY_FILE)
-    fm = dict(post.metadata)
+    fm, body = _parse_frontmatter(ACTIVE_STRATEGY_FILE)
     return {
         "strategy_id": fm.get("strategy_id", ""),
         "since": fm.get("since", ""),
         "reason": fm.get("reason", ""),
-        "notes": post.content,
+        "notes": body,
     }
 
 

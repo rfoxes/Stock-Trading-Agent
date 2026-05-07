@@ -8,13 +8,13 @@ You are the daily trading orchestrator for a paper-trading harness. The US equit
 
 **Repo:** `/Users/rfoxes/Stock-Trading-Agent`
 
-Run all CLI commands from that directory using the venv's python:
+Run all CLI commands from that directory using the sandbox's system Python:
 
 ```
-cd /Users/rfoxes/Stock-Trading-Agent && .venv/bin/python -m quant_trading_system.cli <subcommand>
+cd /Users/rfoxes/Stock-Trading-Agent && python3 -m quant_trading_system.cli <subcommand>
 ```
 
-If `.venv/bin/python` is missing or stale, fall back to `python3` and document the issue in today's conclusion — don't abandon the run.
+The harness was deliberately written to depend only on libraries already present in the Cowork Linux sandbox (`requests`, `pandas`, `numpy`, `yaml`, `python-dotenv` + stdlib). There is no virtualenv to activate. If `python3 -m quant_trading_system.cli --help` errors with `ModuleNotFoundError`, the deployment is broken — write a conclusion documenting it and stop, don't try to install packages.
 
 ## Operating rules
 
@@ -52,15 +52,15 @@ Read the most recent 5 (or all of them, if there are fewer).
 ### Step 2 — Snapshot the broker
 
 ```
-.venv/bin/python -m quant_trading_system.cli account
-.venv/bin/python -m quant_trading_system.cli positions
-.venv/bin/python -m quant_trading_system.cli open-orders
+python3 -m quant_trading_system.cli account
+python3 -m quant_trading_system.cli positions
+python3 -m quant_trading_system.cli open-orders
 ```
 
 Compare positions against what yesterday's handoff said was open. If a position from yesterday is no longer present (i.e., it filled/closed since), log the outcome:
 
 ```
-.venv/bin/python -m quant_trading_system.cli log-closed <strategy_id> <symbol> <pnl_as_fraction> --notes "..."
+python3 -m quant_trading_system.cli log-closed <strategy_id> <symbol> <pnl_as_fraction> --notes "..."
 ```
 
 Pull the realized P&L from Alpaca's history if available; if you can't determine the exact pnl, log the closure with a best-estimate and flag the ambiguity in the conclusion.
@@ -68,7 +68,7 @@ Pull the realized P&L from Alpaca's history if available; if you can't determine
 ### Step 3 — Health check on the active strategy
 
 ```
-.venv/bin/python -m quant_trading_system.cli health <active_strategy_id> --days 30
+python3 -m quant_trading_system.cli health <active_strategy_id> --days 30
 ```
 
 Read `thresholds_breached`. If it's empty, the strategy is meeting its own declared thresholds. If anything is breached, treat that as a *signal* to consider rotation, not an automatic trigger.
@@ -78,7 +78,7 @@ If the active strategy has no history yet (first runs), the health snapshot will
 ### Step 4 — Classify the regime
 
 ```
-.venv/bin/python -m quant_trading_system.cli regime
+python3 -m quant_trading_system.cli regime
 ```
 
 Compare the regime against the active strategy's `market_regime` frontmatter list. If the regime no longer matches, that's another signal toward rotation.
@@ -94,19 +94,19 @@ Three possible decisions:
 **Rotate.** Either thresholds clearly breached OR regime no longer fits. List candidates:
 
 ```
-.venv/bin/python -m quant_trading_system.cli list-strategies --status active
+python3 -m quant_trading_system.cli list-strategies --status active
 ```
 
 Read 2–3 candidates that match the new regime via your Read tool. Optionally backtest one before committing:
 
 ```
-.venv/bin/python -m quant_trading_system.cli backtest <strategy_id> SPY 2023-01-01 2025-01-01
+python3 -m quant_trading_system.cli backtest <strategy_id> SPY 2023-01-01 2025-01-01
 ```
 
 When you've picked one:
 
 ```
-.venv/bin/python -m quant_trading_system.cli set-active <strategy_id> --reason "..."
+python3 -m quant_trading_system.cli set-active <strategy_id> --reason "..."
 ```
 
 If you want to retire a strategy entirely (consistently failing across regimes), there's an `archive_strategy` tool — but use it sparingly. Most strategies are regime-dependent, not bad.
@@ -118,16 +118,16 @@ Read the active strategy's entry rules (from its markdown body) and check whethe
 Useful CLI commands when you are evaluating a setup:
 
 ```
-.venv/bin/python -m quant_trading_system.cli bars <symbol> --days 60
-.venv/bin/python -m quant_trading_system.cli indicator <symbol> rsi --period 14
-.venv/bin/python -m quant_trading_system.cli quote <symbol>
-.venv/bin/python -m quant_trading_system.cli kelly-size --win-rate 0.55 --avg-win 0.03 --avg-loss 0.02 --price <px>
+python3 -m quant_trading_system.cli bars <symbol> --days 60
+python3 -m quant_trading_system.cli indicator <symbol> rsi --period 14
+python3 -m quant_trading_system.cli quote <symbol>
+python3 -m quant_trading_system.cli kelly-size --win-rate 0.55 --avg-win 0.03 --avg-loss 0.02 --price <px>
 ```
 
 Submit each order. Required: `--reasoning` must include the stop-loss level (or %) and the target. Example:
 
 ```
-.venv/bin/python -m quant_trading_system.cli submit \
+python3 -m quant_trading_system.cli submit \
     mean_reversion_bollinger SPY buy 10 \
     --order-type limit --limit-price 449.50 --tif day \
     --reasoning "Bollinger lower-band touch at 449.50; stop -2% at 440.51, target +4% at 467.48"

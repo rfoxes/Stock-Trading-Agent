@@ -78,33 +78,34 @@ reasoning natively. Deterministic helpers (compute health, classify regime,
 submit through SafetyGate, log to journal) are exposed as a CLI:
 
 ```
-.venv/bin/python -m quant_trading_system.cli <subcommand> ...
+python3 -m quant_trading_system.cli <subcommand> ...
 ```
 
+The harness deliberately depends only on libraries pre-installed in the
+Cowork Linux sandbox: `requests`, `pandas`, `numpy`, `yaml`,
+`python-dotenv`, plus stdlib. **No virtualenv, no `pip install` step.**
+That's why Cowork mode actually works inside the scheduled-task sandbox —
+the previous architecture failed because it relied on a macOS-host venv
+that the sandbox couldn't see.
+
 See `quant_trading_system/cli.py` for the full subcommand list, or run
-`python -m quant_trading_system.cli --help`.
+`python3 -m quant_trading_system.cli --help`.
 
 **Setup:**
 
 ```bash
-# 1. Clone and create a venv (Python 3.11+)
+# 1. Clone — no venv, no install step
 git clone <repo-url> && cd Stock-Trading-Agent
-python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
 
 # 2. Configure — Cowork mode does NOT need ANTHROPIC_API_KEY,
-#    but DOES need Alpaca paper credentials.
+#    just Alpaca paper credentials.
 cp .env.example .env
 # Edit .env: ALPACA_API_KEY, ALPACA_SECRET_KEY, ALPACA_PAPER=true
 
-# 3. Pre-flight check
-python scripts/preflight.py
-# (Will warn that ANTHROPIC_API_KEY is missing — that's fine for Cowork mode.)
-
-# 4. Smoke-test the CLI manually
-.venv/bin/python -m quant_trading_system.cli regime
-.venv/bin/python -m quant_trading_system.cli account
-.venv/bin/python -m quant_trading_system.cli list-strategies --status active
+# 3. Smoke-test the CLI manually
+python3 -m quant_trading_system.cli list-strategies --status active
+python3 -m quant_trading_system.cli market-status
+python3 -m quant_trading_system.cli account     # hits Alpaca; needs valid creds
 ```
 
 **Schedule it:**
@@ -129,19 +130,20 @@ Each daily run produces a `conclusions/YYYY-MM-DD.md` and updates
 ### Standalone mode (Pi / cloud, with API key)
 
 In standalone mode, `orchestrator.py` is a Python script that calls the
-Anthropic API directly:
+Anthropic API directly. **This mode needs `pip install anthropic` (the
+sandbox-friendly harness intentionally doesn't bundle it), plus your
+Anthropic API key. Use it on a Pi or cloud VM where you control the
+runtime, not inside Cowork's sandbox.**
 
 ```bash
-# 1. Same setup as Cowork mode, plus an API key:
+# 1. On the deployment target (e.g. a Pi):
+pip install anthropic               # the only extra dep beyond Cowork-mode
 echo "ANTHROPIC_API_KEY=sk-ant-..." >> .env
 
-# 2. Pre-flight check (full)
-python scripts/preflight.py
+# 2. First run — dry-run, off-session is allowed for testing
+python3 -m quant_trading_system.orchestrator --dry-run --allow-non-session
 
-# 3. First run — dry-run, off-session is allowed for testing
-python -m quant_trading_system.orchestrator --dry-run --allow-non-session
-
-# 4. Inspect outputs
+# 3. Inspect outputs
 ls runs/                                 # full transcript of the run
 cat quant_trading_system/knowledge_base/conclusions/$(date +%F).md
 cat quant_trading_system/knowledge_base/state/last_handoff.md

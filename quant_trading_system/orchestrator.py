@@ -249,19 +249,12 @@ def run_orchestrator(
 
     # Skip on non-session days (weekend / NYSE holiday) unless overridden.
     if not allow_non_session:
-        try:
-            import exchange_calendars as xcals
+        from quant_trading_system.scheduler.market_schedule import is_session_day
 
-            nyse = xcals.get_calendar("XNYS")
-            today = dt.date.today()
-            if not nyse.is_session(today):
-                logger.info("non_session_day_skip", date=today.isoformat())
-                return {"skipped": True, "reason": "non_session_day"}
-        except ImportError:
-            # No calendar lib — fall back to weekday check
-            if dt.date.today().weekday() >= 5:
-                logger.info("weekend_skip")
-                return {"skipped": True, "reason": "weekend"}
+        today = dt.date.today()
+        if not is_session_day(today):
+            logger.info("non_session_day_skip", date=today.isoformat())
+            return {"skipped": True, "reason": "non_session_day"}
 
     # Acquire run lock
     lock_path = acquire_lock(memory.LOCK_FILE, force=force_lock)
