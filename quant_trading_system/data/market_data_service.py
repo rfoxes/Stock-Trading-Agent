@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import datetime as dt
 import logging
+import os
 import time
 from typing import Optional
 
@@ -23,6 +24,9 @@ logger = logging.getLogger(__name__)
 
 
 _DATA_BASE = "https://data.alpaca.markets"
+# Which Alpaca data feed to request. Default IEX so the free paper tier works;
+# set ALPACA_DATA_FEED=sip in the environment if the account is upgraded.
+_DATA_FEED = os.environ.get("ALPACA_DATA_FEED", "iex").strip() or "iex"
 _TIMEFRAME_MAP = {
     "1Min": "1Min",
     "5Min": "5Min",
@@ -84,6 +88,7 @@ class MarketDataService:
             "end": end,
             "limit": limit,
             "adjustment": "raw",
+            "feed": _DATA_FEED,
         }
         try:
             resp = self._session.get(url, params=params, timeout=15)
@@ -133,7 +138,7 @@ class MarketDataService:
     def get_latest_quote(self, symbol: str) -> Optional[dict]:
         url = f"{_DATA_BASE}/v2/stocks/{symbol}/quotes/latest"
         try:
-            resp = self._session.get(url, timeout=15)
+            resp = self._session.get(url, params={"feed": _DATA_FEED}, timeout=15)
         except requests.RequestException as e:
             logger.warning("latest_quote_request_failed symbol=%s err=%s", symbol, e)
             return None
