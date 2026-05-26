@@ -45,6 +45,46 @@ You write to:
 - `state/news_tasks.md` (replaced daily — for tomorrow's news agent)
 - This manual's "Recent feedback" section (only when there's a durable lesson)
 
+## What counts as news (and what doesn't)
+
+**The trader already has prices, bars, indicators, regime, P&L, and the
+journal.** Your job is the part it cannot derive from those — actual events
+affecting the companies on the watchlist or macro conditions around them.
+
+**KEEP (real news about the company / market):**
+- Earnings results, guidance changes, pre-announcements.
+- M&A: announced or rumored acquisitions, mergers, divestitures.
+- Management changes (CEO/CFO transitions, board changes).
+- Product launches, delays, recalls, demand signals from suppliers.
+- Regulatory: SEC/DOJ/FTC actions, EU DMA/DSA penalties, antitrust filings.
+- Lawsuits and major settlements.
+- Customer or partnership deals with material revenue implication
+  (e.g. a $250B cloud commit between two named companies).
+- Capital allocation: buybacks, dividends, refinancing, large debt raises.
+- Macro events that change conditions: FOMC decisions, CPI/PPI/jobs prints,
+  geopolitical escalations, policy/tariff announcements.
+- Catalysts on the calendar: earnings dates, FDA approvals, central-bank
+  meetings happening today/tomorrow.
+
+**DROP (price commentary the trader can see itself):**
+- "NVDA down 10% in 2 weeks" / "META -10% unrealized" / "AAPL at record".
+- Index level reports ("S&P +0.6%", "Nasdaq at record"). The trader has bars.
+- "The market shrugged" / "ripped" / "compressed" / "digested cleanly".
+- Analyst price target changes and rating shuffles. These are opinions
+  about prices, not events.
+- Sector-up-X% / sector-down-Y% rollups.
+- Technical setups ("NVDA testing 200-day").
+
+A useful test: would a reasonable journalist write a *news article* about
+this, or is it just a market-commentary blurb? News articles describe
+events. Market commentary describes price action. You write the brief in
+the journalist's voice, not the commentator's.
+
+The brief's `Watchlist + positions` section should be event-driven: one
+line per symbol about a *thing that happened*, not a price observation.
+If nothing happened to a symbol, say so explicitly ("no fresh news") and
+move on. Don't fill space.
+
 ## Source policy
 
 Two primary sources, both via the CLI / your own tool calls:
@@ -117,15 +157,24 @@ move on. Full-article fetching is reserved for the Saturday research agent.
    (with a one-line reason for the call).
 
    ## Watchlist + positions
-   Per symbol with non-trivial news, a one-line summary of what happened
-   and why it might matter for the strategy. Symbols with no news: list
-   them on a single line.
+   Per symbol where something actually HAPPENED (earnings, M&A, regulatory,
+   product, management, partnership, lawsuit, capital allocation), one
+   line describing the EVENT and its likely fundamental implication.
+   Symbols with no fresh news get a single line at the bottom:
+   "No fresh news: AAPL, AMZN, ...". Do not write "NVDA was down today" —
+   the trader can see that.
 
    ## Macro / sector context
-   2-4 bullet points if anything moved. Skip on quiet days.
+   Real events only: Fed decisions, CPI/PPI/jobs prints, geopolitical
+   escalations, policy/tariff announcements, major regulatory actions.
+   Skip "the market did X" lines. Skip generic narrative essays unless a
+   specific new event (e.g. a named analyst report published today with a
+   new dollar figure) makes it fresh.
 
    ## Recommendations for the trader
-   Specific suggestions, framed as "consider X" not "do X". E.g.:
+   Specific EVENT-driven suggestions, framed as "consider X" not "do X".
+   Do not recommend on the basis of price action — the trader handles that.
+   E.g.:
    - "Consider deferring entries on META — earnings AMC."
    - "Fed minutes today were dovish; trend-following strategies likely tailwind."
    - "Nothing notable; standard workflow."
