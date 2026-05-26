@@ -563,6 +563,361 @@ def cancel_order(ctx: ToolContext, *, order_id: str) -> dict[str, Any]:
     return _ok({"order_id": order_id, "cancelled": True})
 
 
+def propose_strategy(
+    ctx: ToolContext,
+    *,
+    strategy_id: str,
+    type: str,
+    frontmatter: dict[str, Any],
+    md_body: str,
+    py_source: str,
+    backtest_symbol: str = "SPY",
+    backtest_start: str | None = None,
+    backtest_end: str | None = None,
+    skip_backtest: bool = False,
+) -> dict[str, Any]:
+    """Add a new strategy to the library, gated on the full ADD battery.
+
+    The decision is fully deterministic via `strategy_evaluation.evaluate_for_addition`
+    (PSR, walk-forward IS/OOS check, Sortino, max-drawdown, trade count). The
+    agent does not override the result. Three outcomes:
+
+      - ADD passed: strategy saved at status='testing'.
+      - REJECT (blocked_by_data): backtest could not run; strategy retained
+        at status='testing' with note "do not promote until verified".
+      - REJECT (performance): strategy folder removed.
+    """
+    import datetime as _dt
+    from quant_trading_system.strategy_evaluation import evaluate_for_addition
+
+    if type not in ("equity", "options"):
+        return _err(f"type must be 'equity' or 'options', got {type!r}")
+    try:
+        compile(py_source, f"<{strategy_id}>", "exec")
+    except SyntaxError as e:
+        return _err(f"strategy.py has a syntax error: {e}")
+    if "def evaluate(" not in py_source:
+        return _err("strategy.py must define `def evaluate(ctx):`")
+
+    try:
+        sf = memory.create_strategy(
+            strategy_id=strategy_id,
+            type=type,
+            frontmatter_data=frontmatter,
+            body=md_body,
+            script=py_source,
+        )
+    except (FileExistsError, ValueError) as e:
+        return _err(str(e))
+
+    if type == "options" or skip_backtest:
+        return _ok({
+            "id": sf.id,
+            "path": str(sf.dir),
+            "status": sf.status,
+            "evaluation": None,
+            "note": (
+                "options strategy added without battery (no chain data); "
+                "kept at status='testing' for manual review"
+                if type == "options"
+                else "battery skipped on caller request; kept at status='testing'"
+            ),
+        })
+
+    if backtest_end is None:
+        backtest_end = _dt.date.today().isoformat()
+    if backtest_start is None:
+        backtest_start = (_dt.date.today() - _dt.timedelta(days=730)).isoformat()
+
+    try:
+        result = evaluate_for_addition(
+            sf.id,
+            symbol=backtest_symbol,
+            start=backtest_start,
+            end=backtest_end,
+            market_data=ctx.market_data,
+            regime_classifier=ctx.regime_classifier,
+        )
+    except Exception as e:
+        return _ok({
+            "id": sf.id,
+            "path": str(sf.dir),
+            "status": sf.status,
+            "evaluation": {"error": f"battery raised: {e}"},
+            "note": "kept at status='testing'; battery could not be evaluated",
+        })
+
+    # Tests blocked by missing data → keep with explicit warning, do not promote
+    if result.get("blocked_by_data"):
+        return _ok({
+            "id": sf.id,
+            "path": str(sf.dir),
+            "status": sf.status,
+            "evaluation": result,
+            "note": (
+                "kept at status='testing'; addition battery could not run "
+                "(data unavailable). Do not promote until verified."
+            ),
+        })
+
+    if result.get("decision") == "ADD":
+        return _ok({
+            "id": sf.id,
+            "path": str(sf.dir),
+            "status": sf.status,
+            "evaluation": result,
+            "note": "ADDED at status='testing'; addition battery passed all tests",
+        })
+
+    # REJECT on real test failure — remove the folder
+    cleanup_err = None
+    try:
+        for f in sf.dir.iterdir():
+            f.unlink()
+        sf.dir.rmdir()
+    except OSError as e:
+        cleanup_err = str(e)
+    note = (
+        f"REJECTED by addition battery: {'; '.join(result.get('reasons', []))}. "
+        + ("Folder removed." if not cleanup_err else f"Manual cleanup needed: {cleanup_err}")
+    )
+    return _ok({
+        "id": strategy_id,
+        "status": "rejected_but_not_cleaned" if cleanup_err else "rejected",
+        "evaluation": result,
+        "note": note,
+    })
+
+
+def evaluate_addition(
+    ctx: ToolContext,
+    *,
+    strategy_id: str,
+    symbol: str = "SPY",
+    start: str | None = None,
+    end: str | None = None,
+) -> dict[str, Any]:
+    """Run the addition test battery on an existing strategy (no side effects).
+
+    Useful for retesting a candidate already on disk, or for the agent to
+    inspect why something would be rejected without going through propose.
+    """
+    import datetime as _dt
+    from quant_trading_system.strategy_evaluation import evaluate_for_addition
+
+    if end is None:
+        end = _dt.date.today().isoformat()
+    if start is None:
+        start = (_dt.date.today() - _dt.timedelta(days=730)).isoformat()
+    try:
+        return _ok(evaluate_for_addition(
+            strategy_id,
+            symbol=symbol, start=start, end=end,
+            market_data=ctx.market_data,
+            regime_classifier=ctx.regime_classifier,
+        ))
+    except Exception as e:
+        return _err(f"battery raised: {e}")
+
+
+def evaluate_replacement(
+    ctx: ToolContext,
+    *,
+    existing_id: str,
+    candidate_id: str,
+    symbol: str = "SPY",
+    start: str | None = None,
+    end: str | None = None,
+) -> dict[str, Any]:
+    """Run the replacement test (paired bootstrap + Sharpe-delta) on two
+    strategies. Decision is REPLACE only if candidate beats existing at
+    p<0.05 AND Sharpe delta >= 0.10 absolute. Strict, deterministic.
+    """
+    import datetime as _dt
+    from quant_trading_system.strategy_evaluation import evaluate_for_replacement
+
+    if end is None:
+        end = _dt.date.today().isoformat()
+    if start is None:
+        start = (_dt.date.today() - _dt.timedelta(days=730)).isoformat()
+    try:
+        return _ok(evaluate_for_replacement(
+            existing_id, candidate_id,
+            symbol=symbol, start=start, end=end,
+            market_data=ctx.market_data,
+            regime_classifier=ctx.regime_classifier,
+        ))
+    except Exception as e:
+        return _err(f"battery raised: {e}")
+
+
+def evaluate_archive(
+    ctx: ToolContext,
+    *,
+    strategy_id: str,
+) -> dict[str, Any]:
+    """Run the archive test (conservative — 90-day rolling Sharpe<0 AND
+    PSR<0.5, OR 60-day zero-trades). Reads the trade journal directly;
+    no backtest involved.
+    """
+    from quant_trading_system.strategy_evaluation import evaluate_for_archive
+
+    try:
+        return _ok(evaluate_for_archive(strategy_id))
+    except Exception as e:
+        return _err(f"battery raised: {e}")
+
+
+def simulate_strategy(
+    ctx: ToolContext,
+    *,
+    strategy_id: str,
+    symbol: str = "SPY",
+    start: str | None = None,
+    end: str | None = None,
+) -> dict[str, Any]:
+    """Run the walk-forward backtester without persisting any changes.
+
+    Useful when the agent wants to test a hypothetical edit before applying
+    it, or to verify an existing strategy's behavior over a window.
+    """
+    import datetime as _dt
+    from quant_trading_system.strategy_backtest import run_backtest
+
+    if end is None:
+        end = _dt.date.today().isoformat()
+    if start is None:
+        start = (_dt.date.today() - _dt.timedelta(days=730)).isoformat()
+    try:
+        bt = run_backtest(
+            strategy_id=strategy_id,
+            symbol=symbol,
+            start=start,
+            end=end,
+            market_data=ctx.market_data,
+            regime_classifier=ctx.regime_classifier,
+        )
+    except Exception as e:
+        return _err(f"backtester raised: {e}")
+    return _ok(bt.to_dict())
+
+
+def news_fetch(
+    ctx: ToolContext,
+    *,
+    symbols: list[str] | None = None,
+    include_positions: bool = True,
+    lookback_hours: int = 24,
+) -> dict[str, Any]:
+    """Fetch Alpaca News for the universe (watchlist + held positions) and
+    write per-symbol + per-sector HTMLs under knowledge_base/news/.
+
+    Returns a summary dict; the news agent uses this to know what got written.
+    """
+    from quant_trading_system import news_service
+
+    universe = set(s.upper() for s in (symbols or ctx.settings.watchlist))
+    if include_positions and ctx.alpaca_client is not None:
+        try:
+            for p in ctx.alpaca_client.get_positions():
+                sym = str(p.get("symbol", "")).upper()
+                if sym:
+                    universe.add(sym)
+        except Exception as e:
+            logger.warning("news_fetch_position_lookup_failed err=%s", e)
+    if not universe:
+        return _err("empty universe; nothing to fetch")
+    return _ok(news_service.fetch_and_write(
+        ctx.settings, sorted(universe), lookback_hours=lookback_hours,
+    ))
+
+
+def news_cleanup(ctx: ToolContext, *, retention_days: int = 90) -> dict[str, Any]:
+    """Sweep dated news HTMLs older than `retention_days` days."""
+    from quant_trading_system import news_service
+
+    return _ok(news_service.cleanup_old(retention_days=retention_days))
+
+
+def news_universe(ctx: ToolContext) -> dict[str, Any]:
+    """Return the symbols / sectors / categories the news layer covers."""
+    from quant_trading_system.news_service import (
+        CATEGORIES,
+        SYMBOL_TO_SECTOR,
+        sector_for,
+    )
+
+    universe = set(s.upper() for s in ctx.settings.watchlist)
+    if ctx.alpaca_client is not None:
+        try:
+            for p in ctx.alpaca_client.get_positions():
+                sym = str(p.get("symbol", "")).upper()
+                if sym:
+                    universe.add(sym)
+        except Exception:
+            pass
+    by_sector: dict[str, list[str]] = {}
+    for s in sorted(universe):
+        by_sector.setdefault(sector_for(s), []).append(s)
+    return _ok({
+        "watchlist_symbols": ctx.settings.watchlist,
+        "sectors": by_sector,
+        "categories": list(CATEGORIES),
+        "sector_map": SYMBOL_TO_SECTOR,
+    })
+
+
+def execute_strategy(
+    ctx: ToolContext,
+    *,
+    strategy_id: str,
+) -> dict[str, Any]:
+    """Run a strategy's strategy.py evaluate() function and submit its intents
+    through SafetyGate. Returns a summary of what got submitted, rejected,
+    or errored.
+
+    This is the *only* sanctioned path for placing trades in the harness.
+    The agent picks WHICH strategy is active; the strategy script decides
+    what to trade.
+    """
+    from quant_trading_system import strategy_runtime
+
+    return strategy_runtime.run_strategy(
+        strategy_id,
+        settings=ctx.settings,
+        market_data=ctx.market_data,
+        regime_classifier=ctx.regime_classifier,
+        safety_gate=ctx.safety_gate,
+        alpaca_client=ctx.alpaca_client,
+        run_id=ctx.run_id,
+    )
+
+
+def execute_active_strategy(ctx: ToolContext) -> dict[str, Any]:
+    """Read which strategy is currently active and execute it. No-op if none."""
+    active = memory.read_active_strategy()
+    sid = (active or {}).get("strategy_id", "")
+    if not sid:
+        return _err("no active strategy set; call set_active_strategy first")
+    return execute_strategy(ctx, strategy_id=sid)
+
+
+def update_strategy_script(
+    ctx: ToolContext, *, strategy_id: str, py_source: str
+) -> dict[str, Any]:
+    """Replace a strategy's strategy.py contents.
+
+    Use this when a strategy's execution logic genuinely needs to change.
+    Parameter-only tweaks should go through `update_strategy` (which edits
+    the .md frontmatter) instead — keep prose and code in sync.
+    """
+    try:
+        sf = memory.update_strategy_script(strategy_id, py_source)
+    except FileNotFoundError as e:
+        return _err(str(e))
+    return _ok({"id": sf.id, "py_path": str(sf.py_path), "bytes": len(py_source)})
+
+
 def log_trade_closed(
     ctx: ToolContext,
     *,
@@ -683,6 +1038,20 @@ TOOL_FUNCTIONS = {
     "submit_order": submit_order,
     "cancel_order": cancel_order,
     "log_trade_closed": log_trade_closed,
+    # strategy execution
+    "execute_strategy": execute_strategy,
+    "execute_active_strategy": execute_active_strategy,
+    "update_strategy_script": update_strategy_script,
+    # research / library curation
+    "propose_strategy": propose_strategy,
+    "simulate_strategy": simulate_strategy,
+    "evaluate_addition": evaluate_addition,
+    "evaluate_replacement": evaluate_replacement,
+    "evaluate_archive": evaluate_archive,
+    # news layer
+    "news_fetch": news_fetch,
+    "news_cleanup": news_cleanup,
+    "news_universe": news_universe,
     # backtest
     "run_backtest": run_backtest,
 }

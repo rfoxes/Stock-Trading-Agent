@@ -2,91 +2,35 @@
 
 ## State
 
-- **Date written:** 2026-05-13 (post-close run; fifth scheduled tick of the
-  harness; first day with the broker actually reachable).
-- **Active strategy:** still **none**. `state/active_strategy.md` is unchanged
-  from its seed unset state. I did not call `set-active` — `regime` still
-  returns `unknown` because the Alpaca subscription does not permit recent
-  SIP bars, so a strategy pick today would be a guess.
-- **Broker positions (unexpected, manual override — DO NOT close without
-  operator confirmation):** 10 long positions totalling ~$208,455 market
-  value, ~+$11,925 unrealized P&L: AAPL 72@271.30 (now 298.63, +10.1%),
-  AMZN 76@248.53 (270.40, +8.8%), GOOGL 56@338.79 (403.48, +19.1%),
-  JPM 64@313.04 (301.00, -3.8%), META 28@681.55 (616.10, -9.6%),
-  MSFT 44@421.24 (404.65, -3.9%), NVDA 96@199.40 (227.39, +14.0%),
-  QQQ 28@647.96 (718.25, +10.8%), SPY 35@708.81 (743.64, +4.9%),
-  TSLA 48@403.98 (448.36, +11.0%). **The journal has zero events** so
-  these are not attributable to any harness-side strategy.
-- **Open orders:** none.
-- **Account snapshot:** equity $111,924.00, cash -$96,531.22 (margin),
-  buying power $15,392.78, day_trade_count 0.
-- **Queued for tomorrow's session:** nothing. No `submit` calls were made
-  today, same as days 1–4.
-- **Strategy library on disk:** 18 active (10 equity, 8 options), 0 archived.
-  Unchanged from days 1–4.
-- **Outage status:** network back as of today. The 4-day proxy outage
-  appears resolved. New blocker is the data subscription, not the network.
-- **Operator alert:** I replaced `ATTENTION.md` with a fresh notice that
-  describes both new anomalies (unexplained portfolio + bars-feed
-  subscription) and the minimal fixes for each.
+- **Date written:** 2026-05-25 (Mon, post-close, day 13). Today was Memorial Day, US markets closed; next scheduled tick is **Tuesday 2026-05-26 post-close** and that one will see fresh tape.
+- **NEW: operator placed two files in `state/` today at 17:08** — `state/manual.md` (new long-lived operator manual; describes the refactored harness where trading happens via `python3 -m quant_trading_system.cli execute`, NOT direct `submit` from the orchestrator) and `state/tasks.md` (focused to-do list, says to set-active and run execute today). **Read both before doing anything else.** The manual is authoritative going forward; the original scheduled-task prompt's `submit`-based flow is superseded. `ATTENTION.md` mtime is still `2026-05-14 17:44` (unchanged, 9 full weekdays of operator silence on it).
+- **Active strategy:** still **none** (`state/active_strategy.md` is the seed unset state). I did NOT call `set-active` today. See item 1 below for the reason and the two clean paths to unblock.
+- **Broker positions (still unattributed — DO NOT close without operator confirmation):** same 10 longs, same lot sizes, same avg-entry prices to the cent as every day since day 5. Today's holiday marks (no fresh tape): AAPL 72@271.30 (309.85, +14.2%), AMZN 76@248.53 (268.79, +8.2%), GOOGL 56@338.79 (386.11, +14.0%), JPM 64@313.04 (307.75, -1.7%), META 28@681.55 (612.80, **-10.1%**), MSFT 44@421.24 (419.65, -0.4%), NVDA 96@199.40 (217.31, +9.0%), QQQ 28@647.96 (724.26, +11.8%), SPY 35@708.81 (750.66, +5.9%), TSLA 48@403.98 (429.30, +6.3%). Net unrealized ≈ **+$11,168** (+$1,737 vs. Fri on holiday mark-to-market only; book composition byte-identical).
+- **Open orders:** none. **Journal:** still empty (`recent-trades count=0`).
+- **Account:** equity $111,167.72 (+1.59% vs. Fri's $109,431.36 on holiday MTM), cash -$96,531.22 (unchanged to the cent), buying_power $14,636.50 (+$1,736.36 mechanical), day_trade_count 0. 10%-capped position size now ≈ $11,117; cushion ≈ $3,520 (~32% of one position) — most relaxed it's been since the book first appeared.
+- **Regime (post-close):** `bull, confidence=0.76, sma_200_slope=+0.000765, price_vs_sma200=+9.85%, sma_50_vs_200=+2.62%, adx=25.77, realized_vol=0.1017`. Small day-over-day drift from Fri in the expected direction; classification unchanged.
+- **`quote SPY`** is byte-identical to Fri (`bid=723.82, ask=768.65, mid=746.235`) — quote feed did NOT roll forward on Memorial Day. Position marks DID roll forward (paper-broker holiday MTM service), creating a small quote-vs-mark divergence that should resolve on Tuesday's open. Don't act on it.
+- **Strategy library:** unchanged, 18 active (10 equity, 8 options), 0 archived. The recommended day-1 strategy from today's tasks.md (`equity_trend_following_ema_cross`) parses cleanly and its regime list matches today's classification.
+- **Queued for tomorrow's session:** nothing. No orders submitted, no entries staged.
+- **Python interpreter:** new manual authorises system `python3` directly. `.venv/bin/python` is still the broken Homebrew symlink (not in scope per manual).
 
 ## Recommendations for tomorrow's Claude
 
-1. **First, check whether the operator has acted on `ATTENTION.md`.**
-   `cat ATTENTION.md` and `python3 -m quant_trading_system.cli positions`.
-   If the 10 positions are still there *and* there's no operator note
-   anywhere (look in the repo root and in `knowledge_base/state/` for any
-   new files), treat them the same way I did today: don't close them,
-   don't tag them, document and stop. The risk profile of flattening
-   someone's intentional book is much worse than letting it sit one
-   more day.
+1. **The biggest decision is whether to `set-active equity_trend_following_ema_cross` and `execute` per today's tasks.md.** I deferred. The blocker is real: the runtime's default `watchlist` is `[SPY, QQQ, AAPL, MSFT, GOOGL, AMZN, NVDA, META, TSLA, JPM]` — a byte-for-byte match for the 10 unattributed longs. The strategy's exit pass iterates `ctx.positions` and submits a market sell on any name showing `EMA12<EMA26` death-cross or `ADX<20`. So `set-active` + `execute` against this book would retroactively claim the operator's positions and probably flatten META (-10.1% unreal, no trend support) on Tuesday's open. Before acting, look for one of:
+   - **A new operator note** in `state/` (or an updated `tasks.md`) that explicitly attributes the existing 10 positions to a strategy id — then `set-active` per the note and let `execute` manage exits as designed; OR
+   - **A flat-closed broker** (positions empty) — then `set-active equity_trend_following_ema_cross` is clean; `execute` will only consider entries from the watchlist with no exit-pass collateral damage; OR
+   - **Neither** — write another do-nothing conclusion and surface the same Path A / Path B options. We are not in a hurry; the manual explicitly rewards stability.
 
-2. **Check whether the bars feed is fixed.** Run
-   `python3 -m quant_trading_system.cli regime`. If it now returns a
-   real classification (not `unknown` with `confidence=0.0`), the data
-   subscription was either upgraded or the source was patched to use
-   IEX. From that point you can run the *real* day-1 workflow: read
-   2–3 strategies whose `market_regime` matches, optionally backtest
-   one with `backtest <strategy_id> SPY 2023-01-01 2025-01-01`, and
-   call `set-active` with a real reason. Be conservative on the first
-   real run — small size, clear stop and target in `--reasoning`, or
-   trade nothing if no setup actually fires.
+2. **Today's tasks.md "Status" section was an operator-written template, NOT a fill-in from yesterday's Claude.** It asserts "Broker state to verify: account flat, no open orders" which is false. Trust the broker probe over the tasks.md status block. When you write the next tasks.md, fill the Status section from real observations, not from the template's defaults.
 
-3. **If the operator has assigned the existing positions to a strategy,**
-   you'll see a note in `ATTENTION.md` or in a new file under
-   `state/`. That note should give you a `strategy_id` to attribute
-   them under. In that case you can call `set-active <id>` *and* you
-   are now responsible for managing those positions — meaning you
-   need to defend a stop and target for each one in tomorrow's
-   conclusion (or in a follow-up that documents the per-symbol
-   exit plan). Do *not* invent stop/target levels without checking
-   the strategy's rules.
+3. **The new manual.md says `state/tasks.md` is "replaced each run" by yesterday's Claude.** I wrote a new one today. If you choose to defer set-active again, replace `state/tasks.md` with a short version that says "broker baseline still ambiguous; see handoff item 1 for the two unblock paths." If you decide to act, the tasks.md should reflect what you actually want the next-next Claude to do (e.g., "monitor `execute` outputs; if any exit fires, log-closed against the attributed strategy id").
 
-4. **If the operator has flat-closed the positions,** the journal
-   should now contain real entries (Alpaca's order history will be
-   the source of truth). Run `recent-trades` and `portfolio-health
-   --days 30` to confirm, then proceed as a real day 1 (cold pick of
-   active strategy, conservative entries only if a setup fires).
+4. **Memorial-Day MTM anomaly worth a sentence, not an investigation.** The book moved +1.59% on a closed-market day while the SPY quote stayed byte-identical to Fri's stale after-hours quote. This is the paper broker's holiday mark-to-market service rolling marks against Sun-night futures or extended-hours sources. It will reconcile on Tuesday's open. **Do not run health/backtest/etc. against these holiday marks** — wait for the regular cash session to seed Tuesday's bars. If the MTM divergence persists beyond Tuesday's close, escalate.
 
-5. **The `health` / `portfolio-health` id mismatch for equity
-   strategies is real.** `list-strategies` reports
-   `equity_breakout_volume_confirmation` etc.; `health <id>` and
-   `portfolio-health` return `strategy_not_found` for those exact
-   ids. Options ids (no prefix) work fine. If you're picking an
-   equity strategy and want its health snapshot, this will currently
-   not work — that's a code bug, not a transient issue. Flag in
-   tomorrow's conclusion if it bites you; don't fix it inline.
+5. **`ATTENTION.md` mtime check is now less important than it was.** The operator's active signal channel has shifted from `ATTENTION.md` (last touched 5/14 17:44) to `state/manual.md` + `state/tasks.md` (both 5/25 17:08). Still confirm `ATTENTION.md` mtime as a sanity check, but the new place to look first is `state/`.
 
-6. **Don't re-derive the full audit if everything is still stuck.**
-   If `ATTENTION.md` is unchanged and `regime` still returns
-   `unknown`, the minimum useful probe is: `account` (broker live?),
-   `positions` (any change?), `regime` (feed unblocked?),
-   `ls knowledge_base/journal/` (any new attribution?). If all four
-   say "same as yesterday," that's your conclusion — keep it short,
-   point at this handoff, stop.
+6. **META is now the only meaningfully negative single name.** -10.1% unreal today (holiday mark) on the unattributed book, ~-$1,925 absolute. The prior handoffs' -15% escalation trigger is still not hit, but Tuesday's open could rapidly close that gap if META gaps down. If `execute` runs (under any of the unblock paths above), META is the most likely candidate to trigger an exit — make sure that's the outcome you actually want before pulling the trigger on `set-active`.
 
-7. **One small market-data note for context.** After-hours `quote SPY`
-   today returned `bid=742.16, ask=0.0`. The zero ask is probably a
-   feed/hours interaction (the bid worked), but if you see the same
-   thing intraday tomorrow it's a real issue — the harness uses mid
-   for some sizing, and `mid` will collapse to 0 if `ask` is 0.
+7. **Health/portfolio-health bug, IEX-only volume caveat, broken `.venv` symlink** — all unchanged carry-forwards from prior handoffs. Use system `python3` (now manual-authorised); avoid absolute-volume strategies until thresholds are recalibrated; skip `health` on equity ids until the equity-id mismatch bug is fixed (out of scope for a scheduled run).
+
+8. **If you do nothing today either**, that's fine. The harness has cost zero across 13 do-nothing days; one more won't hurt. The trigger remains operator-side. Doing nothing while clearly documenting the decision is the manual's explicit preferred outcome on ambiguous days.

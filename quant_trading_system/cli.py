@@ -230,6 +230,86 @@ def cmd_run_backtest(ctx: ToolContext, args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_execute(ctx: ToolContext, args: argparse.Namespace) -> int:
+    if args.strategy_id:
+        _emit(agent_tools.execute_strategy(ctx, strategy_id=args.strategy_id))
+    else:
+        _emit(agent_tools.execute_active_strategy(ctx))
+    return 0
+
+
+def cmd_update_script(ctx: ToolContext, args: argparse.Namespace) -> int:
+    py_source = args.file.read() if args.file else args.source
+    if not py_source:
+        print("[cli] need --source or --file", file=sys.stderr)
+        return 2
+    _emit(agent_tools.update_strategy_script(
+        ctx, strategy_id=args.strategy_id, py_source=py_source
+    ))
+    return 0
+
+
+def cmd_propose(ctx: ToolContext, args: argparse.Namespace) -> int:
+    if not args.md_file or not args.py_file:
+        print("[cli] propose-strategy requires --md-file and --py-file", file=sys.stderr)
+        return 2
+    md_body = args.md_file.read()
+    py_source = args.py_file.read()
+    try:
+        frontmatter = json.loads(args.frontmatter)
+    except json.JSONDecodeError as e:
+        print(f"[cli] --frontmatter must be valid JSON: {e}", file=sys.stderr)
+        return 2
+    _emit(agent_tools.propose_strategy(
+        ctx,
+        strategy_id=args.strategy_id,
+        type=args.type,
+        frontmatter=frontmatter,
+        md_body=md_body,
+        py_source=py_source,
+        backtest_symbol=args.symbol,
+        backtest_start=args.start,
+        backtest_end=args.end,
+        skip_backtest=args.skip_backtest,
+    ))
+    return 0
+
+
+def cmd_simulate(ctx: ToolContext, args: argparse.Namespace) -> int:
+    _emit(agent_tools.simulate_strategy(
+        ctx,
+        strategy_id=args.strategy_id,
+        symbol=args.symbol,
+        start=args.start,
+        end=args.end,
+    ))
+    return 0
+
+
+def cmd_validate(ctx: ToolContext, args: argparse.Namespace) -> int:
+    """Try to import a strategy's strategy.py and confirm it defines evaluate()."""
+    from quant_trading_system import memory
+    from quant_trading_system.strategy_runtime import _load_strategy_module
+
+    sf = memory.read_strategy(args.strategy_id)
+    if sf is None:
+        _emit({"ok": False, "error": f"strategy not found: {args.strategy_id}"})
+        return 0
+    if not sf.py_path.exists():
+        _emit({"ok": False, "error": f"strategy.py missing at {sf.py_path}"})
+        return 0
+    try:
+        mod = _load_strategy_module(sf.py_path)
+    except Exception as e:
+        _emit({"ok": False, "error": f"import failed: {e}"})
+        return 0
+    if not hasattr(mod, "evaluate") or not callable(mod.evaluate):
+        _emit({"ok": False, "error": "strategy.py does not define a callable `evaluate`"})
+        return 0
+    _emit({"ok": True, "id": sf.id, "path": str(sf.py_path)})
+    return 0
+
+
 # ---------------------------------------------------------------------------
 # Argument parser
 # ---------------------------------------------------------------------------
@@ -362,6 +442,115 @@ def _build_parser() -> argparse.ArgumentParser:
     sp.add_argument("start", help="YYYY-MM-DD")
     sp.add_argument("end", help="YYYY-MM-DD")
     sp.set_defaults(func=cmd_run_backtest)
+
+    # execute (run a strategy script through SafetyGate)
+    sp = sub.add_parser(
+        "execute",
+        help="Run a strategy's strategy.py and submit its intents. Omit strategy_id to use the active strategy.",
+    )
+    sp.add_argument("strategy_id", nargs="?", default=None)
+    sp.set_defaults(func=cmd_execute)
+
+    # update-script (edit a strategy's strategy.py)
+    sp = sub.add_parser("update-script", help="Replace a strategy's strategy.py contents.")
+    sp.add_argument("strategy_id")
+    sp.add_argument("--source", help="Python source as a string.")
+    sp.add_argument(
+        "--file",
+        type=argparse.FileType("r"),
+        help="Read source from FILE instead of --source.",
+    )
+    sp.set_defaults(func=cmd_update_script)
+
+    # propose-strategy (research agent — add a new strategy gated on a backtest)
+    sp = sub.add_parser(
+        "propose-strategy",
+        help="Add a new strategy + run a backtest gate. Failed-gate proposals are removed.",
+    )
+    sp.add_argument("strategy_id", help="Snake_case id, e.g. 'overnight_drift_long'.")
+    sp.add_argument("type", choices=["equity", "options"])
+    sp.add_argument("--frontmatter", required=True, help="JSON string of frontmatter fields.")
+    sp.add_argument("--md-file", type=argparse.FileType("r"), required=True,
+                    help="Path to a file containing the strategy.md body (prose, not frontmatter).")
+    sp.add_argument("--py-file", type=argparse.FileType("r"), required=True,
+                    help="Path to a file containing strategy.py source code.")
+    sp.add_argument("--symbol", default="SPY", help="Symbol for the backtest gate (default SPY).")
+    sp.add_argument("--start", default=None, help="Backtest start (YYYY-MM-DD).")
+    sp.add_argument("--end", default=None, help="Backtest end (YYYY-MM-DD).")
+    sp.add_argument("--skip-backtest", action="store_true",
+                    help="Skip the gate (options strategies always skip).")
+    sp.set_defaults(func=cmd_propose)
+
+    # simulate (dry-run backtest, no side effects)
+    sp = sub.add_parser("simulate", help="Run the walk-forward backtester without persisting anything.")
+    sp.add_argument("strategy_id")
+    sp.add_argument("--symbol", default="SPY")
+    sp.add_argument("--start", default=None, help="YYYY-MM-DD")
+    sp.add_argument("--end", default=None, help="YYYY-MM-DD")
+    sp.set_defaults(func=cmd_simulate)
+
+    # validate-strategy (import and check evaluate())
+    sp = sub.add_parser("validate-strategy",
+                        help="Confirm a strategy's strategy.py imports cleanly and defines evaluate().")
+    sp.add_argument("strategy_id")
+    sp.set_defaults(func=cmd_validate)
+
+    # evaluate-add (run the addition battery on an existing on-disk strategy)
+    sp = sub.add_parser("evaluate-add",
+                        help="Run the addition battery on a strategy already on disk (no side effects).")
+    sp.add_argument("strategy_id")
+    sp.add_argument("--symbol", default="SPY")
+    sp.add_argument("--start", default=None)
+    sp.add_argument("--end", default=None)
+    sp.set_defaults(func=lambda ctx, args: (_emit(agent_tools.evaluate_addition(
+        ctx, strategy_id=args.strategy_id, symbol=args.symbol,
+        start=args.start, end=args.end)), 0)[1])
+
+    # evaluate-update (paired-bootstrap comparison)
+    sp = sub.add_parser("evaluate-update",
+                        help="Compare an existing strategy against a candidate variant. Decision: REPLACE or KEEP.")
+    sp.add_argument("existing_id")
+    sp.add_argument("candidate_id")
+    sp.add_argument("--symbol", default="SPY")
+    sp.add_argument("--start", default=None)
+    sp.add_argument("--end", default=None)
+    sp.set_defaults(func=lambda ctx, args: (_emit(agent_tools.evaluate_replacement(
+        ctx, existing_id=args.existing_id, candidate_id=args.candidate_id,
+        symbol=args.symbol, start=args.start, end=args.end)), 0)[1])
+
+    # evaluate-archive (90d rolling Sharpe/PSR + 60d zero-trades)
+    sp = sub.add_parser("evaluate-archive",
+                        help="Run the conservative archive test on a strategy. Decision: ARCHIVE or KEEP.")
+    sp.add_argument("strategy_id")
+    sp.set_defaults(func=lambda ctx, args: (_emit(agent_tools.evaluate_archive(
+        ctx, strategy_id=args.strategy_id)), 0)[1])
+
+    # news-fetch (fetch Alpaca News for watchlist + positions, write HTMLs)
+    sp = sub.add_parser("news-fetch",
+                        help="Fetch news for the universe and write per-symbol + per-sector HTMLs.")
+    sp.add_argument("--symbols", default=None,
+                    help="Comma-separated symbols. Default: settings.DEFAULT_WATCHLIST + held positions.")
+    sp.add_argument("--no-positions", action="store_true",
+                    help="Don't auto-add currently-held positions to the universe.")
+    sp.add_argument("--lookback-hours", type=int, default=24)
+    sp.set_defaults(func=lambda ctx, args: (_emit(agent_tools.news_fetch(
+        ctx,
+        symbols=([s.strip() for s in args.symbols.split(",")] if args.symbols else None),
+        include_positions=not args.no_positions,
+        lookback_hours=args.lookback_hours,
+    )), 0)[1])
+
+    # news-cleanup (90d rolling retention sweep)
+    sp = sub.add_parser("news-cleanup",
+                        help="Delete dated news HTML files older than --retention-days.")
+    sp.add_argument("--retention-days", type=int, default=90)
+    sp.set_defaults(func=lambda ctx, args: (_emit(agent_tools.news_cleanup(
+        ctx, retention_days=args.retention_days)), 0)[1])
+
+    # news-universe (what the news layer covers)
+    sp = sub.add_parser("news-universe",
+                        help="List the symbols / sectors / categories the news layer covers today.")
+    sp.set_defaults(func=lambda ctx, args: (_emit(agent_tools.news_universe(ctx)), 0)[1])
 
     return p
 

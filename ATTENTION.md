@@ -1,12 +1,12 @@
-# ATTENTION — broker network restored, but two new anomalies need operator review
+# ATTENTION — unexplained portfolio still needs operator review
 
-**Status as of 2026-05-13 (4:00 PM PT scheduled run):** the Alpaca broker
-endpoints (`/v2/account`, `/v2/positions`, `/v2/orders`) are reachable again
-from the scheduler sandbox after a 4-day outage (2026-05-07 / 2026-05-08 /
-2026-05-11 / 2026-05-12). However, two new issues prevent the harness from
-operating normally and need a human decision before the next run.
+**Status as of 2026-05-13 (post-close, post-scheduled-run):** the 4-day
+broker outage is resolved and the bars-feed subscription issue has now
+also been patched (see "Resolved" section below). One real anomaly
+remains: the paper account holds 10 positions that the harness journal
+does not explain.
 
-## Anomaly 1 — unexplained portfolio in the paper account
+## Open anomaly — unexplained portfolio in the paper account
 
 The paper account is no longer in its expected baseline state. As of today's
 post-close snapshot:
@@ -44,53 +44,48 @@ that should be flat-closed before the harness starts trading on its own.
 If they are intended, please tell the next run which strategy id to tag
 them under so the journal can attribute future P&L correctly.
 
-## Anomaly 2 — market-data subscription blocks bars / regime
+## Resolved — bars feed now uses IEX (operator-driven post-run patch)
 
-Every call to `/v2/stocks/{symbol}/bars` on `data.alpaca.markets` returns:
+`quant_trading_system/data/market_data_service.py` was edited after
+today's scheduled run completed to default the Alpaca data feed to
+IEX and read an `ALPACA_DATA_FEED` env override. Specifically:
 
-```
-403 {"message":"subscription does not permit querying recent SIP data"}
-```
+- Added `_DATA_FEED = os.environ.get("ALPACA_DATA_FEED", "iex")` at
+  module scope.
+- Threaded `"feed": _DATA_FEED` into `get_bars`' params dict.
+- Added `params={"feed": _DATA_FEED}` to `get_latest_quote`'s request.
 
-This affects every timeframe and every symbol tested today (SPY direct;
-the regime classifier internally fans out to several symbols and all of
-them fail). Effects:
+Verified post-patch:
+`bars SPY --days 60` returns 41 daily bars (2026-03-16 → 2026-05-13),
+and `regime` returns
+`bull, confidence=0.76, price_vs_sma200=+9.45%, adx=26.0`.
 
-- `regime` always reports `unknown` with `confidence=0.0`. The harness
-  cannot classify the market regime, which is a prerequisite for
-  `set-active`.
-- `bars`, `indicator`, and `backtest` are all unusable.
-- `quote` works for the bid side, but the ask side comes back as `0.0`
-  on after-hours quotes (also likely a subscription/feed issue).
+If you later upgrade the Alpaca subscription to a SIP-included tier,
+set `export ALPACA_DATA_FEED=sip` in the scheduler environment — no
+further code change needed.
 
-The CLI's `bars` subcommand has no `--feed` flag, so we cannot switch to
-the IEX feed from the command line without a code change. Adding
-`feed=iex` to `quant_trading_system/data/market_data_service.py:81`'s
-params dict would be the minimal fix; an operator-side fix would be to
-upgrade the Alpaca paper account to a tier that includes recent SIP
-data.
+**One calibration caveat to be aware of.** Volume figures are now
+IEX-only (a fraction of the consolidated SIP tape). Equity strategies
+in the library that key off *absolute* volume thresholds —
+`equity_breakout_volume_confirmation`, `equity_gap_and_go`,
+`equity_opening_range_breakout`, `equity_vwap_reversion` — will
+under-trigger until their thresholds are recalibrated. Strategies that
+use *relative* volume (today vs. its own 20-day average) are fine.
+Tomorrow's handoff already tells the next run to either avoid those
+strategies or to recalibrate them deliberately.
 
-**Action requested:** either upgrade the data subscription, or patch
-`market_data_service.py` to request the IEX feed by default. Until one
-of these happens, the harness cannot legitimately classify regime,
-health-check strategies (they need price history to compute returns),
-or evaluate setups.
+## What the harness will do until the open anomaly is addressed
 
-## What the harness will do until then
+The orchestrator will keep running its M-F 4:00 PM PT tick. As long as
+the 10 unexplained positions remain unattributed, every run will:
 
-The orchestrator will keep running its M-F 4:00 PM PT tick. Until the
-above two items are addressed, every run will:
-
-  1. Snapshot the broker (now reachable).
-  2. Notice the unexplained positions and refuse to trade against them.
-  3. Notice `regime` returns `unknown` and refuse to set an active
-     strategy (cannot defend the pick without regime data).
-  4. Write a short conclusion saying so and stop.
-
-That is the correct behaviour per the operating rules ("If anything is
-anomalous, document the situation in the conclusion and stop"). It is
-also a no-op on the durable record — no orders submitted, no strategy
-changes, no edits to strategy files.
+  1. Snapshot the broker.
+  2. Notice the unexplained positions and refuse to trade *against*
+     them (no closing, no offsetting).
+  3. Decide whether the harness should start trading *alongside* them
+     — only with very limited buying power ($15,393 today) and a
+     strategy pick that's defensible from the current regime.
+  4. Write a conclusion explaining what it did or didn't do.
 
 ## Where to read the full diagnosis
 
@@ -101,6 +96,6 @@ for the most recent inter-Claude note.
 
 ## How to clear this file
 
-Delete `ATTENTION.md` once (a) the unexplained portfolio has been resolved
-one way or the other (closed, or assigned a strategy id), and (b) the bars
-endpoint returns real data so `regime` can classify a real market.
+Delete `ATTENTION.md` once the unexplained portfolio has been resolved
+one way or the other (closed, or assigned a strategy id so the harness
+can attribute it in the journal).
