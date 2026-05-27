@@ -557,11 +557,22 @@ def _build_parser() -> argparse.ArgumentParser:
         "git-sync",
         help="Stage all changes, commit, and push to origin. Each agent should run this as its final action.",
     )
-    sp.add_argument("--message", required=True, help="Commit message. Include agent name + date.")
+    sp.add_argument(
+        "--agent",
+        choices=["trader", "news", "research"],
+        required=True,
+        help="Which agent is committing. Auto-prefixes the commit message with `[<agent> YYYY-MM-DD] `.",
+    )
+    sp.add_argument(
+        "--message",
+        required=True,
+        help="One-line summary of what changed (no date or agent prefix — the helper adds it).",
+    )
     sp.add_argument("--no-push", action="store_true", help="Commit locally but don't push.")
     sp.add_argument("--no-pull", action="store_true", help="Skip the pull --rebase --autostash step.")
     sp.set_defaults(func=lambda ctx, args: (_emit(agent_tools.git_sync(
-        ctx, message=args.message, push=not args.no_push, pull_first=not args.no_pull,
+        ctx, message=args.message, agent=args.agent,
+        push=not args.no_push, pull_first=not args.no_pull,
     )), 0)[1])
 
     return p

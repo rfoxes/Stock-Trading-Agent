@@ -42,7 +42,15 @@ There is no virtualenv.
 
 7. **Write `state/news_tasks.md`** for tomorrow's news agent. Brief.
 
-8. **Stop.**
+8. **Commit and push your changes:** as your last tool call, run
+
+   ```
+   python3 -m quant_trading_system.cli git-sync --agent news --message "<headline assessment + counts>"
+   ```
+
+   The helper auto-prefixes with `[news YYYY-MM-DD] ` so every commit is dated and attributed; do NOT include the date or agent name in `--message`. Good summaries: `"NORMAL FLOW, 71 items across watchlist"`, `"NOTABLE; FOMC tomorrow"`. Best-effort — if git fails the error is returned but the run does not fail. Note any failure in tomorrow's `news_tasks.md` carry-forwards.
+
+9. **Stop.**
 
 **Key constraints — non-negotiable:**
 

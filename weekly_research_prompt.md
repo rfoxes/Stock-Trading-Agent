@@ -59,7 +59,15 @@ B. Replace `state/research_tasks.md` with the to-do list for next Saturday. Brie
 
 C. Only edit `state/research_manual.md` if there's a durable threshold-calibration lesson worth appending to its "Recent feedback" section. Most weeks: no edit.
 
-D. Stop. Do not call additional tools.
+D. **Commit and push your changes:** as your last tool call, run
+
+   ```
+   python3 -m quant_trading_system.cli git-sync --agent research --message "<summary of curation changes>"
+   ```
+
+   The helper auto-prefixes with `[research YYYY-MM-DD] ` so every commit is dated and attributed; do NOT include the date or agent name in `--message`. Good summaries: `"added equity_overnight_drift_long, archived equity_vwap_reversion"`, `"no library changes, 3 candidates evaluated and rejected"`. Best-effort — git failures get returned in the JSON but don't fail your run. Note any failure in next week's `research_tasks.md`.
+
+E. Stop. Do not call additional tools.
 
 **If something is broken:**
 

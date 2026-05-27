@@ -23,6 +23,13 @@ Then follow the workflow in `manual.md` §"Daily workflow" exactly. Run CLI comm
 - Update `quant_trading_system/knowledge_base/state/last_handoff.md` with the day's narrative summary (include "## Summary of what I did today" and "## Observations and reasoning" sections).
 - Replace `quant_trading_system/knowledge_base/state/tasks.md` with the focused to-do list for tomorrow's Claude. Brief is fine — even one line per item.
 - Only edit `state/manual.md` if there's a durable lesson worth appending to its "Recent feedback" section. Daily observations do not belong there.
+- **Commit and push your changes:** as your last tool call, run
+
+  ```
+  python3 -m quant_trading_system.cli git-sync --agent trader --message "<one-line summary>"
+  ```
+
+  The helper auto-prefixes your message with `[trader YYYY-MM-DD] ` so every commit is dated and attributed; do NOT include the date or agent name in `--message` yourself. Good summaries: `"do-nothing day, broker baseline ambiguous"`, `"rotated to mean_reversion_bollinger, 2 entries"`. Best-effort — if git fails (auth missing, push rejected, etc.), the helper returns the error but does NOT fail your run. If it errored, note it in `last_handoff.md` and stop anyway.
 
 **Reminders:**
 

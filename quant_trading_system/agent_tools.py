@@ -806,18 +806,29 @@ def git_sync(
     ctx: ToolContext,
     *,
     message: str,
+    agent: str | None = None,
     push: bool = True,
     pull_first: bool = True,
 ) -> dict[str, Any]:
     """Commit and push everything that changed in the repo since the last sync.
 
-    Called as the final action of each scheduled-task agent. Best-effort:
-    a git error does not fail the run, just gets reported back so the agent
-    can document it in its handoff.
+    Called as the final action of each scheduled-task agent. If `agent` is
+    given, the commit message is auto-prefixed with `[<agent> YYYY-MM-DD] `
+    so commit history is consistently dated and attributed.
+
+    Best-effort: a git error does not fail the run, just gets reported back
+    so the agent can document it in its handoff.
     """
+    import datetime as _dt
     from quant_trading_system.git_sync import git_sync as _do_sync
 
-    return _ok(_do_sync(ctx.settings, message=message, push=push, pull_first=pull_first))
+    full_message = message
+    if agent:
+        today = _dt.date.today().isoformat()
+        prefix = f"[{agent} {today}] "
+        if not message.startswith(prefix):
+            full_message = prefix + message
+    return _ok(_do_sync(ctx.settings, message=full_message, push=push, pull_first=pull_first))
 
 
 def news_fetch(
