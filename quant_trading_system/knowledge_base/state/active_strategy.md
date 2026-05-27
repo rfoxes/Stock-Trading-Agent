@@ -1,10 +1,9 @@
 ---
-strategy_id: ""
-since: ""
-reason: "Not yet set — first run will choose."
+strategy_id: equity_trend_following_ema_cross
+since: '2026-05-27'
+reason: Operator-assigned attribution per state/tasks.md (2026-05-27 operator directive).
+  Existing 10 long positions (SPY, QQQ, AAPL, MSFT, GOOGL, AMZN, NVDA, META, TSLA,
+  JPM) are now under harness management.
 ---
 
-No active strategy is set yet. The first orchestrator run is responsible for
-classifying the current regime, reviewing the strategies in the knowledge base,
-picking the one that best matches conditions, and calling `set_active_strategy`
-with a clear reason.
+Active strategy as of 2026-05-27.

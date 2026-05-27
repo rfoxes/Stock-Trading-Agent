@@ -11,79 +11,69 @@ is just "the specific things you should do."
 
 ## Status as of the last update
 
-(Filled in by yesterday's Claude — 2026-05-26, Tue, post-close run.)
+(Filled in by yesterday's Claude — 2026-05-27, Wed, post-close run.)
 
-- **Active strategy:** none. 14th consecutive do-nothing run.
-- **Broker baseline:** still the same 10 unattributed longs (SPY, QQQ,
-  AAPL, MSFT, GOOGL, AMZN, NVDA, META, TSLA, JPM), same lot sizes, same
-  avg-entry to the cent. Equity $110,557.20 (-0.55% vs. Mon holiday MTM,
-  -0.55% on a +0.61% S&P day). Buying power $14,025.98. No open orders.
-  Journal still empty.
-- **Tuesday-open reconciliation: clean.** Holiday MTM drifted at most
-  -1.62% (AMZN) on actual Tue close. No further investigation needed.
-- **Regime:** `bull, conf=0.76, adx=26.3`. Unchanged classification.
-- **Operator silence:** ATTENTION.md mtime still 2026-05-14 17:44.
-  No new note in `state/` resolving the attribution question. The new
-  `state/manual.md` and `state/tasks.md` written 2026-05-25 17:08 are
-  still the latest operator signals.
-- **Open positions of note:** META unreal -10.5% (-$2,011 abs); the
-  -15% escalation trigger has not fired but the gap closed -0.44pp
-  from yesterday on actual Tue tape.
+- **Active strategy:** `equity_trend_following_ema_cross`
+  (`since: 2026-05-27`). Operator directive executed. Attribution of the
+  10 longs is now formal. End of the 14-day do-nothing run.
+- **Today's `execute`:** strategy generated 3 ADX-fade exits (JPM, META,
+  MSFT). All 3 rejected by SafetyGate (`daily_loss`: 2.3% > 2.0% cap).
+  No orders submitted, book unchanged. Journal now has 3
+  `order_rejected` events.
+- **Broker baseline:** same 10 longs, same qty, same avg-entry to the
+  cent. Equity $111,589.39 (+0.93% vs. Tue). Buying power $15,058.17.
+  Cash -$96,531.22 (unchanged to the cent for the 15th day). No open
+  orders.
+- **Regime:** `bull, conf=0.76, adx=26.3`. Byte-identical to yesterday.
+- **Position health update:**
+  - **JPM** -4.46% unreal (was -2.12%) — dropped on Dimon $20B M&A +
+    "tempered earnings" comments. Now an exit candidate (ADX 19.7).
+  - **META** -7.23% unreal (was -10.54%) — *bounced* +3.70% on SCOTUS
+    denial day. ADX 19.3 → exit candidate.
+  - **MSFT** -1.60% unreal — small loss but ADX is 16.4, deeply
+    trendless. Surprise exit candidate.
+  - Others: all positive unreal, no exit triggers.
 
-## To do tomorrow (Wed 5/27)
+## To do tomorrow (Thu 5/28)
 
-**OPERATOR DIRECTIVE (added by operator 2026-05-27, supersedes decision
-tree below):** Attribute the existing 10 unattributed positions to
-`equity_trend_following_ema_cross`. Run:
-
-```
-python3 -m quant_trading_system.cli set-active equity_trend_following_ema_cross \
-    --reason "Operator-assigned attribution per state/tasks.md (2026-05-27 operator directive). Existing 10 long positions (SPY, QQQ, AAPL, MSFT, GOOGL, AMZN, NVDA, META, TSLA, JPM) are now under harness management."
-```
-
-Then run `execute`. Expected first-session effects per the strategy's
-rules: META (and possibly JPM) likely exit on the next session's open
-due to EMA12<EMA26 / ADX-fade conditions. That outcome is intended and
-authorised by the operator. Do NOT defer.
-
-The original decision tree below is preserved for context but the
-operator directive above takes precedence today.
-
-1. Run the standard read-and-snapshot sequence (manual.md §1–2). Same
-   shape as today.
-2. **Check `state/` mtimes** (not just contents) for any new operator
-   signal since 2026-05-25 17:08. If anything moved, read it.
-3. **Decision tree (superseded today by operator directive above):**
-   - **Path A:** if a new note attributes existing positions to `<id>`
-     → `set-active <id>` with reason "Operator-assigned attribution per
-     `state/<note>`", then `execute`. Expect META (and possibly JPM)
-     to exit on the next session's open.
-   - **Path B:** if the broker is flat (positions list empty)
-     → `set-active equity_trend_following_ema_cross` is clean, then
-     `execute`. Day-1 sizing should fit the ~$14K buying-power cushion.
-   - **Path C:** neither → 15th do-nothing day. One-paragraph
-     conclusion. Don't force `set-active`.
-4. If META gapped further down on Wed open, log the new unreal % in
-   your handoff but do NOT take unilateral action on an unattributed
-   name.
-5. Write a new `tasks.md` and `last_handoff.md`. Fill the Status section
-   from real probe observations. The next `tasks.md` should reflect that
-   attribution has happened — no need to keep the directive block above
-   in tomorrow's file.
+1. Standard read-and-snapshot sequence (manual.md §1–2). Check `state/`
+   mtimes for any new operator note since 2026-05-27 21:54.
+2. **Run `execute` again.** The active strategy is set; daily `execute`
+   is the normal flow now. Expected scenarios:
+   - **(A) Same 3-name basket re-rejected** if Thu marks keep the
+     combined loss ≥ 2.0%. → No orders submit. Document and stop.
+   - **(B) Basket unbundles** if e.g. JPM's ADX(19.7 today) recovers
+     above 20, leaving META+MSFT (~1.5% loss) which would pass the
+     `daily_loss` gate. → Orders submit and fill. Then run
+     `log-closed equity_trend_following_ema_cross <symbol> <pnl>` for
+     each closed position using the **actual realised pnl fraction**
+     from the fill (not today's unreal numbers).
+   - **(C) Outage / ModuleNotFoundError / broker unreachable** → don't
+     edit strategies. Document in handoff and stop. (Manual §safety.)
+3. **Do NOT loosen the `daily_loss` cap** to force the exits through.
+   The gate is working as designed — a graduated multi-day exit of three
+   losing positions is the intended behaviour. Force-flushing requires
+   operator authorisation, not a Claude-side parameter tweak.
+4. **Watch MSFT specifically.** It's the unexpected exit candidate (ADX
+   16.4). If the basket unbundles and JPM/META exit but MSFT keeps
+   getting re-targeted day after day, that's a "first to flush when the
+   gate opens" pattern worth noting. If MSFT suddenly stops getting
+   targeted (ADX climbs back above 20), note that too.
+5. **News brief: read it.** CRM prints AMC tonight (adjacent MSFT
+   enterprise-AI sentiment, not on watchlist). Iran de-escalation
+   continues unless reversed. SCOTUS-META is now priced-in noise.
+6. **No script edits.** Library is fine; the live strategy behaved
+   correctly today.
 
 ## Open questions for the operator
 
-(Same as yesterday — operator has not yet weighed in.)
-
-1. **Should the harness take ownership of the existing 10 longs?**
-   If yes: add a one-line attribution in this file (e.g., "Attribute
-   existing positions to `equity_trend_following_ema_cross`"). If no:
-   flat-close them (or move them to a separate account) so the harness
-   starts from `positions == []`.
-2. **The new `state/tasks.md` you placed on 5/25 asserted "account
-   flat, no open orders" in its Status section.** Was that template
-   default-committed-verbatim, or did you intend for Claude to ignore
-   broker state? Either is fine; just want confirmation before acting.
-3. **No new question today.** The Memorial-Day MTM anomaly (flagged
-   in yesterday's open questions) is resolved — reconciled cleanly on
-   Tuesday's open. No future-holiday handling needed beyond a sentence.
+1. **Daily_loss cap behaviour confirmed expected?** Today's basket of 3
+   ADX-fade exits was blocked at 2.3% > 2.0% cap. Implicit assumption:
+   you want a graduated multi-day exit rather than a single-day flush
+   of attributed losers. If you actually want instant clearance, the
+   cap needs a config bump or a one-time override mechanism (not
+   currently present in the CLI). Will continue to honour the gate
+   until you say otherwise.
+2. **MSFT exit was not anticipated by yesterday's handoff.** ADX 16.4
+   exit triggered cleanly. Just flagging — no action requested.
+3. **Holiday-MTM diligence remains closed.** No outstanding question.

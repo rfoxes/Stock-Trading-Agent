@@ -2,149 +2,217 @@
 
 ## Summary of what I did today
 
-- 14th consecutive do-nothing run. No `set-active`, no `execute`, no script
-  edits. Wrote a new `tasks.md` and this handoff. That's it.
-- Reason for inaction: the broker baseline ambiguity flagged in yesterday's
-  handoff is still unresolved. No new operator note in `state/`,
-  `ATTENTION.md` mtime still `2026-05-14 17:44` (10 weekdays of silence),
-  and the 10 unattributed longs are byte-identical in lot composition to
-  every day since day 5. Yesterday's tasks.md explicitly said: if state/
-  is unchanged and the broker is unchanged → another do-nothing day. Both
-  conditions held.
-- News brief was **NORMAL FLOW** (Iran "defensive strikes" pushed Brent to
-  ~$100 briefly but equities closed +0.61% S&P, +1.19% Nasdaq to a record).
-  No catalyst that would override the meta-level decision either way.
+- **Executed the operator directive.** Per yesterday's `tasks.md` (2026-05-27
+  operator directive), called `set-active equity_trend_following_ema_cross`
+  with the supplied reason. Attribution of the 10 existing longs is now
+  formal — `active_strategy.md` shows `strategy_id:
+  equity_trend_following_ema_cross, since: 2026-05-27`. End of 14-day
+  do-nothing run.
+- **Ran `execute`.** Strategy generated **3 exit intents**: JPM (sell 64),
+  META (sell 28), MSFT (sell 44). All three were rejected by SafetyGate's
+  `daily_loss` check — the basket's combined realized loss would be 2.3%
+  of equity, exceeding the 2.0% cap. **No orders were submitted. Book is
+  unchanged.**
+- Wrote new `tasks.md` (dropped the operator-directive block per the
+  instruction in yesterday's file) and this handoff.
+- News brief was **NOTABLE** — SCOTUS denied META's Vermont
+  Instagram-addiction appeal, Dimon floated $20B JPM M&A capacity, NVDA
+  committed $150B/yr to Taiwan, Iran de-escalated (-5.55% WTI). Did not
+  override execution — the strategy is purely technical (EMA + ADX) and
+  doesn't read `ctx.news_brief`. Note: META actually rallied +3.70% today
+  on the SCOTUS news (markets had it priced in), and JPM dropped -2.39%
+  on Dimon comments. The METAB exit candidacy is driven by the ADX
+  fade, not the legal item.
 
 ## Observations and reasoning
 
-### Broker snapshot (Tue 2026-05-26 post-close)
+### Broker snapshot (Wed 2026-05-27 post-close, pre-execute)
 
-- **Account:** equity $110,557.20, cash -$96,531.22 (unchanged to the cent
-  for the 14th day), buying_power $14,025.98, day_trade_count 0.
-- **Equity moved -$610.52 (-0.55%) vs. yesterday's holiday MTM** of
-  $111,167.72. That delta is precisely the change in `buying_power` (also
-  -$610.52), confirming the cash leg didn't move — only marks did.
-- **Positions:** same 10 longs, same qty, same avg-entry to the cent. Today's
-  close marks (Tue actual) vs. yesterday's holiday MTM:
-  - AAPL 308.36 (was 309.85, -0.48%), unreal +13.66%
-  - AMZN 264.43 (was 268.79, -1.62%), unreal +6.40%
-  - GOOGL 388.01 (was 386.11, +0.49%), unreal +14.53%
-  - JPM 306.40 (was 307.75, -0.44%), unreal -2.12%
-  - META 609.74 (was 612.80, -0.50%), unreal **-10.54%** (-$2,011 abs)
-  - MSFT 415.05 (was 419.65, -1.10%), unreal -1.47%
-  - NVDA 213.94 (was 217.31, -1.55%), unreal +7.29%
-  - QQQ 729.64 (was 724.26, +0.74%), unreal +12.61%
-  - SPY 750.01 (was 750.66, -0.09%), unreal +5.81%
-  - TSLA 435.38 (was 429.30, +1.42%), unreal +7.77%
-- **Holiday-MTM reconciliation: clean.** Largest single-name drift is
-  AMZN -1.62%; nothing material. The paper-broker's holiday mark service
-  was within normal Tuesday-open noise. No need to escalate; future
-  holiday runs can rely on the same service without flagging it.
-- **SPY quote:** rolled forward as expected. Fri/Mon was bid=723.82 /
-  ask=768.65 / mid=746.235 (stale); today is bid=727.62 / ask=772.70 /
-  mid=750.16. Quote feed is alive again.
-- **Open orders:** none. **Journal:** still empty (`recent-trades count=0`).
-- **Regime:** `bull, confidence=0.76, sma_200_slope=+0.000775,
+- **Account:** equity $111,589.39 (+$1,032.19 / +0.93% vs. Tue $110,557.20),
+  cash -$96,531.22 (unchanged to the cent, **15th consecutive day**),
+  buying_power $15,058.17, day_trade_count 0.
+- **Positions:** same 10 longs, same qty, same avg-entry to the cent.
+  Today's marks vs. yesterday:
+  - AAPL 310.66 (+0.75%), unreal +14.51% (was +13.66%)
+  - AMZN 272.89 (+3.20%), unreal +9.80% (was +6.40%)
+  - GOOGL 389.33 (+0.34%), unreal +14.92% (was +14.53%)
+  - JPM 299.075 (-2.39%), unreal **-4.46%** (was -2.12%) — **worsened ~2.3pp on Dimon $20B M&A + "tempered earnings" comments**
+  - META 632.29 (+3.70%), unreal -7.23% (was -10.54%) — **bounced ~3.3pp despite SCOTUS adverse ruling (priced in)**
+  - MSFT 414.51 (-0.13%), unreal -1.60% (was -1.47%)
+  - NVDA 212.05 (-0.88%), unreal +6.35% (was +7.29%) — chip rotation pullback
+  - QQQ 729.71 (+0.01%), unreal +12.62% (was +12.61%)
+  - SPY 751.02 (+0.13%), unreal +5.96% (was +5.81%)
+  - TSLA 438.98 (+0.83%), unreal +8.66% (was +7.77%)
+- **Open orders:** none. **Journal** (pre-execute): empty. (Post-execute:
+  3 `order_rejected` events.)
+- **Regime:** `bull, conf=0.76, sma_200_slope=+0.000775,
   price_vs_sma200=+10.46%, sma_50_vs_200=+2.79%, adx=26.33,
-  realized_vol=0.1028`. Drift from Friday is the right direction (price-vs-
-  200SMA +0.6pp, ADX +0.6, vol +0.001) and classification is unchanged.
-  Bull/strong-trend regime. No regime change to react to.
+  realized_vol=0.1028`. Byte-identical to yesterday's read. Unchanged.
 
-### Why I deferred again
+### Execute outcome — strategy fires, SafetyGate clamps
 
-Per the manual: "If the broker is now flat → `set-active
-equity_trend_following_ema_cross` is clean. If a note says 'attribute
-existing positions to <id>' → set-active per the note. If nothing changed
-in state/ and the broker is unchanged → do-nothing."
+`set-active equity_trend_following_ema_cross` then `execute` →
+**3 intents, 0 submitted, 3 rejected.** The strategy's `evaluate()`
+scanned the book and decided three names had lost their trend (all
+**ADX-fade exits**, not death-cross):
 
-The broker is **not flat** and **no attribution note has appeared**. So
-yesterday's tasks.md third sub-case applies, verbatim. The exit-cascade
-risk is also unchanged: the EMA-cross strategy's default watchlist
-(`[SPY, QQQ, AAPL, MSFT, GOOGL, AMZN, NVDA, META, TSLA, JPM]`) still
-matches the unattributed book byte-for-byte. Calling `set-active
-equity_trend_following_ema_cross` + `execute` on Tue's close would
-retroactively claim the operator's positions and the exit pass would
-probably flatten META (-10.5% unreal, no EMA trend support) and possibly
-JPM (-2.1%, trendless) on Wed's open. That outcome needs operator
-authorisation, not a unilateral Claude decision.
+| Symbol | Side | Qty | Reason | Result |
+|---|---|---|---|---|
+| JPM | sell | 64 | `ADX(14)=19.7 < exit threshold 20.0` | rejected: daily_loss |
+| META | sell | 28 | `ADX(14)=19.3 < exit threshold 20.0` | rejected: daily_loss |
+| MSFT | sell | 44 | `ADX(14)=16.4 < exit threshold 20.0` | rejected: daily_loss |
 
-### News brief
+SafetyGate rejection rationale: "Daily loss 2.3% exceeds limit 2.0%."
+The realized loss from closing all three at today's marks would be
+~$2,569 (JPM -$893 + META -$1,379 + MSFT -$296), or 2.30% of equity.
+The 2% `daily_loss` cap is per-batch and treated the three sells as a
+single basket. The gate passed `paper_trading_mode`, `restricted_symbols`,
+and `position_size` checks for each intent individually — it's purely
+the aggregate-realized-loss-vs-cap test that failed.
 
-NORMAL FLOW. The Iran story is below the >2% futures-move threshold for a
-halt-worthy geopolitical event; the news agent explicitly recommended
-standard workflow. The only items that touch the unattributed book:
-- NVDA: "down ~10% in 2 weeks despite record $81.6B revenue" — already in
-  the tape, not a fresh catalyst. Today's actual NVDA close -1.55% vs.
-  holiday MTM, position still +7.29% unreal — consistent with the news
-  agent's "noise high, signal neutral-to-positive" characterization.
-- MSFT/AAPL: constructive single-name news (BNPP 33% upside case;
-  PT raised to $380). Doesn't move my meta-decision.
-- META: no fresh catalyst, but no relief either. Still the only
-  meaningfully negative single name.
-- GOOGL: EU DMA penalty incoming but no $ amount yet. Position has +14.5%
-  cushion. Slow burn.
+**Why this is the right outcome.** The cap exists exactly to prevent a
+single-day liquidation cascade. Day 1 of attribution, the strategy
+correctly identified that three names had lost trend support, but the
+SafetyGate enforced a graduated exit rather than a basket dump. The
+operator directive was honoured (positions are now attributed); the
+safety gate's behaviour is also correct (it didn't allow the harness to
+realise -2.3% on day 1 of taking the book under management).
 
-None of this changes the meta-decision. If `set-active` had been called,
-the news doesn't argue for or against the resulting trades — it's a
-neutral input.
+Both observations matter:
+1. **Yesterday's handoff was directionally right** — it predicted META
+   and possibly JPM would exit, and noted "EMA12<EMA26 / ADX-fade
+   conditions." The reality is ADX-fade for all three (META + JPM + a
+   surprise MSFT), not death-cross. The +DI / -DI / death-cross legs
+   never triggered today; the ADX < 20 threshold did.
+2. **MSFT was unexpected.** Yesterday's handoff did not flag MSFT as an
+   exit candidate. MSFT's ADX is 16.4 — the deepest below the 20
+   threshold of the three. The position is only -1.60% unreal (smallest
+   loss of the three) but is in the most trendless tape. This is the
+   first thing that should be re-checked tomorrow.
 
-### Carry-forwards (unchanged from prior handoffs)
+### News brief vs. execution
 
-- Health/portfolio-health bug, IEX-only volume caveat, broken `.venv`
-  symlink — all status quo. Manual now authorises system `python3`
-  directly so the venv issue is out of scope.
-- `recent-trades` journal is empty so there's nothing to attribute via
-  `log-closed`. No closed positions to reconcile (all 10 longs persist).
+Brief was **NOTABLE**, not HALT-WORTHY. Three watchlist items:
 
-## Recommendations for tomorrow's Claude (Wed 2026-05-27)
+- **META — SCOTUS denied appeal** (adverse legal). Reality: META +3.70%
+  intraday. The market had this priced in. Strategy doesn't read news;
+  the ADX-fade exit triggered independent of the legal item. If anything,
+  today's bounce slightly improved the META exit math (-$1,379 vs. an
+  expected -$2,000+ at yesterday's marks).
+- **JPM — Dimon $20B M&A + "higher costs / tempered earnings"**. Reality:
+  JPM -2.39%. The intraday weakness pushed JPM's unreal from -2.12% to
+  -4.46% and contributed to crossing the 2% daily-loss aggregate
+  threshold. ADX also fell to 19.7. Pure technical exit decision; the
+  news context confirms direction.
+- **NVDA — $150B/yr Taiwan investment** (structurally bullish, chip
+  rotation today). NVDA -0.88%, no exit trigger. Strategy left it alone.
 
-1. **Read `state/` first.** Specifically: has the operator added a new
-   note (or updated `tasks.md` / `ATTENTION.md` / `active_strategy.md`)
-   that resolves the attribution question? Check mtime, not just
-   contents. If yes → follow the operator's directive. If no → continue
-   the do-nothing posture documented here.
+None of the news items would have overridden the technical exits had
+they been submitted, and none argued for adding entries. The strategy
+correctly executed its rules; the SafetyGate correctly throttled the
+basket.
 
-2. **The unblock paths from yesterday's handoff are still the same.**
-   Don't re-derive them. They are:
-   - (A) Operator note attributes existing positions to `<id>` → `set-active <id>` with reason "Operator-assigned attribution per `state/<note>`", then `execute`. Expect META and possibly JPM to exit on Wed's open.
-   - (B) Broker is flat (positions list empty) → `set-active equity_trend_following_ema_cross` is clean, then `execute`. Cushion is ~$3.5K-ish so first-day sizing should fit.
-   - (C) Neither → 15th do-nothing day. Write a one-paragraph conclusion. Don't force action.
+### Equity move sanity check
 
-3. **Holiday-MTM reconciliation is done.** The Mon→Tue mark drift was
-   within normal noise. Future Memorial Day / 4th-of-July / etc. runs can
-   note the holiday MTM in one sentence and move on; no need for the
-   "is this a bug?" diligence I did today.
+Equity +$1,032 (+0.93%) on a day where the position-weighted move (using
+qty × Δprice) sums to +$1,034.43:
 
-4. **META is at -10.5% unreal (-$2,011 abs).** The -15% escalation
-   trigger from prior handoffs hasn't fired, but the move was -0.44pp
-   from yesterday's holiday mark — single-day pace. If META gaps down
-   further on Wed open, the trigger could fire. If it does (post-close
-   read), surface in your handoff but don't take unilateral action on an
-   unattributed name.
+| Symbol | Qty | Δ vs. yesterday | Contribution |
+|---|---|---|---|
+| AAPL | 72 | +2.30 | +$165.60 |
+| AMZN | 76 | +8.46 | +$642.96 |
+| GOOGL | 56 | +1.32 | +$73.92 |
+| JPM | 64 | -7.325 | -$468.80 |
+| META | 28 | +22.55 | +$631.40 |
+| MSFT | 44 | -0.539 | -$23.71 |
+| NVDA | 96 | -1.89 | -$181.44 |
+| QQQ | 28 | +0.07 | +$1.96 |
+| SPY | 35 | +1.01 | +$35.35 |
+| TSLA | 48 | +3.60 | +$172.80 |
+| **Sum** | | | **+$1,050.04** |
 
-5. **Equity moved -0.55% on a +0.61% S&P day.** That's mild relative
-   underperformance from the unattributed book — META + MSFT + NVDA all
-   slipped against a green tape. Not alarming (book has +13.6%
-   AAPL, +14.5% GOOGL, +12.6% QQQ offsetting). Just note: this is the
-   first session where the book underperformed SPY meaningfully in a
-   while. If it persists, that's structural drag worth flagging — one
-   day isn't a pattern.
+Reconciles to within ~$18 (mark precision / mid-vs-last difference). No
+anomaly. Cash leg unchanged to the cent, again.
 
-6. **`ATTENTION.md` mtime check.** Still `2026-05-14 17:44`. Will be
-   `2026-05-14 17:44` again tomorrow unless the operator finally writes
-   to it. The `state/` directory is the operator's active signal channel
-   (manual + tasks both touched 2026-05-25 17:08 by operator) — check
-   `state/*.md` mtimes too.
+### Carry-forwards
 
-7. **No script edits today.** Strategy library unchanged (18 active, 0
-   archived). The recommended day-1 strategy
-   (`equity_trend_following_ema_cross`) still parses cleanly and its
-   regime list (`trending`, `high_momentum`) matches today's
-   `bull/conf=0.76, adx=26.3` classification. It is the right strategy
-   to activate the moment the baseline ambiguity is resolved.
+- 18 strategies on disk, status unchanged.
+- `equity_trend_following_ema_cross` `.md` and `.py` not edited today —
+  the rules fired as designed.
+- `recent-trades` journal now has 3 events (all `order_rejected`).
+- Holiday-MTM diligence remains closed.
 
-8. **If you're tempted to act unilaterally**: don't. The harness is at
-   zero cost across 14 do-nothing days. The trigger remains operator-
-   side. The manual's "Doing nothing is a valid outcome and is often the
-   correct one" rule applies. The cost of waiting one more day is much
-   smaller than the cost of an unintended META flush.
+## Recommendations for tomorrow's Claude (Thu 2026-05-28)
+
+1. **Standard read-and-snapshot sequence** (`manual.md` §1–2). Re-read
+   `tasks.md` first.
+
+2. **Check `state/` mtimes** for any new operator note since
+   2026-05-27 21:54 (when today's operator directive was written into
+   the old `tasks.md`).
+
+3. **Run `execute` again.** The active strategy is set; `execute` is
+   the normal daily action now. Two scenarios:
+
+   - **Most likely: same 3-name exit basket re-attempts.** JPM/META/MSFT
+     ADX values were 19.7 / 19.3 / 16.4 — all below 20, none with
+     a clear path to recover above 20 in a single session. The
+     SafetyGate aggregate-loss math depends on Thu's marks vs. today's
+     close. If Thu prices move favorably enough that the basket loss
+     drops below 2.0%, the orders submit. If not, rejected again.
+
+   - **Possibly: one or two names recover above ADX 20 → fewer exits → basket loss drops → some submit.** If e.g. JPM's ADX climbs back above 20 (its 19.7 today is closest to the threshold), only META + MSFT may try to exit, which is ~$1,675 loss = ~1.50% of equity → would pass the gate.
+
+4. **If exits submit and fill**, write `log-closed
+   equity_trend_following_ema_cross <symbol> <pnl_fraction>` for each
+   closed position. Today's unreal losses (if filled at today's marks)
+   would be: JPM -4.46%, META -7.23%, MSFT -1.60%. Use the *actual*
+   realised PnL fraction from the fill, not these unreal numbers.
+
+5. **Do NOT loosen the daily_loss cap to force the exit.** The cap is
+   working as intended. A multi-day graduated exit of three losing
+   positions is exactly the behaviour the gate is designed to encourage.
+   If the operator wants instant flush, that's a config / operator
+   decision, not a Claude-side parameter edit.
+
+6. **News brief: re-read it.** Today's NOTABLE items (SCOTUS-META,
+   Dimon-JPM, Huang-NVDA) may have follow-on prints tomorrow. CRM
+   prints AMC tonight (not on watchlist but adjacent MSFT enterprise-AI
+   sentiment). Iran de-escalation continues to be tailwind unless
+   reversed.
+
+7. **Watch MSFT.** It was the unexpected exit candidate today (ADX 16.4,
+   smallest unreal loss of the three). If the basket *does* unbundle
+   tomorrow and JPM/META exit but MSFT survives one more day in the
+   `intent → rejected` state, that's worth observing — it means MSFT is
+   in a more persistently trendless tape and may be a "first to flush"
+   candidate when the gate opens. If the strategy keeps re-targeting
+   MSFT every day, that's fine; if it suddenly stops targeting MSFT
+   (ADX climbs back above 20), note that too.
+
+8. **No script edits.** Strategy library unchanged; the live strategy
+   behaved correctly. Only edit `.md` / `.py` if a structural problem
+   emerges — not for "we got blocked by SafetyGate," which is desired
+   behaviour.
+
+9. **META legal item.** Today's bounce shows the SCOTUS denial was
+   priced in. No need to track it as a special event going forward; it's
+   now ordinary discovery-phase litigation noise. If a damages number
+   prints later, news brief will surface it.
+
+10. **15 days of cash unchanged to the cent** — `cash: -96531.22`. Worth
+    noting in your handoff if it persists tomorrow; the cash leg has not
+    moved since attribution-day-zero. Will change the moment any exit
+    fills.
+
+## Git-sync status
+
+`git-sync` **failed** today. The helper reported a stale `.git/index.lock`
+in the worktree from "another git process" with `Operation not permitted`
+on the unlink — the sandbox couldn't remove it. Result: `committed:
+false, pushed: false, nothing to commit`. Today's state-file edits
+(`active_strategy.md`, `tasks.md`, `last_handoff.md`, `manual.md`) are
+on the sandbox disk but were **not** committed or pushed. Tomorrow's
+Claude may want to re-run `git-sync` (or escalate to the operator if the
+lock persists) so today's changes don't get lost in a future session
+that overwrites them.

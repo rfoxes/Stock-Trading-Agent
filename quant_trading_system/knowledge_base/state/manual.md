@@ -254,4 +254,4 @@ regime classifier needs more than 200 bars of warmup; first-week runs see
 'unknown' until SPY history fills"; "halt new entries when net unrealized
 P&L drops below -8% — three weeks of data confirm this gate works.")
 
-(empty)
+- **SafetyGate `daily_loss` is evaluated per-batch, not per-order.** When a strategy's `evaluate()` returns multiple sell intents in a single run, the gate sums their combined realised loss against the 2% cap; if the basket exceeds it, *every* intent in the batch is rejected, not just enough to bring it under the line. This is desired behaviour (it prevents a one-day liquidation cascade) but means a strategy with N losing positions will get throttled into a multi-day graduated exit. Don't edit the cap or the strategy to work around this — the gate is doing its job. Observed 2026-05-27 when 3 ADX-fade exits (JPM/META/MSFT, combined -2.3% of equity) were all rejected together.
