@@ -125,6 +125,15 @@ added. The battery does.
 - Published-author quant blogs (Quantpedia, Marc Rubinstein, Robert Carver,
   CSSAnalytics, Allocate Smartly)
 
+**Options-specific sources** (use these when researching options strategy
+ideas — the harness now supports multi-leg options end-to-end):
+- tastytrade research / Tom Sosnoff content
+- Option Alpha (educational + back-test posts)
+- CBOE white papers (RUT/VIX research)
+- SSRN q-fin Options section
+- "Option Volatility & Pricing" (Natenberg) for foundational concepts
+- Charles M. Cottle "Coulda Woulda Shoulda" for advanced multi-leg shapes
+
 **Acceptable but verify reasoning concretely:**
 - Substacks with named authors and reproducible methodology
 - Hedge-fund letters (thematic ideas, not literal rules)

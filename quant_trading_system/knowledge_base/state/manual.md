@@ -161,6 +161,45 @@ The Saturday research agent can extend the universe by adding new
 strategies that target new symbols; the M-F news agent covers whatever
 the universe contains.
 
+## Options trading
+
+The harness supports multi-leg options end-to-end as of the Phase-1 build:
+chain data via Alpaca's `/v1beta1/options/snapshots` endpoint, OCC symbol
+parsing/building (`options.py`), an `OptionsOrderRequest` model, multi-leg
+submission via Alpaca's `/v2/orders` with `legs[]`, and an options-specific
+SafetyGate path (`validate_and_submit_options`).
+
+Strategies signal options trades by returning `OptionsIntent` objects from
+`evaluate()` (instead of, or alongside, equity `OrderIntent` objects). The
+runtime detects the type and routes through the right safety gate.
+
+**Defined vs. undefined risk:** the safety gate has an explicit undefined-risk
+gate. Strategies must either declare `declared_max_loss_usd` (the structure's
+known max loss) OR explicitly set `allow_undefined_risk=True` to opt into
+naked / short-vol structures. The user has authorised undefined-risk
+structures (per the design decision); the gate is in place anyway because
+slipping past it should require deliberate code, not an accident.
+
+**Currently functional strategies:**
+- `iron_condor_high_iv` — fully wired up (4-leg, defined risk).
+
+**Skeleton strategies** (the rules are documented in `strategy.md` but
+`evaluate()` returns `[]` until the Python is upgraded — Saturday research
+agent can do this, or the operator can edit each strategy.py):
+- `bear_call_spread`, `bull_put_spread`, `calendar_spread`,
+  `covered_call_wheel`, `jade_lizard`, `long_straddle_earnings`,
+  `protective_put_collar`
+
+**One-time setup on your Alpaca paper account:** enable Options Trading at
+Level 2 (for defined-risk multi-leg) or Level 3 (to also allow undefined-risk
+positions like naked puts/short straddles). Without that approval, even a
+correctly-built multi-leg order will be rejected with a 403.
+
+You can `set-active iron_condor_high_iv` like any other strategy. The
+strategy will iterate the filtered universe, look for IV rank ≥ 50,
+construct a 0.16-delta-strike condor with 5-wide wings at 30-45 DTE,
+size to ~5% of equity max loss, and submit as a 4-leg limit order.
+
 ## News-aware strategies
 
 Every strategy's `StrategyContext` exposes `ctx.news_brief`, a parsed

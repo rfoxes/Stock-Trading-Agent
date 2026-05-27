@@ -194,3 +194,78 @@ class AlpacaClient:
             "ask_size": int(q.get("as", 0)),
             "mid": (bid + ask) / 2 if bid and ask else 0.0,
         }
+
+    # -- options ---------------------------------------------------------
+
+    def get_options_chain(
+        self,
+        underlying: str,
+        *,
+        expiration: str | None = None,
+        feed: str = "indicative",
+    ) -> list[dict]:
+        """Fetch options chain snapshots for an underlying.
+
+        Returns a list of snapshot dicts, each containing:
+            symbol, latestQuote ({bid, ask, bidSize, askSize, ts}),
+            greeks ({delta, gamma, theta, vega, rho}),
+            impliedVolatility, openInterest, …
+
+        Uses Alpaca's `/v1beta1/options/snapshots/{underlying}` endpoint.
+        Auto-paginates up to a hard cap.
+        """
+        url = f"https://data.alpaca.markets/v1beta1/options/snapshots/{underlying.upper()}"
+        params: dict[str, Any] = {"feed": feed, "limit": 100}
+        if expiration:
+            params["expiration_date"] = expiration
+        out: list[dict] = []
+        page_token: str | None = None
+        pages = 0
+        while True:
+            p = dict(params)
+            if page_token:
+                p["page_token"] = page_token
+            try:
+                resp = self._session.get(url, params=p, timeout=DEFAULT_TIMEOUT)
+            except requests.RequestException as e:
+                logger.warning("alpaca_options_chain_request_failed sym=%s err=%s", underlying, e)
+                return out
+            if resp.status_code >= 400:
+                logger.warning(
+                    "alpaca_options_chain_http_error sym=%s status=%s body=%s",
+                    underlying, resp.status_code, resp.text[:200],
+                )
+                return out
+            data = resp.json() or {}
+            snaps = data.get("snapshots") or {}
+            # Alpaca returns snapshots as {option_symbol: {...}}
+            for sym, snap in snaps.items():
+                snap = dict(snap or {})
+                snap["symbol"] = sym
+                # Hoist greeks for easy access
+                g = snap.get("greeks") or {}
+                snap["greeks"] = {
+                    "delta": float(g.get("delta", 0.0)) if g.get("delta") is not None else None,
+                    "gamma": float(g.get("gamma", 0.0)) if g.get("gamma") is not None else None,
+                    "theta": float(g.get("theta", 0.0)) if g.get("theta") is not None else None,
+                    "vega": float(g.get("vega", 0.0)) if g.get("vega") is not None else None,
+                    "rho": float(g.get("rho", 0.0)) if g.get("rho") is not None else None,
+                }
+                out.append(snap)
+            page_token = data.get("next_page_token") or None
+            pages += 1
+            if not page_token or pages >= 20:
+                break
+        return out
+
+    def submit_options_order(self, body: dict) -> dict:
+        """Submit a multi-leg options order.
+
+        `body` is the raw Alpaca request payload; SafetyGate assembles it
+        with `order_class: "mleg"` and `legs: [{symbol, side, ratio_qty, position_intent}, ...]`.
+        """
+        logger.info(
+            "alpaca_submit_options_order qty=%s order_class=%s n_legs=%s",
+            body.get("qty"), body.get("order_class"), len(body.get("legs") or []),
+        )
+        return self._request("POST", "/v2/orders", json_body=body)

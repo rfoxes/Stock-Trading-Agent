@@ -65,6 +65,13 @@ affecting the companies on the watchlist or macro conditions around them.
   geopolitical escalations, policy/tariff announcements.
 - Catalysts on the calendar: earnings dates, FDA approvals, central-bank
   meetings happening today/tomorrow.
+- **Volatility regime markers**: VIX moves > 3 points, IV-rank shifts on
+  watchlist names, VIX-futures term-structure inversion. The trader uses
+  these to decide whether vol-selling vs vol-buying options structures
+  are appropriate today.
+- **Unusual options activity** (UOA): when a watchlist symbol has a
+  confirmed large sweep / volume spike pre-print. Doesn't tell us what
+  to do but is a signal an event is impending.
 
 **DROP (price commentary the trader can see itself):**
 - "NVDA down 10% in 2 weeks" / "META -10% unrealized" / "AAPL at record".
@@ -136,12 +143,24 @@ move on. Full-article fetching is reserved for the Saturday research agent.
    - `macro` — Fed, inflation prints, jobs reports, GDP. WebSearch queries
      like `"FOMC <today>"`, `"CPI release"`.
    - `earnings` — symbols on the watchlist or in positions reporting today
-     or tomorrow. WebSearch `"<SYMBOL> earnings <today>"`.
+     or tomorrow. WebSearch `"<SYMBOL> earnings <today>"`. Earnings
+     dates double as options catalysts (IV expansion pre-print, crush
+     post-print) — flag earnings dates explicitly even when the print
+     itself is in the future.
    - `geopolitics` — only material events (e.g. trade war escalation, war
      news affecting energy or supply chains). Skip when nothing major
      happened.
    - `policy` — SEC actions, tariffs, executive orders impacting the
      watchlist. Skip when nothing major happened.
+   - `volatility` — VIX moves > 3 points / day, IV rank changes on
+     watchlist names, term-structure shifts (front-month above back-month
+     = inverted), VIX futures/SVXY/UVXY action that signals vol regime
+     change. WebSearch `"VIX today"`, `"<SYMBOL> implied volatility"`.
+   - `options_flow` — confirmed unusual options activity (UOA): large
+     sweeps, calls > 3x avg daily volume, dark pool prints. Sources:
+     "<SYMBOL> unusual options activity", CBOE flow reports, Cheddar
+     Flow / Unusual Whales summaries when free / accessible. Only
+     include items where the underlying is on our universe.
 
    Use the same HTML structure as the auto-fetched stock/sector files: a
    simple list of items with headline, source, date, summary. Empty
@@ -218,6 +237,29 @@ than it needs to be.
 A run that writes a NO MATERIAL NEWS brief with all-empty category files
 is a fine run. **No-op briefs are valid and often correct.** Don't invent
 significance to look productive.
+
+## Options awareness
+
+The harness now supports options trading end-to-end (Phase 1 — `iron_condor_high_iv`
+is the first fully-implemented options strategy; 7 more remain skeletons). Your
+job in the news layer is to give the options-trading side of the trader useful
+context, specifically:
+
+- **Earnings dates** for any watchlist symbol within the next 14 days. Even
+  if the print itself is in the future, the options market is already
+  trading the expected move; the trader needs to know.
+- **VIX level + recent moves**. Today's VIX close, change vs. last week, and
+  any term-structure shifts (front-month vs. back-month spread). Volatility
+  selling strategies want IV rank > 50; volatility buying strategies want
+  IV rank < 20.
+- **Ex-dividend dates** for symbols with held shares or active covered-call
+  positions — early assignment risk spikes around ex-div for ITM calls.
+- **FDA / regulatory catalyst calendars** for biotech / pharma names if
+  the universe expands into them. Binary events are the canonical setup
+  for long-straddle strategies.
+
+You do NOT need to make recommendations about which options structures to
+use — that's the trader's call. You just surface the events.
 
 ## Recent feedback
 

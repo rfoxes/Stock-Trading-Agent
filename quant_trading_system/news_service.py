@@ -63,7 +63,10 @@ SYMBOL_TO_SECTOR: dict[str, str] = {
     "JPM": "financials",
 }
 
-CATEGORIES = ("macro", "earnings", "geopolitics", "policy")
+CATEGORIES = (
+    "macro", "earnings", "geopolitics", "policy",
+    "volatility", "options_flow",
+)
 
 
 def sector_for(symbol: str) -> str:

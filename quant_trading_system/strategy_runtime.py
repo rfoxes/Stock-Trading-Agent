@@ -128,6 +128,10 @@ class StrategyContext:
     get_bars: Callable[..., pd.DataFrame] = field(default=lambda *a, **kw: pd.DataFrame())
     get_quote: Callable[[str], Optional[dict[str, Any]]] = field(default=lambda s: None)
     compute_indicator: Callable[..., Any] = field(default=lambda *a, **kw: None)
+    # Options data access (no-ops by default for backward compat)
+    get_options_chain: Callable[..., list[dict[str, Any]]] = field(default=lambda *a, **kw: [])
+    find_strike_by_delta: Callable[..., Any] = field(default=lambda *a, **kw: None)
+    compute_iv_rank: Callable[..., Optional[float]] = field(default=lambda *a, **kw: None)
 
     def __repr__(self) -> str:  # avoid dumping pandas/callables in logs
         return (
@@ -135,6 +139,30 @@ class StrategyContext:
             f"positions={len(self.positions)}, regime={self.regime.get('regime')!r}, "
             f"watchlist_size={len(self.watchlist)}, news={self.news_brief.assessment})"
         )
+
+
+@dataclass
+class OptionsIntent:
+    """One multi-leg options order a strategy wants the harness to submit.
+
+    Strategies build OptionsIntent objects with explicit OCC option symbols
+    in each leg. The runtime translates each intent into an
+    OptionsOrderRequest, sends it through SafetyGate's options validator,
+    and journals the result.
+
+    `declared_max_loss_usd` is the strategy's stated max loss for the
+    structure — required unless `allow_undefined_risk=True` is set, in
+    which case the strategy is taking responsibility for managing the tail.
+    """
+
+    legs: list[dict[str, Any]]                         # [{contract_symbol, side, ratio?}, ...]
+    qty: int = 1                                        # multiplier across legs (# of spreads)
+    order_type: str = "limit"
+    limit_price: float | None = None                    # net debit/credit
+    time_in_force: str = "day"
+    reasoning: str = ""
+    declared_max_loss_usd: float | None = None
+    allow_undefined_risk: bool = False
 
 
 @dataclass
@@ -268,11 +296,30 @@ def run_strategy(
             "strategy_id": strategy_id,
         }
 
-    # Submit each intent through SafetyGate
+    # Submit each intent through SafetyGate. Strategies can return either
+    # OrderIntent (single-leg equity) or OptionsIntent (multi-leg options);
+    # route accordingly.
     submitted: list[dict[str, Any]] = []
     rejected: list[dict[str, Any]] = []
     errors: list[dict[str, Any]] = []
     for raw in intents:
+        # Options intent (or dict that looks like one)
+        if isinstance(raw, OptionsIntent) or (
+            isinstance(raw, dict) and "legs" in raw
+        ):
+            opt_result = _submit_options_intent(
+                raw, strategy_id=strategy_id, run_id=run_id, safety_gate=safety_gate,
+            )
+            if opt_result is None:
+                errors.append({"raw": str(raw)[:200], "reason": "invalid OptionsIntent"})
+                continue
+            if opt_result.get("status") == "rejected":
+                rejected.append(opt_result)
+            else:
+                submitted.append(opt_result)
+            continue
+
+        # Equity intent (default)
         intent = _coerce_intent(raw)
         if intent is None:
             errors.append({"raw": str(raw)[:200], "reason": "could not coerce to OrderIntent"})
@@ -477,6 +524,36 @@ def _build_context(sf, *, settings, market_data, regime_classifier, alpaca_clien
             return float(ti.compute_vwap(bars["High"], bars["Low"], bars["Close"], bars["Volume"]).iloc[-1])
         return None
 
+    # Options helpers
+    def _get_chain(symbol: str, expiration: str | None = None) -> list[dict[str, Any]]:
+        try:
+            return market_data.get_options_chain(symbol, expiration=expiration)
+        except Exception as e:
+            logger.warning("ctx_options_chain_failed sym=%s err=%s", symbol, e)
+            return []
+
+    def _find_strike(chain, target_delta, right, expiration=None):
+        from quant_trading_system.options import find_strike_by_delta
+        return find_strike_by_delta(
+            chain, target_delta=target_delta, right=right, expiration=expiration,
+        )
+
+    def _iv_rank(symbol: str) -> float | None:
+        # Best-effort: derive from recent ATM IV via the chain snapshots.
+        # We don't have a historical IV series wired up; approximate using
+        # realized volatility of the underlying as a poor-man's anchor.
+        try:
+            bars = market_data.get_bars(symbol, "1Day")
+            if bars.empty or len(bars) < 60:
+                return None
+            from quant_trading_system.options import compute_iv_rank
+            ret = bars["Close"].pct_change().dropna()
+            # Realized vol annualized, rolling 21-day
+            rv = ret.rolling(21).std() * (252 ** 0.5)
+            return compute_iv_rank(rv.tail(252))
+        except Exception:
+            return None
+
     return StrategyContext(
         date=dt.date.today(),
         params=params,
@@ -495,6 +572,9 @@ def _build_context(sf, *, settings, market_data, regime_classifier, alpaca_clien
         ),
         get_quote=lambda symbol: _safe_quote(market_data, symbol),
         compute_indicator=_compute_indicator,
+        get_options_chain=_get_chain,
+        find_strike_by_delta=_find_strike,
+        compute_iv_rank=_iv_rank,
     )
 
 
@@ -509,6 +589,90 @@ def _safe_quote(market_data, symbol: str) -> Optional[dict[str, Any]]:
         return market_data.get_latest_quote(symbol)
     except Exception:
         return None
+
+
+def _submit_options_intent(
+    raw: Any,
+    *,
+    strategy_id: str,
+    run_id: str,
+    safety_gate,
+) -> Optional[dict[str, Any]]:
+    """Translate an OptionsIntent (or dict) into an OptionsOrderRequest and
+    submit through SafetyGate's options validator. Returns a result dict
+    (with `status`) or None if the intent could not be coerced."""
+    from quant_trading_system.models.trade import OptionsOrderRequest, TimeInForce, OrderType
+
+    if isinstance(raw, OptionsIntent):
+        d = {
+            "legs": raw.legs,
+            "qty": raw.qty,
+            "order_type": raw.order_type,
+            "limit_price": raw.limit_price,
+            "time_in_force": raw.time_in_force,
+            "reasoning": raw.reasoning,
+            "declared_max_loss_usd": raw.declared_max_loss_usd,
+            "allow_undefined_risk": raw.allow_undefined_risk,
+        }
+    elif isinstance(raw, dict):
+        d = raw
+    else:
+        return None
+
+    try:
+        req = OptionsOrderRequest(
+            qty=int(d.get("qty", 1)),
+            legs=list(d.get("legs") or []),
+            order_type=OrderType((d.get("order_type") or "limit").lower()),
+            time_in_force=TimeInForce((d.get("time_in_force") or "day").lower()),
+            limit_price=d.get("limit_price"),
+            reasoning=str(d.get("reasoning", ""))[:500],
+            agent_name="strategy_runtime",
+            strategy_name=strategy_id,
+            declared_max_loss_usd=d.get("declared_max_loss_usd"),
+            allow_undefined_risk=bool(d.get("allow_undefined_risk", False)),
+        )
+    except (ValueError, TypeError) as e:
+        logger.error("options_intent_coerce_failed err=%s raw=%s", e, str(raw)[:300])
+        return {"status": "rejected", "rejection_reason": f"invalid OptionsIntent: {e}"}
+
+    try:
+        result = safety_gate.validate_and_submit_options(req)
+    except Exception as e:
+        logger.error("options_safety_gate_raised err=%s", e)
+        return {"status": "rejected", "rejection_reason": f"safety_gate raised: {e}"}
+
+    result_dict = {
+        "order_id": result.order_id,
+        "status": result.status.value,
+        "mode": result.mode.value,
+        "filled_qty": result.filled_qty,
+        "filled_avg_price": result.filled_avg_price,
+        "rejection_reason": result.rejection_reason,
+        "safety_checks_passed": result.safety_checks_passed,
+        "safety_checks_failed": result.safety_checks_failed,
+        "n_legs": len(req.legs),
+        "qty": req.qty,
+        "declared_max_loss_usd": req.declared_max_loss_usd,
+    }
+    # Journal
+    from quant_trading_system import journal
+    journal.log_event({
+        "type": "options_order_submitted" if result.status.value != "rejected" else "options_order_rejected",
+        "strategy_id": strategy_id,
+        "run_id": run_id,
+        "n_legs": len(req.legs),
+        "qty": req.qty,
+        "reasoning": req.reasoning,
+        "declared_max_loss_usd": req.declared_max_loss_usd,
+        "result_status": result.status.value,
+        "result_mode": result.mode.value,
+        "result_order_id": result.order_id,
+        "result_rejection_reason": result.rejection_reason,
+        "result_safety_checks_passed": result.safety_checks_passed,
+        "result_safety_checks_failed": result.safety_checks_failed,
+    })
+    return result_dict
 
 
 def _coerce_intent(raw: Any) -> Optional[OrderIntent]:

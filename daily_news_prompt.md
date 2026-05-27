@@ -32,7 +32,7 @@ There is no virtualenv.
 
 2. **Auto-fetch Alpaca news.** `cli news-fetch --lookback-hours 24` writes per-symbol and per-sector HTMLs under `knowledge_base/news/stocks/<SYMBOL>/<DATE>.html` and `news/sectors/<SECTOR>/<DATE>.html` automatically.
 
-3. **Use WebSearch yourself for the four categories** (`macro`, `earnings`, `geopolitics`, `policy`) — Alpaca News doesn't cover these well. Write each as `knowledge_base/news/categories/<category>/<DATE>.html`. Empty categories get a file too, with `<p class="empty">No notable news today.</p>`.
+3. **Use WebSearch yourself for the six categories** (`macro`, `earnings`, `geopolitics`, `policy`, `volatility`, `options_flow`) — Alpaca News doesn't cover these well. Write each as `knowledge_base/news/categories/<category>/<DATE>.html`. Empty categories get a file too, with `<p class="empty">No notable news today.</p>`. See `news_manual.md` §"Workflow" step 4 for what each category should cover, including the new `volatility` (VIX, IV rank, term structure) and `options_flow` (unusual options activity) categories that feed the harness's options trading.
 
 4. **Write the daily summary** at `knowledge_base/news/daily_summary/<DATE>.html` — a "front page" with the 5-15 most important items across all sources.
 

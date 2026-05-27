@@ -135,6 +135,52 @@ class MarketDataService:
     ) -> dict[str, pd.DataFrame]:
         return {s: self.get_bars(s, timeframe, start, end) for s in symbols}
 
+    def get_options_chain(
+        self,
+        underlying: str,
+        *,
+        expiration: Optional[str] = None,
+    ) -> list[dict]:
+        """Fetch options chain snapshots from Alpaca.
+
+        Returns a list of snapshot dicts (each with `symbol`, `latestQuote`,
+        `greeks`, `impliedVolatility`, `openInterest`). Empty list if data is
+        unavailable. Strategies use this via ctx.get_options_chain().
+        """
+        url = f"{_DATA_BASE}/v1beta1/options/snapshots/{underlying.upper()}"
+        params: dict[str, object] = {"feed": "indicative", "limit": 100}
+        if expiration:
+            params["expiration_date"] = expiration
+        out: list[dict] = []
+        page_token = None
+        pages = 0
+        while True:
+            p = dict(params)
+            if page_token:
+                p["page_token"] = page_token
+            try:
+                resp = self._session.get(url, params=p, timeout=15)
+            except requests.RequestException as e:
+                logger.warning("options_chain_request_failed sym=%s err=%s", underlying, e)
+                return out
+            if resp.status_code >= 400:
+                logger.warning(
+                    "options_chain_http_error sym=%s status=%s body=%s",
+                    underlying, resp.status_code, resp.text[:200],
+                )
+                return out
+            data = resp.json() or {}
+            snaps = data.get("snapshots") or {}
+            for sym, snap in snaps.items():
+                s = dict(snap or {})
+                s["symbol"] = sym
+                out.append(s)
+            page_token = data.get("next_page_token") or None
+            pages += 1
+            if not page_token or pages >= 20:
+                break
+        return out
+
     def get_latest_quote(self, symbol: str) -> Optional[dict]:
         url = f"{_DATA_BASE}/v2/stocks/{symbol}/quotes/latest"
         try:

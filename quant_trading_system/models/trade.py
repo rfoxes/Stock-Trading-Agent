@@ -114,6 +114,57 @@ class OrderResult:
 
 
 @dataclass
+class OptionsOrderRequest:
+    """A multi-leg options order request from a trading agent.
+
+    Each entry in `legs` is a dict with:
+        contract_symbol: OCC-format option symbol (e.g. AAPL250620C00150000)
+        side: "buy" | "sell"
+        ratio: int (typically 1; some structures use other ratios)
+    `qty` is the multiplier — total contracts per leg = leg.ratio * qty.
+
+    For now we represent legs as dicts to keep the dataclass JSON-friendly;
+    the helper `quant_trading_system.options.OptionLeg` is the structured form
+    strategies construct internally.
+    """
+
+    qty: int                                   # multiplier across all legs
+    legs: list[dict[str, Any]] = field(default_factory=list)
+    order_class: str = "mleg"                  # alpaca uses "mleg" for multi-leg
+    time_in_force: TimeInForce = TimeInForce.DAY
+    order_type: OrderType = OrderType.MARKET
+    limit_price: Optional[float] = None        # net debit/credit for the spread
+    agent_name: str = ""
+    strategy_name: str = ""
+    reasoning: str = ""
+    # For SafetyGate's defined-risk check: strategies declare what their max
+    # loss is. None means "undefined risk" — requires explicit strategy flag.
+    declared_max_loss_usd: Optional[float] = None
+    allow_undefined_risk: bool = False         # set by strategy if applicable
+
+    def __post_init__(self) -> None:
+        if isinstance(self.time_in_force, str):
+            self.time_in_force = TimeInForce(self.time_in_force)
+        if isinstance(self.order_type, str):
+            self.order_type = OrderType(self.order_type)
+        if self.qty < 1:
+            raise ValueError(f"qty must be >= 1, got {self.qty}")
+        if not self.legs:
+            raise ValueError("options order must have at least one leg")
+        for i, leg in enumerate(self.legs):
+            if not isinstance(leg, dict):
+                raise ValueError(f"leg {i} must be a dict")
+            for key in ("contract_symbol", "side"):
+                if key not in leg:
+                    raise ValueError(f"leg {i} missing required key {key!r}")
+            if leg["side"].lower() not in ("buy", "sell"):
+                raise ValueError(f"leg {i} side must be buy/sell")
+
+    def model_dump(self) -> dict[str, Any]:
+        return _serialize(asdict(self))
+
+
+@dataclass
 class TradeRecord:
     """A completed trade record for logging and analysis."""
 

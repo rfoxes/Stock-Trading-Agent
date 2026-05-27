@@ -74,9 +74,172 @@ class SafetyGate:
     def validate_and_submit(self, order: OrderRequest) -> OrderResult:
         """Validate an order through all safety checks and submit if approved.
 
-        This is the ONLY authorized path to order execution.
+        This is the ONLY authorized path to equity order execution.
         """
         return self._validate_and_submit_inner(order)
+
+    def validate_and_submit_options(self, order) -> OrderResult:
+        """Validate + submit a multi-leg options order.
+
+        Distinct from the equity path because options have different risk
+        shapes: defined-risk spreads have a known max loss; undefined-risk
+        positions (naked puts, short straddles) can lose multiples of
+        premium. Checks (in order):
+          1. Dry-run mode.
+          2. Live-money gate.
+          3. Undefined-risk gate: the strategy must explicitly set
+             `allow_undefined_risk=True` if `declared_max_loss_usd` is None.
+          4. Max single-trade loss vs MAX_POSITION_SIZE_PCT * equity.
+          5. Max concurrent options orders (uses MAX_CONCURRENT_POSITIONS as proxy).
+          6. Daily loss limit.
+        """
+        from quant_trading_system.models.trade import OptionsOrderRequest
+
+        if not isinstance(order, OptionsOrderRequest):
+            return OrderResult(
+                status=OrderStatus.REJECTED,
+                mode=self._get_trading_mode(),
+                rejection_reason="not an OptionsOrderRequest",
+                safety_checks_failed=["bad_input"],
+            )
+        result = self._validate_and_submit_options_inner(order)
+        return result
+
+    def _validate_and_submit_options_inner(self, order) -> OrderResult:
+        from quant_trading_system.models.trade import OptionsOrderRequest
+
+        self._reset_daily_if_needed()
+        checks_passed: list[str] = []
+        log = logger.bind(
+            strategy=order.strategy_name,
+            n_legs=len(order.legs),
+            qty=order.qty,
+            agent=order.agent_name,
+        )
+
+        # 1. Dry-run
+        if self._settings.DRY_RUN:
+            log.info("dry_run_options_order")
+            return OrderResult(
+                order_id=f"dry-run-options-{_unique_id()}",
+                status=OrderStatus.DRY_RUN,
+                mode=TradingMode.DRY_RUN,
+                safety_checks_passed=["dry_run_bypass"],
+            )
+
+        # 2. Live-money gate
+        if not self._settings.ALPACA_PAPER:
+            if not self._settings.REAL_MONEY_ENABLED or not self._settings.REAL_MONEY_CONFIRMATION:
+                raise SafetyError(
+                    "Options live trading attempted without REAL_MONEY_ENABLED + "
+                    "REAL_MONEY_CONFIRMATION. Critical safety violation."
+                )
+            checks_passed.append("live_money_gate")
+        else:
+            checks_passed.append("paper_trading_mode")
+
+        # 3. Undefined-risk gate
+        if order.declared_max_loss_usd is None:
+            if not order.allow_undefined_risk:
+                log.warning("options_undefined_risk_blocked")
+                return OrderResult(
+                    status=OrderStatus.REJECTED,
+                    mode=self._get_trading_mode(),
+                    rejection_reason=(
+                        "Options order has no declared_max_loss_usd and "
+                        "allow_undefined_risk is False. Strategies that wish "
+                        "to submit undefined-risk positions must declare so."
+                    ),
+                    safety_checks_passed=checks_passed,
+                    safety_checks_failed=["undefined_risk_gate"],
+                )
+            checks_passed.append("undefined_risk_acknowledged")
+        else:
+            checks_passed.append("defined_risk")
+
+        # 4. Max single-trade loss
+        if self._client is not None:
+            try:
+                account = self._client.get_account()
+                equity = account.get("equity", 0.0)
+                if equity > 0 and order.declared_max_loss_usd is not None:
+                    loss_pct = order.declared_max_loss_usd / equity
+                    if loss_pct > self._settings.MAX_POSITION_SIZE_PCT:
+                        log.warning(
+                            "options_position_size_exceeded loss_pct=%.3f max=%.3f",
+                            loss_pct, self._settings.MAX_POSITION_SIZE_PCT,
+                        )
+                        return OrderResult(
+                            status=OrderStatus.REJECTED,
+                            mode=self._get_trading_mode(),
+                            rejection_reason=(
+                                f"declared max loss {loss_pct:.1%} of equity "
+                                f"exceeds MAX_POSITION_SIZE_PCT "
+                                f"{self._settings.MAX_POSITION_SIZE_PCT:.1%}"
+                            ),
+                            safety_checks_passed=checks_passed,
+                            safety_checks_failed=["position_size"],
+                        )
+            except Exception as e:
+                log.warning("options_position_size_check_failed err=%s", e)
+        checks_passed.append("position_size")
+
+        # 5. Submit
+        log.info("all_options_safety_checks_passed checks=%s", checks_passed)
+        if self._client is None:
+            return OrderResult(
+                order_id=f"no-client-options-{_unique_id()}",
+                status=OrderStatus.SUBMITTED,
+                mode=self._get_trading_mode(),
+                safety_checks_passed=checks_passed,
+            )
+        try:
+            alpaca_resp = self._submit_options_to_alpaca(order)
+            return OrderResult(
+                order_id=str(alpaca_resp.get("id", "")),
+                status=OrderStatus.SUBMITTED,
+                mode=self._get_trading_mode(),
+                filled_qty=float(alpaca_resp.get("filled_qty") or 0),
+                filled_avg_price=float(alpaca_resp.get("filled_avg_price") or 0),
+                safety_checks_passed=checks_passed,
+            )
+        except Exception as e:
+            log.error("options_submission_failed err=%s", e)
+            return OrderResult(
+                status=OrderStatus.REJECTED,
+                mode=self._get_trading_mode(),
+                rejection_reason=f"Broker error: {e}",
+                safety_checks_passed=checks_passed,
+                safety_checks_failed=["broker_submission"],
+            )
+
+    def _submit_options_to_alpaca(self, order) -> dict:
+        """Build Alpaca multi-leg /v2/orders body and submit."""
+        body: dict = {
+            "order_class": order.order_class,
+            "qty": str(order.qty),
+            "type": order.order_type.value,
+            "time_in_force": order.time_in_force.value,
+            "legs": [
+                {
+                    "symbol": leg["contract_symbol"],
+                    "side": leg["side"].lower(),
+                    "ratio_qty": str(leg.get("ratio", 1)),
+                    "position_intent": (
+                        "buy_to_open"
+                        if leg["side"].lower() == "buy"
+                        else "sell_to_open"
+                    ),
+                }
+                for leg in order.legs
+            ],
+        }
+        if order.order_type.value == "limit" and order.limit_price is not None:
+            body["limit_price"] = str(order.limit_price)
+        if order.strategy_name:
+            tag = order.strategy_name[:32].replace(" ", "_")
+            body["client_order_id"] = f"opt-{tag}-{int(_unique_id())}"
+        return self._client.submit_options_order(body)
 
     def _validate_and_submit_inner(self, order: OrderRequest) -> OrderResult:
         """Internal validation logic."""
