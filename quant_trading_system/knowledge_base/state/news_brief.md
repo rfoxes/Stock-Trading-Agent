@@ -1,32 +1,36 @@
-# News brief for 2026-05-26 (Tue, post-close)
+# News brief for 2026-05-27 (Wed, post-close)
 
 ## Headline assessment
 
-**NORMAL FLOW** — risk-on tape (S&P +0.61% to 7,519, Nasdaq +1.19% to 26,656 record). US "defensive strikes" on Iran pushed Brent to ~$100 briefly but equities shrugged; the move is well below the >2% futures-threshold for a halt-worthy geopolitical event. No FOMC, no CPI, no jobs, and no watchlist earnings this week.
+**NOTABLE** — three event-driven items affecting the watchlist hit the tape today:
+(1) Supreme Court denied META's appeal in the Vermont Instagram-addiction case, letting the suit proceed; (2) Jamie Dimon publicly floated $20B of M&A capacity at JPM; (3) Jensen Huang committed NVDA to $150B/year in Taiwan investment. Plus a clean macro regime marker (Kevin Warsh formally seated as Fed Chair, sworn in Friday May 22; first Warsh FOMC is June 16–17). Iran de-escalated meaningfully today — White House called the Iranian-floated draft deal "complete fabrication" but Trump said a deal is close; oil unwound -5.55% to $88.68 and equities printed records. This is NOTABLE not HALT-WORTHY: no FOMC today, no held-position overnight earnings catalyst, no >2% futures move.
 
 ## Watchlist + positions
 
-- **NVDA** — "down ~10% in 2 weeks despite record $81.6B revenue" is the headline drumbeat; Gavin Baker bull-case, Rubin-transition + rising-yields bear-case. Notable but not a fresh catalyst — already in the tape. AI complex around it is ripping (MU +18%, SOXX +4.8%, AMD +3% premarket on a Nvidia-related CPU TAM expansion). Jensen: "tokens are now profitable"; H200 China-export sales approved; China called "very important." Net: noise high, signal neutral-to-positive.
-- **MSFT** — BNP Paribas lays out a ~33% upside case: 25M Copilot seats, Azure >40% growth, $250B OpenAI cloud commit. Constructive single-name news.
-- **AAPL** — analyst PT raised to $380 (Buy reiterated) on agentic-AI thesis. iPhone 17e Japan softness flagged (-9.8% vs. 16e per Counterpoint). Net mildly positive. Intel-foundry-with-Apple rumor adds optionality.
-- **GOOGL** — facing record EU DMA penalty over search self-preferencing. Slow-burn regulatory overhang, no fine amount yet. Position has +14% unreal cushion.
-- **META** — no fresh catalyst today. SpaceX–Anthropic compute-deal piece reframes META AI spend as "hidden bullish." Still the only meaningfully negative single name in the unattributed book (-10.1% on Friday's mark). No new catalyst pulls it further down.
-- **AMZN** — quiet single-name tape. Nothing actionable.
-- **TSLA** — Ferrari Luce EV unveil (Jony-Ive-designed, $640k) is the only adjacent item; not a TSLA-specific catalyst.
-- **JPM** — zero items from Alpaca News today. No catalyst.
-- **SPY / QQQ** — items today are about SpaceX S&P-inclusion mechanics; not actionable. QQQ rode Nasdaq's record-high.
+- **META** — **Supreme Court rejected META's appeal**, clearing the path for Vermont's state-court Instagram-addiction lawsuit to proceed. Discovery-stage event. Damages not yet quantified, but META is already the only meaningfully negative single name in the unattributed book (-10.5% unreal per yesterday's handoff) and this is the first material adverse legal event since META made it onto the watchlist's "no-news" list. Worth surfacing if exit logic re-evaluates META overnight.
+- **JPM** — **Jamie Dimon: JPM could spend $20B on an acquisition.** 1994 deposit-cap law blocks the obvious deposit-bank targets; implied target is fintech / asset-management. Same Dimon commentary also flagged "higher costs" and "tempered earnings expectations," which dragged the stock intraday. Capital-allocation signal — neutral-to-positive for long-term EPS framing, near-term ambiguous.
+- **NVDA** — **Jensen Huang: $150B/year investment in Taiwan**, locking up TSM supply for the Rubin / Blackwell ramp. NVDA dividend boost separately announced (small absolute but a signal). Today saw a chip-rotation pullback (Nasdaq 100 -0.7% intraday on chip unwind even as composite finished green), but the news flow is structurally bullish.
+- **MSFT** — **Dell won a $9.7B Pentagon contract to manage MSFT licenses for the DoD**, a structurally positive federal-cloud / SaaS subscription stream for MSFT. Separately, CRM prints AMC tonight; a bad print could drag MSFT enterprise-AI sentiment, but that's tomorrow's input.
+- **AAPL** — No fresh single-name event. DuckDuckGo's anti-GOOGL salvo today indirectly references the same agentic-AI search shift that anchors the AAPL bull case; no AAPL-specific catalyst.
+- **GOOGL** — **DuckDuckGo says US installs +30%, public criticism of Alphabet's AI search overhaul.** Slow-burn share-loss narrative; competitor anecdote, not a regulator action. The EU DMA self-preferencing penalty flagged in prior briefs is still pending — no dollar figure today.
+- **AMZN** — Quiet single-name tape. The "Claude on AWS Bedrock widens margin lead vs. Azure / GCP" piece reinforces the AWS-winning narrative; BlackRock's $800B-AI-capex inflation warning names AMZN + MSFT as the drivers (macro headwind framing).
+- **TSLA** — **Tesla European April EV sales +67%**; patent granted on "lens cleaning system" (robotaxi / Optimus relevant). SpaceX IPO June 12 sits in the background as adjacent narrative.
+- **SPY / QQQ** — Index records (S&P 7,520.36, Nasdaq 26,674.73). Chip-stock pullback intraday capped Nasdaq gain. No actionable index-specific event.
+- **No fresh news today:** (none — every watchlist symbol had at least adjacent news flow). The "nothing happened" set is empty today.
 
 ## Macro / sector context
 
-- **Iran**: US conducted "defensive strikes" on missile launch sites + mine-laying boats. Brent +3% to ~$99.58, intraday tap of $100. Iran issued verbal retaliation warning. No Strait of Hormuz closure. Equities digested — risk-on close.
-- **AI capex**: Goldman raised 2026 forecast — ~$800B AI capex flowing this year; business-investment forecast 7.8%. Macro-supportive for the entire watchlist tech bloc.
-- **Semis**: Micron +18%, SOXX +4.8% (YTD >80%), Nasdaq 100 above 30,000. BofA published an "AI bubble that isn't" piece arguing NVDA/MU still cheap on historical P/E. Tailwind for NVDA even if NVDA itself is the rotation laggard.
-- **Macro data**: No FOMC, CPI, PPI, or payrolls this week. Next CPI 6/10, next payrolls 6/5, next FOMC 6/16–17.
+- **Iran**: Iran state TV floated a draft MOU restoring Strait of Hormuz traffic to pre-conflict levels within 30 days; White House publicly dismissed as "complete fabrication" on X; Trump said Iran "wants very much to make a deal" but he's "not satisfied... or we'll have to just finish the job." Oil unwound yesterday's spike entirely — WTI -5.55% to $88.68, Brent below $90. The geopolitical risk premium that was bid into the tape yesterday is now bid OUT. No halt-worthy threshold triggered (futures finished up).
+- **Fed**: Kevin Warsh sworn in as Chair last Friday (May 22). First Warsh FOMC is June 16–17. April 29 minutes (Powell's last) signaled "shift away from easing bias," with a subset of participants floating a possible HIKE. Warsh's reform / passive-Fed history suggests a structurally hawkish framing. Macro-relevant for duration and growth-vs-value tilt; no policy action today.
+- **Sell-side**: Goldman raised S&P 500 year-end target to 8,000 (from 7,500), citing AI-driven earnings at NVDA + MU. ~6% upside from spot.
+- **Inflation**: BlackRock warned the $800B AI capex binge from AMZN + MSFT is feeding inflation and complicating the Fed's path. Reinforces the Warsh-era hawkish framing.
+- **No macro data this week**: Next CPI June 10, next payrolls June 5, next FOMC June 16–17. Between-data tape through Friday.
 
 ## Recommendations for the trader
 
-- **Standard workflow.** No news-driven reason to defer `execute`.
-- **Iran is a watch-item, not a halt-item.** If the strategy uses a vol filter, today's realized-vol bump (oil-led) may register; the equity tape did not. Don't preemptively de-risk on the basis of geopolitics — the market already priced it and went up.
-- **If you set-active equity_trend_following_ema_cross and run `execute`, the META exit risk flagged in yesterday's handoff is unchanged.** META has no fresh catalyst today that would push it through an exit threshold any faster than yesterday's MTM implied; the news layer doesn't change the decision either way.
-- **NVDA's "down 10% in 2 weeks despite record revenue"** is a market-structure story (yields + product transition), not a fundamentals shock. If the trend strategy reads NVDA as still-bullish on the EMAs, news doesn't dispute that; if it reads it as rolling over, news doesn't dispute that either. Neutral input.
-- **No watchlist earnings AMC tonight or tomorrow.** No "defer entries" suggestion is warranted.
+- **Standard workflow remains the right baseline.** Nothing today rises to halt-worthy. NOTABLE means "pay attention to the items below if any feed into the strategy's decision rules" — not "defer execute."
+- **META is the single name where today's news could matter most for an exit decision.** The SCOTUS denial is a fresh adverse legal event on the only deep-negative position in the unattributed book. If the strategy's exit logic considers fundamental overhang or news catalysts, the META exit threshold is now meaningfully closer than yesterday's data implied. If exit logic is purely technical (EMAs / vol), this news doesn't change the math. Either way, surface it in tomorrow's handoff.
+- **JPM has fresh ambiguity.** Dimon's $20B M&A signal is neutral-to-positive long-term, but the "higher costs, tempered earnings expectations" remarks are near-term negative. If the strategy treats JPM as a trend-following long, today's intraday dip on those comments is a noise-not-signal move; if it treats JPM via fundamentals, the comments are mild guidance-style soft-negative.
+- **Iran is now a tailwind, not a watch-item.** Oil's -5.55% slide removed the geopolitical risk premium. The yesterday-flagged "futures gap >2% would escalate to HALT-WORTHY" condition went the opposite direction. Treat Iran as background context tomorrow unless retaliation news lands.
+- **Warsh era starts.** No action today, but the trader's regime classification should note that the Fed-policy backdrop is structurally hawkish-leaning going into the June 16–17 meeting. Trend-following strategies are agnostic to this; mean-reversion / vol-selling strategies may want to weight rate-shock risk slightly higher into June FOMC.
+- **No watchlist earnings tonight or this week.** No "defer entries" suggestion is warranted. (MRVL beat AMC tonight, CRM still to print — neither on the watchlist. Both are adjacent-sentiment items only.)
