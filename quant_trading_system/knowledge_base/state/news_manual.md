@@ -116,7 +116,14 @@ move on. Full-article fetching is reserved for the Saturday research agent.
 
 2. **Identify the universe.**
    - Run `python3 -m quant_trading_system.cli news-universe`. This returns the
-     watchlist + currently held positions, grouped by sector.
+     full *composed* universe (active strategies ∪ held positions ∪
+     news-tracked subdirs ∪ operator-added symbols in
+     `state/extra_symbols.md`), grouped by sector. The static
+     `DEFAULT_WATCHLIST` env var is no longer authoritative — it's only a
+     bootstrap fallback. You cover whatever the universe contains, and the
+     universe grows as the wiki grows.
+   - You can also run `cli universe` directly to see per-source provenance
+     (which symbols came from strategies, positions, news, or operator).
 
 3. **Fetch Alpaca news.**
    - Run `python3 -m quant_trading_system.cli news-fetch --lookback-hours 24`.

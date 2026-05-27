@@ -869,31 +869,46 @@ def news_cleanup(ctx: ToolContext, *, retention_days: int = 90) -> dict[str, Any
 
 
 def news_universe(ctx: ToolContext) -> dict[str, Any]:
-    """Return the symbols / sectors / categories the news layer covers."""
+    """Return the symbols / sectors / categories the news layer covers,
+    derived from the composed universe (strategies + positions + news +
+    operator additions). Bootstrap env-var watchlist is the fallback when
+    nothing else has declared anything."""
     from quant_trading_system.news_service import (
         CATEGORIES,
         SYMBOL_TO_SECTOR,
         sector_for,
     )
+    from quant_trading_system.universe import compute_universe
 
-    universe = set(s.upper() for s in ctx.settings.watchlist)
-    if ctx.alpaca_client is not None:
-        try:
-            for p in ctx.alpaca_client.get_positions():
-                sym = str(p.get("symbol", "")).upper()
-                if sym:
-                    universe.add(sym)
-        except Exception:
-            pass
+    universe = compute_universe(ctx.settings, alpaca_client=ctx.alpaca_client)
     by_sector: dict[str, list[str]] = {}
-    for s in sorted(universe):
+    for s in universe.symbols:
         by_sector.setdefault(sector_for(s), []).append(s)
     return _ok({
-        "watchlist_symbols": ctx.settings.watchlist,
+        "universe": universe.to_dict(),
         "sectors": by_sector,
         "categories": list(CATEGORIES),
         "sector_map": SYMBOL_TO_SECTOR,
     })
+
+
+def universe_view(ctx: ToolContext, *, include_testing: bool = False) -> dict[str, Any]:
+    """Return today's composed universe with provenance per symbol.
+
+    Sources: active strategies' declared symbols/sectors, currently-held
+    positions, news-tracked symbols (subdirs under news/stocks/),
+    operator additions in state/extra_symbols.md. The env-var
+    DEFAULT_WATCHLIST is used only as a fallback when none of the above
+    have anything.
+    """
+    from quant_trading_system.universe import compute_universe
+
+    universe = compute_universe(
+        ctx.settings,
+        alpaca_client=ctx.alpaca_client,
+        include_testing_strategies=include_testing,
+    )
+    return _ok(universe.to_dict())
 
 
 def execute_strategy(
@@ -1081,6 +1096,8 @@ TOOL_FUNCTIONS = {
     "news_fetch": news_fetch,
     "news_cleanup": news_cleanup,
     "news_universe": news_universe,
+    # universe (derived)
+    "universe_view": universe_view,
     # git
     "git_sync": git_sync,
     # backtest

@@ -128,6 +128,58 @@ commands you'll use most:
 | `update-script <id> --file path.py` | Replace a strategy's strategy.py |
 | `log-closed <id> <symbol> <pnl>` | Record a closed position's realized return |
 
+## The universe
+
+The harness has no fixed watchlist. The set of symbols it considers
+trading on any given day is a *derived view* — the union of:
+
+  1. **Active strategies' declared symbols.** Strategies can list
+     `symbols: [AAPL, MSFT, ...]` and/or `sectors: [technology, financials]`
+     in their frontmatter. Sectors resolve to symbols via the small
+     hardcoded sector map in `news_service.SYMBOL_TO_SECTOR`.
+     Strategies without either field default to the full universe.
+  2. **Currently held positions** on Alpaca.
+  3. **News-tracked symbols** — anything with a folder under
+     `knowledge_base/news/stocks/`.
+  4. **Operator additions** — anything declared in
+     `state/extra_symbols.md` (free-form list, lines starting with `#`
+     are comments).
+
+The `DEFAULT_WATCHLIST` env var in `.env` is now only a *bootstrap
+fallback*, used when none of the above sources have anything.
+
+Inspect the composed universe at any time with:
+
+    python3 -m quant_trading_system.cli universe
+
+It returns the set plus per-source provenance so you can see why each
+symbol is in there. To widen the universe without code changes, add
+symbols to `state/extra_symbols.md`; to narrow it for a specific strategy,
+add `symbols:` or `sectors:` to that strategy's frontmatter.
+
+The Saturday research agent can extend the universe by adding new
+strategies that target new symbols; the M-F news agent covers whatever
+the universe contains.
+
+## News-aware strategies
+
+Every strategy's `StrategyContext` exposes `ctx.news_brief`, a parsed
+view of the day's `state/news_brief.md`. Strategies can use it as a
+filter (e.g., "don't enter symbol X today because the brief flags
+negative news") or as a signal (event-driven entries). The
+`event_driven_catalyst` strategy is the only one in the library that
+treats news as a primary entry signal; the rest may use it as a
+filter only or ignore it. Available on `ctx.news_brief`:
+
+  - `assessment` — `NO MATERIAL NEWS` / `NORMAL FLOW` / `NOTABLE` /
+    `HALT-WORTHY EVENT` / `UNKNOWN`.
+  - `is_halt_worthy()` and `is_notable()` shortcuts.
+  - `news_for(symbol)` — returns the bullet text for that symbol from
+    the brief's `## Watchlist + positions` section, or `""`.
+  - `has_positive_signal(symbol)` / `has_negative_signal(symbol)` —
+    keyword-based best-effort sentiment markers for that symbol.
+  - `raw_text` — the full brief markdown if a strategy needs more.
+
 ## On editing strategies
 
 A strategy is a folder under `knowledge_base/strategies/<type>/<id>/`

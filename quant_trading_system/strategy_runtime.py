@@ -51,6 +51,57 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass
+class NewsBriefView:
+    """Parsed view of today's news brief, exposed to strategies.
+
+    `raw_text` is the full markdown if a strategy needs more than the
+    structured fields. `assessment` is one of:
+        NO MATERIAL NEWS | NORMAL FLOW | NOTABLE | HALT-WORTHY EVENT | UNKNOWN
+    `per_symbol` is a dict mapping uppercase ticker → the brief's bullet text
+    for that symbol (or "" if it appeared but had no narrative).
+    """
+
+    raw_text: str = ""
+    assessment: str = "UNKNOWN"
+    per_symbol: dict[str, str] = field(default_factory=dict)
+    date_in_file: str = ""
+
+    def is_halt_worthy(self) -> bool:
+        return self.assessment.upper() == "HALT-WORTHY EVENT"
+
+    def is_notable(self) -> bool:
+        return self.assessment.upper() in ("NOTABLE", "HALT-WORTHY EVENT")
+
+    def news_for(self, symbol: str) -> str:
+        return self.per_symbol.get(symbol.upper(), "")
+
+    def has_negative_signal(self, symbol: str) -> bool:
+        """Best-effort: does the brief contain negative-sounding language for this symbol?"""
+        text = self.news_for(symbol).lower()
+        if not text:
+            return False
+        neg_markers = (
+            "guidance cut", "miss", "missed", "downgrade", "lawsuit",
+            "regulatory action", "investigation", "recall", "warned",
+            "warning", "halt", "delist", "fraud", "restate", "going concern",
+            "bankruptcy",
+        )
+        return any(m in text for m in neg_markers)
+
+    def has_positive_signal(self, symbol: str) -> bool:
+        text = self.news_for(symbol).lower()
+        if not text:
+            return False
+        pos_markers = (
+            "beat", "beats", "raised guidance", "raises guidance", "upgrade",
+            "approval", "approved", "acquisition", "acquires", "buyback",
+            "record revenue", "record earnings", "deal", "partnership",
+            "win", "won contract",
+        )
+        return any(m in text for m in pos_markers)
+
+
+@dataclass
 class StrategyContext:
     """Everything a strategy script needs to make its decisions.
 
@@ -60,7 +111,8 @@ class StrategyContext:
 
     date: dt.date
     params: dict[str, Any]                       # frontmatter `parameters` block
-    watchlist: list[str]                         # symbols the operator wants considered
+    watchlist: list[str]                         # *composed universe filtered for this strategy*
+    universe: list[str]                          # the full composed universe (unfiltered)
     regime: dict[str, Any]                       # output of classify_regime
     account: dict[str, Any]                      # equity, cash, buying_power, ...
     positions: list[dict[str, Any]]              # current Alpaca positions
@@ -68,6 +120,7 @@ class StrategyContext:
     strategy_id: str
     strategy_type: str                           # "equity" | "options"
     log: logging.Logger                          # strategy-scoped logger
+    news_brief: NewsBriefView = field(default_factory=NewsBriefView)
 
     # Callable hooks — the strategy uses these instead of importing data
     # modules directly. Lets the harness control caching, mocking for tests,
@@ -79,7 +132,8 @@ class StrategyContext:
     def __repr__(self) -> str:  # avoid dumping pandas/callables in logs
         return (
             f"StrategyContext(id={self.strategy_id!r}, date={self.date}, "
-            f"positions={len(self.positions)}, regime={self.regime.get('regime')!r})"
+            f"positions={len(self.positions)}, regime={self.regime.get('regime')!r}, "
+            f"watchlist_size={len(self.watchlist)}, news={self.news_brief.assessment})"
         )
 
 
@@ -285,6 +339,50 @@ def run_strategy(
 # ---------------------------------------------------------------------------
 
 
+def _load_news_brief() -> NewsBriefView:
+    """Parse state/news_brief.md into a structured view for strategies."""
+    import re as _re
+    from quant_trading_system.memory import STATE_DIR
+
+    path = STATE_DIR / "news_brief.md"
+    if not path.exists():
+        return NewsBriefView()
+    text = path.read_text(encoding="utf-8")
+    view = NewsBriefView(raw_text=text)
+
+    # Headline assessment — looks like "**NORMAL FLOW**" or "NO MATERIAL NEWS"
+    assess_re = _re.compile(
+        r"(NO MATERIAL NEWS|NORMAL FLOW|NOTABLE|HALT-WORTHY EVENT)",
+        _re.IGNORECASE,
+    )
+    m = assess_re.search(text)
+    if m:
+        view.assessment = m.group(1).upper()
+    # Date if present in the header
+    date_m = _re.search(r"News brief for (\d{4}-\d{2}-\d{2})", text)
+    if date_m:
+        view.date_in_file = date_m.group(1)
+
+    # Per-symbol bullets: lines starting with "- **SYMBOL** — ..." or "- SYMBOL: ..."
+    sym_re = _re.compile(r"^[-*]\s*\*?\*?([A-Z][A-Z0-9.\-]{0,5})\*?\*?\s*[—:\-]\s*(.*)$")
+    in_watchlist = False
+    for line in text.splitlines():
+        if line.strip().lower().startswith("## watchlist"):
+            in_watchlist = True
+            continue
+        if line.startswith("## ") and in_watchlist:
+            in_watchlist = False
+            continue
+        if not in_watchlist:
+            continue
+        m2 = sym_re.match(line)
+        if m2:
+            sym = m2.group(1).upper()
+            view.per_symbol[sym] = m2.group(2).strip()
+
+    return view
+
+
 def _build_context(sf, *, settings, market_data, regime_classifier, alpaca_client) -> StrategyContext:
     # Account / positions / open orders (best-effort)
     account: dict[str, Any] = {}
@@ -323,6 +421,20 @@ def _build_context(sf, *, settings, market_data, regime_classifier, alpaca_clien
         logger.warning("ctx_regime_failed err=%s", e)
 
     params = dict(sf.frontmatter.get("parameters") or {})
+
+    # Composed universe — derived from strategies + positions + news + operator
+    from quant_trading_system.universe import (
+        compute_universe,
+        filter_universe_for_strategy,
+    )
+
+    universe = compute_universe(settings, alpaca_client=alpaca_client)
+    filtered = filter_universe_for_strategy(
+        universe, strategy_frontmatter=sf.frontmatter or {},
+    )
+
+    # News brief — parse state/news_brief.md
+    news_brief = _load_news_brief()
 
     # Provide indicator helper that knows about ctx caching is overkill; lean
     # version: defer to tools.technical_indicators on whatever bars the strategy
@@ -368,7 +480,8 @@ def _build_context(sf, *, settings, market_data, regime_classifier, alpaca_clien
     return StrategyContext(
         date=dt.date.today(),
         params=params,
-        watchlist=list(settings.watchlist),
+        watchlist=filtered,
+        universe=list(universe.symbols),
         regime=regime,
         account=account,
         positions=positions,
@@ -376,6 +489,7 @@ def _build_context(sf, *, settings, market_data, regime_classifier, alpaca_clien
         strategy_id=sf.id,
         strategy_type=sf.type,
         log=logging.getLogger(f"strategy.{sf.id}"),
+        news_brief=news_brief,
         get_bars=lambda symbol, timeframe="1Day", lookback_days=200: _bars_with_lookback(
             market_data, symbol, timeframe, lookback_days
         ),

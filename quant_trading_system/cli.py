@@ -552,6 +552,16 @@ def _build_parser() -> argparse.ArgumentParser:
                         help="List the symbols / sectors / categories the news layer covers today.")
     sp.set_defaults(func=lambda ctx, args: (_emit(agent_tools.news_universe(ctx)), 0)[1])
 
+    # universe (the composed universe with provenance per source)
+    sp = sub.add_parser(
+        "universe",
+        help="Show today's composed universe (strategies ∪ positions ∪ news_tracked ∪ operator_extras).",
+    )
+    sp.add_argument("--include-testing", action="store_true",
+                    help="Also include strategies at status=testing (default: status=active only).")
+    sp.set_defaults(func=lambda ctx, args: (_emit(agent_tools.universe_view(
+        ctx, include_testing=args.include_testing)), 0)[1])
+
     # git-sync (commit + push everything changed; called as agent's last action)
     sp = sub.add_parser(
         "git-sync",
