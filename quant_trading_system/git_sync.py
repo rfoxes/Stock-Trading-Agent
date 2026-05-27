@@ -21,6 +21,7 @@ from __future__ import annotations
 import logging
 import os
 import subprocess
+import time
 from pathlib import Path
 from typing import Any
 
@@ -30,6 +31,22 @@ from quant_trading_system.memory import _REPO_ROOT
 logger = logging.getLogger(__name__)
 
 DEFAULT_BRANCH = "main"
+
+# How old a lock file must be for us to consider it stale and remove it.
+# A lock newer than this could be a legitimate concurrent git process.
+STALE_LOCK_AGE_SECONDS = 300  # 5 minutes
+
+# Known lock files git creates. We only sweep these; anything else stays.
+LOCK_FILE_PATTERNS = (
+    ".git/HEAD.lock",
+    ".git/index.lock",
+    ".git/packed-refs.lock",
+    ".git/ORIG_HEAD.lock",
+    ".git/FETCH_HEAD.lock",
+    ".git/MERGE_HEAD.lock",
+    ".git/CHERRY_PICK_HEAD.lock",
+    ".git/REVERT_HEAD.lock",
+)
 
 
 def _run(cmd: list[str], cwd: Path, *, capture: bool = True) -> tuple[int, str, str]:
@@ -50,6 +67,43 @@ def _run(cmd: list[str], cwd: Path, *, capture: bool = True) -> tuple[int, str, 
 
 def _is_git_repo(root: Path) -> bool:
     return (root / ".git").exists()
+
+
+def _sweep_stale_locks(root: Path) -> tuple[list[str], list[str]]:
+    """Remove .git lock files older than STALE_LOCK_AGE_SECONDS.
+
+    Locks newer than the threshold are left alone (they might be from a
+    legitimate concurrent process). Returns (removed, kept_too_recent)
+    so the caller can log + warn appropriately.
+    """
+    removed: list[str] = []
+    kept: list[str] = []
+    now = time.time()
+    # Fixed-name locks
+    candidates: list[Path] = [root / p for p in LOCK_FILE_PATTERNS]
+    # Per-ref locks under refs/heads, refs/remotes, refs/tags
+    for sub in (".git/refs/heads", ".git/refs/remotes", ".git/refs/tags"):
+        d = root / sub
+        if d.exists():
+            for p in d.rglob("*.lock"):
+                candidates.append(p)
+    for p in candidates:
+        if not p.exists():
+            continue
+        try:
+            age = now - p.stat().st_mtime
+        except OSError:
+            continue
+        rel = str(p.relative_to(root))
+        if age < STALE_LOCK_AGE_SECONDS:
+            kept.append(f"{rel} (age {int(age)}s)")
+            continue
+        try:
+            p.unlink()
+            removed.append(f"{rel} (age {int(age)}s)")
+        except OSError as e:
+            kept.append(f"{rel} (unlink failed: {e})")
+    return removed, kept
 
 
 def _bootstrap_config(settings: Settings, root: Path) -> list[str]:
@@ -129,6 +183,33 @@ def git_sync(
         out["ok"] = False
         out["error"] = f"not a git repo: {root}"
         return out
+
+    # Self-heal stale .git/*.lock files from previously-killed git processes.
+    # Locks newer than 5 minutes are left alone (legitimate concurrency).
+    removed_locks, kept_locks = _sweep_stale_locks(root)
+    if removed_locks:
+        out["steps"].append(
+            f"removed stale locks: {', '.join(removed_locks)}"
+        )
+    if kept_locks:
+        out["steps"].append(
+            f"WARNING: recent lock files present, not removing: "
+            f"{', '.join(kept_locks)}"
+        )
+        # If there's a recent HEAD.lock or index.lock, git operations will
+        # almost certainly fail. Report and bail rather than wedging.
+        critical = [
+            k for k in kept_locks
+            if k.startswith((".git/HEAD.lock", ".git/index.lock"))
+        ]
+        if critical:
+            out["ok"] = False
+            out["error"] = (
+                f"recent git lock(s) present: {critical}. "
+                "A concurrent git process may be running, or the lock is <5min "
+                "old. Wait or remove the lock(s) manually if no process is live."
+            )
+            return out
 
     out["steps"].extend(_bootstrap_config(settings, root))
     out["steps"].extend(_configure_origin_with_token(settings, root))
