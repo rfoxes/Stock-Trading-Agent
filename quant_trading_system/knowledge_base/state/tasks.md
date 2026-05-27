@@ -11,25 +11,60 @@ is just "the specific things you should do."
 
 ## Status as of the last update
 
-(Filled in by yesterday's Claude — 2026-05-25, Memorial Day, post-close run.)
+(Filled in by yesterday's Claude — 2026-05-26, Tue, post-close run.)
 
-- **Active strategy:** none. Today's tasks.md (operator-placed) said to set-active `equity_trend_following_ema_cross`; deferred — see handoff item 1.
-- **Last run's outcome:** 13th consecutive do-nothing run; no trades, no edits to strategy files, no `set-active`. Wrote a new conclusion (`2026-05-25.md`), a new handoff, and this file.
-- **Broker state to verify:** **NOT flat.** 10 unattributed longs from day 5 still on the account (SPY, QQQ, AAPL, MSFT, GOOGL, AMZN, NVDA, META, TSLA, JPM). Net unreal ≈ +$11.2K on holiday MTM. Equity $111,167.72. No open orders. Journal still empty.
-- **Blockers from last run:** the runtime's default watchlist exactly matches the 10 unattributed positions, so `set-active equity_trend_following_ema_cross` + `execute` would let the strategy's exit pass touch the operator's book on Tuesday's open. Needs operator clarification before acting (see handoff item 1, paths A/B).
+- **Active strategy:** none. 14th consecutive do-nothing run.
+- **Broker baseline:** still the same 10 unattributed longs (SPY, QQQ,
+  AAPL, MSFT, GOOGL, AMZN, NVDA, META, TSLA, JPM), same lot sizes, same
+  avg-entry to the cent. Equity $110,557.20 (-0.55% vs. Mon holiday MTM,
+  -0.55% on a +0.61% S&P day). Buying power $14,025.98. No open orders.
+  Journal still empty.
+- **Tuesday-open reconciliation: clean.** Holiday MTM drifted at most
+  -1.62% (AMZN) on actual Tue close. No further investigation needed.
+- **Regime:** `bull, conf=0.76, adx=26.3`. Unchanged classification.
+- **Operator silence:** ATTENTION.md mtime still 2026-05-14 17:44.
+  No new note in `state/` resolving the attribution question. The new
+  `state/manual.md` and `state/tasks.md` written 2026-05-25 17:08 are
+  still the latest operator signals.
+- **Open positions of note:** META unreal -10.5% (-$2,011 abs); the
+  -15% escalation trigger has not fired but the gap closed -0.44pp
+  from yesterday on actual Tue tape.
 
-## To do tomorrow (Tue 5/26 — first fresh-tape session after the long weekend)
+## To do tomorrow (Wed 5/27)
 
-1. Run the standard read-and-snapshot sequence (manual.md §1–2). Compare Tuesday's open marks against today's holiday MTM to verify the paper-broker mark service reconciled cleanly. If a name diverges materially on Tuesday vs. today's holiday mark, document it but don't act.
-2. Check `state/` for any new operator note resolving the broker baseline. Specifically:
-   - If a note says "attribute existing positions to `<id>`" → `set-active <id>` with reason "Operator-assigned attribution per `state/<note>`" and then `execute` to let the strategy manage exits. Expect META (-10.1% unreal today) to be the most likely first exit candidate; that's intended under explicit attribution.
-   - If the broker is now flat (positions list empty) → `set-active equity_trend_following_ema_cross` is clean (no exit-pass collateral damage), then `execute`. Conservative day-1 sizing should be fine; current buying-power cushion is ~$3.5K (~32% of one 10%-capped position).
-   - If nothing changed in `state/` and the broker is unchanged → write another do-nothing conclusion. Don't force `set-active`.
-3. If you do call `set-active` and `execute`, read the execute output's `intents` / `submitted` / `rejected` fields carefully. SafetyGate-rejected intents are useful diagnostic signal, not failures.
-4. Write a new `tasks.md` and `last_handoff.md`. The Status section here was wrong-by-template on the version I received; please write yours from real probe observations.
+1. Run the standard read-and-snapshot sequence (manual.md §1–2). Same
+   shape as today.
+2. **Check `state/` mtimes** (not just contents) for any new operator
+   signal since 2026-05-25 17:08. If anything moved, read it.
+3. **Decision tree (unchanged from yesterday — handoff item 2):**
+   - **Path A:** if a new note attributes existing positions to `<id>`
+     → `set-active <id>` with reason "Operator-assigned attribution per
+     `state/<note>`", then `execute`. Expect META (and possibly JPM)
+     to exit on the next session's open.
+   - **Path B:** if the broker is flat (positions list empty)
+     → `set-active equity_trend_following_ema_cross` is clean, then
+     `execute`. Day-1 sizing should fit the ~$14K buying-power cushion.
+   - **Path C:** neither → 15th do-nothing day. One-paragraph
+     conclusion. Don't force `set-active`.
+4. If META gapped further down on Wed open, log the new unreal % in
+   your handoff but do NOT take unilateral action on an unattributed
+   name.
+5. Write a new `tasks.md` and `last_handoff.md`. Fill the Status section
+   from real probe observations.
 
 ## Open questions for the operator
 
-1. **Should the harness take ownership of the existing 10 longs?** If yes, please add a one-line attribution in this file (e.g., "Attribute existing positions to `equity_trend_following_ema_cross`"). If no, please flat-close them (or move them to a separate account) so the harness starts from `positions == []`.
-2. **The new `state/tasks.md` you placed today asserted "account flat, no open orders" in its Status section.** Was that an oversight (the template's default got committed verbatim) or did you intend for today's Claude to ignore the broker state? Either is fine, but I deferred until you confirm.
-3. **The paper broker's holiday mark-to-market rolled position marks forward +1.59% on a closed Memorial Day** while the SPY quote stayed byte-identical to Friday's stale after-hours quote. Not an issue if it reconciles on Tue's open, but worth knowing about for any future holiday runs.
+(Same as yesterday — operator has not yet weighed in.)
+
+1. **Should the harness take ownership of the existing 10 longs?**
+   If yes: add a one-line attribution in this file (e.g., "Attribute
+   existing positions to `equity_trend_following_ema_cross`"). If no:
+   flat-close them (or move them to a separate account) so the harness
+   starts from `positions == []`.
+2. **The new `state/tasks.md` you placed on 5/25 asserted "account
+   flat, no open orders" in its Status section.** Was that template
+   default-committed-verbatim, or did you intend for Claude to ignore
+   broker state? Either is fine; just want confirmation before acting.
+3. **No new question today.** The Memorial-Day MTM anomaly (flagged
+   in yesterday's open questions) is resolved — reconciled cleanly on
+   Tuesday's open. No future-holiday handling needed beyond a sentence.
