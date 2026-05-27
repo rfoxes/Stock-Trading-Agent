@@ -802,6 +802,24 @@ def simulate_strategy(
     return _ok(bt.to_dict())
 
 
+def git_sync(
+    ctx: ToolContext,
+    *,
+    message: str,
+    push: bool = True,
+    pull_first: bool = True,
+) -> dict[str, Any]:
+    """Commit and push everything that changed in the repo since the last sync.
+
+    Called as the final action of each scheduled-task agent. Best-effort:
+    a git error does not fail the run, just gets reported back so the agent
+    can document it in its handoff.
+    """
+    from quant_trading_system.git_sync import git_sync as _do_sync
+
+    return _ok(_do_sync(ctx.settings, message=message, push=push, pull_first=pull_first))
+
+
 def news_fetch(
     ctx: ToolContext,
     *,
@@ -1052,6 +1070,8 @@ TOOL_FUNCTIONS = {
     "news_fetch": news_fetch,
     "news_cleanup": news_cleanup,
     "news_universe": news_universe,
+    # git
+    "git_sync": git_sync,
     # backtest
     "run_backtest": run_backtest,
 }

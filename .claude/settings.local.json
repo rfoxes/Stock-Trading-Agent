@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /Users/rfoxes/Stock-Trading-Agent log --oneline -5)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:docs.langchain.com)",
+      "Bash(python -c ':*)",
+      "Bash(python3 -c ':*)",
+      "Bash(pip search:*)",
+      "Bash(pip index:*)",
+      "Bash(pip install:*)",
+      "Bash(python3 -c \"import urllib.request, json; data = json.loads\\(urllib.request.urlopen\\('https://pypi.org/pypi/pandas_ta/json'\\).read\\(\\)\\); print\\('Latest:', data['info']['version']\\); print\\('All versions:', sorted\\(data['releases'].keys\\(\\)\\)[-10:]\\)\")",
+      "Bash(brew list:*)",
+      "Bash(/opt/homebrew/bin/python3.13 -m venv .venv)",
+      "Bash(ollama --version)",
+      "Bash(brew services:*)",
+      "Bash(ollama pull:*)",
+      "Bash(ollama list:*)"
+    ]
+  }
+}

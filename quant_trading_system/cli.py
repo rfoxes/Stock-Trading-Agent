@@ -552,6 +552,18 @@ def _build_parser() -> argparse.ArgumentParser:
                         help="List the symbols / sectors / categories the news layer covers today.")
     sp.set_defaults(func=lambda ctx, args: (_emit(agent_tools.news_universe(ctx)), 0)[1])
 
+    # git-sync (commit + push everything changed; called as agent's last action)
+    sp = sub.add_parser(
+        "git-sync",
+        help="Stage all changes, commit, and push to origin. Each agent should run this as its final action.",
+    )
+    sp.add_argument("--message", required=True, help="Commit message. Include agent name + date.")
+    sp.add_argument("--no-push", action="store_true", help="Commit locally but don't push.")
+    sp.add_argument("--no-pull", action="store_true", help="Skip the pull --rebase --autostash step.")
+    sp.set_defaults(func=lambda ctx, args: (_emit(agent_tools.git_sync(
+        ctx, message=args.message, push=not args.no_push, pull_first=not args.no_pull,
+    )), 0)[1])
+
     return p
 
 

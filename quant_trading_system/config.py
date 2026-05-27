@@ -65,6 +65,12 @@ class Settings:
     ANTHROPIC_API_KEY: str = ""
     SUPERVISOR_MODEL: str = "claude-sonnet-4-6"
 
+    # --- GitHub (optional, used by `cli git-sync` so agents can commit + push) ---
+    GITHUB_TOKEN: str = ""
+    GITHUB_USER: str = ""                  # username for HTTPS-with-token URL
+    GITHUB_AUTHOR_NAME: str = "Trading Harness"
+    GITHUB_AUTHOR_EMAIL: str = "harness@local"
+
     # --- Alpaca ---
     ALPACA_API_KEY: str = ""
     ALPACA_SECRET_KEY: str = ""
@@ -112,6 +118,10 @@ class Settings:
         s = cls(
             ANTHROPIC_API_KEY=_envstr("ANTHROPIC_API_KEY", ""),
             SUPERVISOR_MODEL=_envstr("SUPERVISOR_MODEL", "claude-sonnet-4-6"),
+            GITHUB_TOKEN=_envstr("GITHUB_TOKEN", ""),
+            GITHUB_USER=_envstr("GITHUB_USER", ""),
+            GITHUB_AUTHOR_NAME=_envstr("GITHUB_AUTHOR_NAME", "Trading Harness"),
+            GITHUB_AUTHOR_EMAIL=_envstr("GITHUB_AUTHOR_EMAIL", "harness@local"),
             ALPACA_API_KEY=_envstr("ALPACA_API_KEY", ""),
             ALPACA_SECRET_KEY=_envstr("ALPACA_SECRET_KEY", ""),
             ALPACA_PAPER=_envbool("ALPACA_PAPER", True),
