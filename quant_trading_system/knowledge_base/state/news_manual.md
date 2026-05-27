@@ -72,6 +72,17 @@ affecting the companies on the watchlist or macro conditions around them.
 - **Unusual options activity** (UOA): when a watchlist symbol has a
   confirmed large sweep / volume spike pre-print. Doesn't tell us what
   to do but is a signal an event is impending.
+- **Outlier movers OUTSIDE the universe with concrete catalysts**. If a
+  non-universe name had a real fundamental event (earnings beat with
+  raised guidance, FDA approval, M&A target, regulatory win/loss, major
+  contract), flag it. Not so the trader can trade it — the trader can
+  only act on universe symbols — but so the operator / Saturday research
+  agent has a record of names worth adding to `state/extra_symbols.md`.
+  The criterion is the *event*, not the price move; "stock up 30%" alone
+  doesn't qualify, "stock up 30% on confirmed FDA approval" does.
+- **Sector-level developments**, not just sector price commentary. "Goldman
+  raised 2026 AI capex forecast to $800B" is real sector news.
+  "Semis pulled back today" is price action and doesn't qualify.
 
 **DROP (price commentary the trader can see itself):**
 - "NVDA down 10% in 2 weeks" / "META -10% unrealized" / "AAPL at record".
@@ -167,10 +178,28 @@ move on. Full-article fetching is reserved for the Saturday research agent.
    categories should still get a file with `<p class="empty">No notable
    <category> news today.</p>`.
 
-5. **Build the daily summary.** Write
+5. **Survey the broader tape for outlier movers + sector themes.** This is
+   the step that prevents the brief from being too inward-looking.
+   - **Top movers outside the universe.** WebSearch for `"biggest gainers
+     today S&P 500"`, `"biggest losers today S&P 500"`, optionally
+     `"Russell 2000 top gainers"` for smaller-cap context. For each item
+     in the top ~10 either direction, identify whether there's a
+     concrete catalyst behind the move. Names with catalysts go in the
+     brief's "Candidates for the universe" section (see step 6). Names
+     that moved on flow / noise alone get discarded.
+   - **Sector themes with real events.** WebSearch for `"<sector> sector
+     news today"` for the 3-4 sectors most represented in the universe
+     (today: technology, financials, consumer, index). The bar is
+     event-driven: a sell-side analyst raising sector targets with a
+     dollar figure counts; "tech rallied today" doesn't.
+   - **Cross-sector themes** — AI capex, defense spending, energy
+     transition, rate-sensitive flows. Whichever 1-2 themes had a real
+     event today.
+
+6. **Build the daily summary.** Write
    `knowledge_base/news/daily_summary/<TODAY>.html` aggregating the most
-   important items across all categories. ~5-15 items max. This is the
-   "newspaper front page" view.
+   important items across all categories — including outlier movers and
+   sector themes. ~10-20 items max. This is the "newspaper front page" view.
 
 6. **Write `state/news_brief.md`.** This is what the trader reads. Required
    sections:
@@ -189,6 +218,24 @@ move on. Full-article fetching is reserved for the Saturday research agent.
    Symbols with no fresh news get a single line at the bottom:
    "No fresh news: AAPL, AMZN, ...". Do not write "NVDA was down today" —
    the trader can see that.
+
+   ## Sector themes
+   2-5 bullet points describing real sector-level EVENTS that affect
+   groups of symbols (e.g., "AI capex: Goldman raised 2026 forecast to
+   $800B", "Healthcare: PBM reform bill passed Senate committee",
+   "Energy: OPEC+ surprise production cut announced"). Skip on truly
+   quiet days; this section can be short or omitted. Cover the 3-4
+   sectors most represented in the universe at a minimum.
+
+   ## Candidates for the universe
+   Non-watchlist names that had material catalysts today and would be
+   worth the operator / Saturday research agent considering for inclusion
+   in `state/extra_symbols.md`. One-liner per name: ticker, the catalyst,
+   why it might matter. Example: "MRVL — Q4 beat $0.80 vs. $0.75, +6.7%
+   post-print; semis ex-NVDA exposure". The trader will NOT trade these
+   (they're outside the universe) but the operator should see them.
+   "No new candidates today" is a valid section content when the broader
+   tape had nothing event-worthy outside the universe.
 
    ## Macro / sector context
    Real events only: Fed decisions, CPI/PPI/jobs prints, geopolitical
@@ -210,12 +257,16 @@ move on. Full-article fetching is reserved for the Saturday research agent.
    "standard workflow" recommendation is a fine output on a quiet day. The
    trader is allowed to skim it in 30 seconds.
 
-7. **Cleanup.** Run `python3 -m quant_trading_system.cli news-cleanup` to
+8. **Cleanup.** Run `python3 -m quant_trading_system.cli news-cleanup` to
    sweep HTMLs older than 90 days.
 
-8. **Write `state/news_tasks.md`** for tomorrow's news agent. Brief.
+9. **Write `state/news_tasks.md`** for tomorrow's news agent. Brief. If you
+   identified "Candidates for the universe" today, list them in
+   `news_tasks.md`'s carry-forwards section so tomorrow's news agent
+   tracks whether the same names keep coming up (recurring catalysts on a
+   non-universe name is a stronger signal than a one-day event).
 
-9. **Stop.**
+10. **Stop.**
 
 ## The "halt-worthy" call
 

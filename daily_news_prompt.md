@@ -34,9 +34,11 @@ There is no virtualenv.
 
 3. **Use WebSearch yourself for the six categories** (`macro`, `earnings`, `geopolitics`, `policy`, `volatility`, `options_flow`) — Alpaca News doesn't cover these well. Write each as `knowledge_base/news/categories/<category>/<DATE>.html`. Empty categories get a file too, with `<p class="empty">No notable news today.</p>`. See `news_manual.md` §"Workflow" step 4 for what each category should cover, including the new `volatility` (VIX, IV rank, term structure) and `options_flow` (unusual options activity) categories that feed the harness's options trading.
 
-4. **Write the daily summary** at `knowledge_base/news/daily_summary/<DATE>.html` — a "front page" with the 5-15 most important items across all sources.
+4. **Survey the broader tape** — outlier movers outside the universe with concrete catalysts, sector themes with real events, cross-sector themes (AI capex, defense, energy transition, rate-sensitive flows). See `news_manual.md` §"Workflow" step 5. This is the step that prevents the brief from being too inward-looking. WebSearch top gainers/losers for the S&P/Russell, sector-level news for the 3-4 sectors most represented in the universe. The bar is event-driven: a catalyst behind the move counts; "stock up 30%" alone doesn't.
 
-5. **Write `state/news_brief.md`** — the file the trader reads. See `news_manual.md` for the required section structure. Headline assessment must be one of: `NO MATERIAL NEWS` / `NORMAL FLOW` / `NOTABLE` / `HALT-WORTHY EVENT`.
+5. **Write the daily summary** at `knowledge_base/news/daily_summary/<DATE>.html` — a "front page" with the 10-20 most important items across all sources (universe news + sector themes + outlier movers).
+
+6. **Write `state/news_brief.md`** — the file the trader reads. See `news_manual.md` for the required section structure. The brief now has six sections including `## Sector themes` and `## Candidates for the universe` (non-universe names with material catalysts that the operator should consider adding to `state/extra_symbols.md`). Headline assessment must be one of: `NO MATERIAL NEWS` / `NORMAL FLOW` / `NOTABLE` / `HALT-WORTHY EVENT`.
 
 6. **Cleanup.** `cli news-cleanup` sweeps HTMLs older than 90 days.
 
