@@ -6,35 +6,38 @@ Yesterday's news agent writes this. Replace, don't append.
 
 ## Status as of the last update
 
-- **Last brief assessment:** NOTABLE (2026-05-27, Wed). Three watchlist event items: (1) SCOTUS denied META's appeal — Vermont Instagram-addiction lawsuit can proceed; (2) Jamie Dimon publicly floated $20B JPM M&A capacity (also flagged "higher costs"); (3) Jensen Huang committed NVDA to $150B/yr Taiwan investment + dividend boost. Plus macro: Kevin Warsh formally seated as Fed Chair (sworn in May 22); first Warsh FOMC June 16–17; Goldman raised SPX target to 8,000.
-- **Iran de-escalated**: White House denied Iran-floated draft MOU as "complete fabrication"; Trump said deal close; oil -5.55% to $88.68 (full unwind of yesterday's strikes spike). Risk-on close: Dow / S&P at fresh records (Dow 50,644 +0.36%; S&P 7,520 +0.02%; Nasdaq 26,675 +0.07%). VIX 17.01.
-- **Universe last covered:** full 10-name watchlist (SPY, QQQ, AAPL, MSFT, GOOGL, AMZN, NVDA, META, TSLA, JPM). Alpaca News returned 92 items (NVDA 24, TSLA 13, AAPL 10, MSFT 10, AMZN 9, META 6, JPM 6, QQQ 5, SPY 5, GOOGL 4). All six category HTMLs written (macro, earnings, geopolitics, policy, volatility, options_flow). Cleanup deleted 0 (90-day retention still not hit).
+- **Last brief assessment:** NOTABLE (2026-05-28, Thu). Three watchlist event items: (1) META launched global paid subscriptions across Instagram, Facebook, WhatsApp, and Meta AI ($3–$4/mo) — first material business-model expansion in years, BNP $955 target, ~$13.5B incremental rev by 2028; (2) Snowflake signed $6B 5-year AWS Graviton commitment alongside +37% post-print on raised FY27 guide — direct positive for AMZN cloud-share narrative; (3) Laura Loomer wrote to Pentagon flagging Jensen Huang's just-reported Tsinghua University advisory-board role as a "massive scandal." Plus a mixed April PCE (3.8% headline, 3-year high; 3.3% core; monthly 0.4% slightly cooler than 0.5% est.) and a tentative US-Iran 60-day ceasefire MoU framework that Trump hasn't approved (US/Iran also briefly exchanged fire early Thursday before the diplomatic news landed). S&P closed fresh record 7,563.63 (+0.58%); VIX 15.7–16.3 (off ~1pt from 17.01).
+- **Universe last covered:** full 10-name watchlist (SPY, QQQ, AAPL, MSFT, GOOGL, AMZN, NVDA, META, TSLA, JPM). Alpaca News returned 83 items (NVDA 17, MSFT 14, AMZN 13, TSLA 9, META 8, GOOGL 6, SPY 6, AAPL 5, QQQ 3, JPM 2). All six category HTMLs written (macro, earnings, geopolitics, policy, volatility, options_flow). Cleanup deleted 0 (90-day retention still not hit).
 
 ## Notable carry-forwards
 
-- **META exit-risk just got fresh.** The SCOTUS denial is a real adverse legal event for META, on top of its -10.5% unreal position in the unattributed book. If META gaps down on Thu open, this is the most likely catalyst chain to flag as triggering an exit. Watch overnight options activity (no put-sweep size flagged today) and the Thu pre-market tape.
-- **CRM prints AMC tonight (May 27)** — not on watchlist but a MSFT-sentiment leading indicator. **Confirm tomorrow morning** whether CRM beat / missed and whether Agentforce ARR accelerated. A bad print would be a soft-negative for MSFT enterprise-AI narrative. Options implied 8.7% post-print move.
-- **MRVL beat AMC tonight ($0.80 vs. $0.75 est., +6.7%).** Constructive read-through for NVDA / semi sentiment. Confirm the post-print stock reaction overnight.
-- **Iran is now a tailwind, not a watch-item.** Deal optics improving; oil collapsed. If overnight news flips back (Iranian retaliation, Trump pulls out of talks), re-escalate. Otherwise drop it from the daily watch-list.
-- **JPM Dimon $20B M&A signal** is slow-burn — won't move JPM unless a specific target rumor surfaces. Background note only.
-- **GOOGL EU DMA penalty** still pending dollar figure; no movement today.
-- **Warsh-era Fed.** Trader handoffs should note "Warsh seated, hawkish-leaning, first FOMC June 16–17" as macro regime context. No action items today.
+- **META cleanest positive single-name catalyst of the week.** Paid subscriptions launched today across all four properties; analyst $955 target; ~$13.5B 2028 revenue add. Combined with yesterday's bounce on priced-in SCOTUS denial + Zuckerberg-cloud-hint, META's bear case is materially softened. Watch for follow-on coverage tomorrow (subscription pricing reactions, take-rate datapoints if any leak).
+- **NVDA Loomer/Tsinghua story is the new political-risk overhang.** Loomer letters have historically translated into administration action. Tomorrow: check for any Truth Social post or Pentagon response. If WH distance themselves from Huang's advisory role, that's a NVDA-negative escalation. If nothing happens, it fades. AAPL (Cook) and TSLA (Musk) reportedly on same Tsinghua board — multi-name policy-risk path exists.
+- **Iran MoU needs Trump approval.** Tentative 60-day framework reached today; Trump said "not satisfied." Overnight Truth Social signal could resolve either direction. If rejected → futures gap risk + oil bid back. If approved → mild risk-on continuation. Treat as a fresh input tomorrow morning.
+- **SNOW worth adding to extra_symbols.** Direct AMZN read-through plus standalone AI-monetization-narrative leader. Recurring catalyst.
+- **MU / INTC / DELL / SNDK / AKAM** — large gainers today; MU and DELL recur from yesterday. Check tomorrow whether AKAM (+28.2%) and INTC (+13.5%) had confirmed catalysts (likely yes given size). AKAM specifically warrants a quick confirmation pass — that's earnings-grade movement.
+- **AI-monetization theme.** SNOW +37% on revenue-now framing; CRM/MRVL flat-down on revenue-later framing. Next watchlist prints (late July onward) will be judged on this same axis. Soft-negative MSFT bias going into the late-July print window.
+- **Warsh-era Fed remains background context.** First Warsh FOMC June 16–17. PCE today reinforced hawkish framing; ~50% probability of ≥25bp hike by year-end per CME FedWatch.
+- **VIX in vol-selling territory (~16).** Index IV rank likely <30; NOT a high-IV regime for the `iron_condor_high_iv` skeleton. NVDA single-name IV elevated on positioning, no catalyst.
 
-## To do today (tomorrow's run, Thu 2026-05-28)
+## To do today (tomorrow's run, Fri 2026-05-29)
 
 1. Run the standard workflow (news_manual.md §"Workflow").
-2. **CRM post-print read-through:** check whether CRM gapped > 5% either way on the print, and whether MSFT pre-market is reacting. Note in the brief.
-3. **MRVL post-print read-through:** beat was reported (+6.7%); confirm the stock reaction and any NVDA-sentiment spillover.
-4. **META Thu pre-market check:** any overnight gap-down on the SCOTUS news? If META is -3%+ pre-market, that's a single-name escalation worth flagging prominently.
-5. **Iran-deal status:** if a real deal text surfaces (or talks visibly collapse) overnight, treat as a fresh catalyst. If the day's news is just more posturing, drop to background.
-6. **No FOMC, CPI, payrolls this week.** Macro section will likely be quiet — that's fine, write it short.
-7. **No watchlist earnings this week.** Earnings section is just MRVL / CRM read-throughs.
+2. **META subscription follow-on:** check for any take-rate or pricing-reaction coverage; check whether META gapped on the subscription news tomorrow.
+3. **NVDA Loomer follow-on:** any Truth Social signal, Pentagon response, or WH distancing from Huang? If yes, NVDA-negative; if no, fade the story.
+4. **Iran MoU status:** check for Trump approval / rejection. If rejected, expect futures gap + oil re-bid; flag prominently. If approved, drop to background.
+5. **SPX gainers confirmation:** validate that AKAM +28.2%, INTC +13.5%, MU +13.8%, SNDK +14.3%, DELL +12.3%, MNST +13.9%, CPAY +11.1% had real catalysts (earnings beats most likely). Add the confirmed-catalyst names to candidates section.
+6. **No FOMC, CPI, payrolls this week.** Macro section will be quiet — that's fine.
+7. **No watchlist earnings in next 14 days.** Earnings section will be sparse — SNOW/CRM/MRVL post-print follow-throughs only.
+8. **Friday-PM run:** weekend means the Saturday research agent will read your brief. If anything looks worth deeper research (Loomer/NVDA path, META subscription economics, SNOW take-rate methodology), flag it in `news_tasks.md` for Saturday.
 
 ## Open questions for the operator
 
-(none new)
+- The brief now consistently flags SNOW, MU, DELL as "candidates for universe" multiple sessions in a row. Worth a deliberate operator decision on `state/extra_symbols.md` inclusion.
+- AKAM's +28.2% move is large enough to warrant operator awareness even if it stays out of the universe.
 
 ## Operational notes
 
-- `cli news-fetch` returned 92 items cleanly (no proxy errors). WebSearch returned useful results for FOMC/Warsh, Iran, VIX, earnings, and tariff/policy queries. Yesterday's note that "WebSearch returns nothing useful for 'CPI release'" wasn't tested today (no CPI this week); leave the note.
-- `git-sync` ran as the final tool call. If it failed for any reason, surface in tomorrow's notes.
+- `cli news-fetch` returned 83 items cleanly (no proxy errors). WebSearch returned useful results for PCE/Fed, Iran/Hormuz, VIX, NVDA options skew, SPX movers, and earnings calendar queries.
+- `git-sync` failed yesterday (stale `.git/index.lock` from another git process; sandbox couldn't unlink). If yesterday's trader handoff didn't clear it, today's `git-sync` may hit the same error. Surface the error if it recurs.
+- Previous note: "WebSearch returns nothing useful for 'CPI release' queries; use 'CPI <month> <year>' instead" — not exercised today (no CPI on calendar); leave the note for future runs.
