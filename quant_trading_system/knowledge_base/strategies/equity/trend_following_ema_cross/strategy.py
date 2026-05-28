@@ -13,6 +13,8 @@ Run cadence is post-close, so all entries are queued for the next session.
 
 from __future__ import annotations
 
+from typing import Any
+
 from quant_trading_system._strategy_helpers import (
     crossed_above,
     crossed_below,
@@ -39,7 +41,9 @@ def evaluate(ctx: StrategyContext) -> list[OrderIntent]:
 
     intents: list[OrderIntent] = []
 
-    # --- Exit pass: check existing positions for death-cross / ADX fade ---
+    # --- Exit pass: collect ALL candidates first, then submit a capped subset ---
+    max_exits_per_run = int(p.get("max_exits_per_run", 1))
+    exit_candidates: list[dict[str, Any]] = []  # collected before any submission
     for pos in ctx.positions:
         sym = str(pos.get("symbol", "")).upper()
         if not sym:
@@ -50,22 +54,54 @@ def evaluate(ctx: StrategyContext) -> list[OrderIntent]:
         ema_fast = ti.compute_ema(bars["Close"], fast_period)
         ema_slow = ti.compute_ema(bars["Close"], slow_period)
         adx = ti.compute_adx(bars["High"], bars["Low"], bars["Close"], adx_period)
+        qty = position_qty(ctx.positions, sym)
+        if qty <= 0:
+            continue
+        exit_reason: str | None = None
         if crossed_below(ema_fast, ema_slow):
-            qty = position_qty(ctx.positions, sym)
-            if qty > 0:
-                intents.append(OrderIntent(
-                    symbol=sym, side="sell", qty=qty, order_type="market",
-                    reasoning=f"Exit: EMA{fast_period} crossed below EMA{slow_period} (death cross).",
-                ))
-                continue
-        if not adx.empty and not adx.iloc[-1] != adx.iloc[-1]:  # not NaN
-            if float(adx.iloc[-1]) < adx_exit:
-                qty = position_qty(ctx.positions, sym)
-                if qty > 0:
-                    intents.append(OrderIntent(
-                        symbol=sym, side="sell", qty=qty, order_type="market",
-                        reasoning=f"Exit: ADX({adx_period})={float(adx.iloc[-1]):.1f} < exit threshold {adx_exit}.",
-                    ))
+            exit_reason = f"EMA{fast_period} crossed below EMA{slow_period} (death cross)"
+        elif (
+            not adx.empty
+            and not (adx.iloc[-1] != adx.iloc[-1])  # not NaN
+            and float(adx.iloc[-1]) < adx_exit
+        ):
+            exit_reason = f"ADX({adx_period})={float(adx.iloc[-1]):.1f} < exit threshold {adx_exit}"
+        if exit_reason is None:
+            continue
+        # Estimate $ loss/gain if we exit at the current mark
+        current_price = float(pos.get("current_price", 0) or 0)
+        avg_entry = float(pos.get("avg_entry_price", 0) or 0)
+        dollar_pnl = (current_price - avg_entry) * qty if avg_entry > 0 else 0.0
+        # Absolute loss (more negative = bigger loss, we sort ascending so
+        # smallest-loss-first; gains sort to the very front)
+        exit_candidates.append({
+            "symbol": sym,
+            "qty": qty,
+            "reason": exit_reason,
+            "dollar_pnl": dollar_pnl,
+            "abs_loss": max(0.0, -dollar_pnl),  # 0 if profitable, magnitude if losing
+        })
+
+    # Sort: smallest absolute loss first (profitable exits rank first since
+    # they have abs_loss == 0). Take at most max_exits_per_run.
+    exit_candidates.sort(key=lambda c: (c["abs_loss"], c["symbol"]))
+    deferred_count = max(0, len(exit_candidates) - max_exits_per_run)
+    for cand in exit_candidates[:max_exits_per_run]:
+        defer_note = (
+            f" ({deferred_count} other exit{'s' if deferred_count != 1 else ''} "
+            f"deferred to next run)"
+            if deferred_count > 0
+            else ""
+        )
+        intents.append(OrderIntent(
+            symbol=cand["symbol"], side="sell", qty=cand["qty"], order_type="market",
+            reasoning=(
+                f"Exit: {cand['reason']}. "
+                f"Est. P&L at current mark: ${cand['dollar_pnl']:.0f}. "
+                f"Staggered (max_exits_per_run={max_exits_per_run}); selected "
+                f"smallest-loss candidate first{defer_note}."
+            ),
+        ))
 
     # --- Entry pass: only consider symbols we don't already hold ---
     for sym in ctx.watchlist:
