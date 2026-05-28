@@ -21,7 +21,7 @@ parameters:
   atr_period: 14
   atr_stop_multiplier: 2.5
   trailing_stop_atr_multiplier: 3.0
-  max_exits_per_run: 1
+  max_exits_per_run: 5
 status: active
 ---
 
@@ -48,7 +48,7 @@ This trend-following strategy uses the classic 12/26 EMA crossover as its direct
 - **Trailing stop:** Once the position is profitable by at least 1x ATR(14), implement a trailing stop at 3.0x ATR(14) below the highest close since entry.
 - **Initial stop:** Place an initial stop-loss at 2.5x ATR(14) below the entry price.
 - If the stock gaps down more than 4% on any day, close the position at market open regardless of other signals.
-- **Staggered exit pacing (`max_exits_per_run`):** When multiple positions trigger an exit on the same run, the strategy submits at most `max_exits_per_run` (default 1) per day, ordered by ascending absolute dollar loss — smallest-loss candidate first. This prevents SafetyGate's daily-loss cap from rejecting the entire basket when several positions roll over together. Deferred exits are re-evaluated next run; if their conditions still hold and the daily-loss math allows, they exit then. Set to a higher value (e.g. 3) on days where you've manually pre-approved a basket dump via the operator directive flow.
+- **Staggered exit pacing (`max_exits_per_run`):** When multiple positions trigger an exit on the same run, the strategy collects all candidates, sorts them by ascending absolute dollar loss (profitable exits first), and submits at most `max_exits_per_run` per run. Default is 5 — high enough that a typical day's exit basket clears in one session while still guarding against degenerate cascades (e.g. 20 simultaneous exits on a flash event). SafetyGate's `daily_loss` check is now per-batch realized P&L (rescoped 2026-05-28), so the gate itself bounds the basket's combined realized loss to `MAX_DAILY_LOSS_PCT × equity`; this parameter is a soft secondary throttle. Lower to 1-2 for very conservative pacing; raise above 5 only when you want maximum basket throughput on a known unwind day.
 
 ## Risk Management
 

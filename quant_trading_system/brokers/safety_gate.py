@@ -335,18 +335,50 @@ class SafetyGate:
         checks_passed.append("position_size")
 
         # --- Check 5: Daily loss limit ---
+        # Per-batch realized-loss semantics: sum (a) the estimated realized loss
+        # of THIS order if it's a sell that would close at a loss, plus (b)
+        # cumulative session-realized losses already booked this day. Compare
+        # against MAX_DAILY_LOSS_PCT * equity. This gate measures the cost of
+        # *closing trades the strategy actually proposes today*, not the
+        # portfolio's standing unrealized losses (which were the old, incorrect
+        # semantics — that interpretation halted the entire harness whenever
+        # mark-to-market dipped under -2%, blocking even profitable exits).
+        #
+        # When this check passes for a sell order with a negative estimated P&L,
+        # we accrue that loss into self._daily_realized_loss so that subsequent
+        # orders in the same batch see the cumulative number. The accrual is
+        # an estimate using the position's current_price (market orders) or the
+        # order's limit_price (limit orders); actual fills may differ slightly
+        # but the safety property — no day realizes losses > MAX_DAILY_LOSS_PCT
+        # of equity from strategy-driven closes — is preserved within mark
+        # precision.
+        order_realized_loss = 0.0
         if self._client is not None:
             try:
                 account = self._client.get_account()
                 equity = account.get("equity", 0.0)
-                if equity > 0:
+                if equity > 0 and order.side.value == "sell":
                     positions = self._client.get_positions()
-                    unrealized_loss = sum(
-                        p.get("unrealized_pl", 0.0)
-                        for p in positions
-                        if p.get("unrealized_pl", 0.0) < 0
+                    position = next(
+                        (p for p in positions if p.get("symbol") == order.symbol),
+                        None,
                     )
-                    total_loss = abs(unrealized_loss) + abs(self._daily_realized_loss)
+                    if position is not None:
+                        avg_entry = float(position.get("avg_entry_price", 0.0) or 0.0)
+                        # Prefer the order's limit price when set; otherwise the
+                        # position's current mark.
+                        est_price = float(
+                            order.limit_price
+                            or position.get("current_price", 0.0)
+                            or 0.0
+                        )
+                        if avg_entry > 0 and est_price > 0:
+                            # Realized P&L on a long-side close: qty * (sale - entry).
+                            realized_pl = order.qty * (est_price - avg_entry)
+                            if realized_pl < 0:
+                                order_realized_loss = abs(realized_pl)
+                if equity > 0:
+                    total_loss = order_realized_loss + abs(self._daily_realized_loss)
                     loss_pct = total_loss / equity
                     if loss_pct > self._settings.MAX_DAILY_LOSS_PCT:
                         log.warning(
@@ -354,18 +386,27 @@ class SafetyGate:
                             reason="daily_loss_limit",
                             loss_pct=round(loss_pct, 4),
                             max_pct=self._settings.MAX_DAILY_LOSS_PCT,
+                            order_realized_loss=round(order_realized_loss, 2),
+                            prior_realized_loss=round(abs(self._daily_realized_loss), 2),
                         )
                         return OrderResult(
                             status=OrderStatus.REJECTED,
                             mode=self._get_trading_mode(),
                             rejection_reason=(
                                 f"Daily loss {loss_pct:.1%} exceeds "
-                                f"limit {self._settings.MAX_DAILY_LOSS_PCT:.1%}"
+                                f"limit {self._settings.MAX_DAILY_LOSS_PCT:.1%} "
+                                f"(this order ~${order_realized_loss:.0f} + "
+                                f"prior realized ~${abs(self._daily_realized_loss):.0f})"
                             ),
                             safety_checks_passed=checks_passed,
                             safety_checks_failed=["daily_loss"],
                             original_request=order,
                         )
+                    # Accrue this order's expected realized loss so subsequent
+                    # orders in the same batch see it. Only sells against a long
+                    # position with a negative estimated P&L contribute.
+                    if order_realized_loss > 0:
+                        self._daily_realized_loss += order_realized_loss
             except Exception as e:
                 log.warning("daily_loss_check_failed", error=str(e))
         checks_passed.append("daily_loss")
