@@ -802,6 +802,32 @@ def simulate_strategy(
     return _ok(bt.to_dict())
 
 
+def git_doctor(ctx: ToolContext) -> dict[str, Any]:
+    """Diagnose + auto-fix the most common .git/*.lock wedge.
+
+    Aggressively removes every stale lock file under .git/ regardless of age.
+    Safe to run from a terminal OR from the harness. Returns what it cleaned up.
+    """
+    from quant_trading_system.git_sync import (
+        _sweep_all_locks_unconditional,
+        _install_cleanup_handlers,
+    )
+    from quant_trading_system.memory import _REPO_ROOT
+
+    _install_cleanup_handlers(_REPO_ROOT)
+    removed = _sweep_all_locks_unconditional(_REPO_ROOT)
+    return _ok({
+        "repo": str(_REPO_ROOT),
+        "removed_count": len(removed),
+        "removed": removed,
+        "note": (
+            "all .git/*.lock files removed. Safe to re-run git commands now."
+            if removed
+            else "no lock files found — repo is clean."
+        ),
+    })
+
+
 def git_sync(
     ctx: ToolContext,
     *,
@@ -1100,6 +1126,7 @@ TOOL_FUNCTIONS = {
     "universe_view": universe_view,
     # git
     "git_sync": git_sync,
+    "git_doctor": git_doctor,
     # backtest
     "run_backtest": run_backtest,
 }

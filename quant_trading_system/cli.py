@@ -562,6 +562,13 @@ def _build_parser() -> argparse.ArgumentParser:
     sp.set_defaults(func=lambda ctx, args: (_emit(agent_tools.universe_view(
         ctx, include_testing=args.include_testing)), 0)[1])
 
+    # git-doctor (clean up stale .git/*.lock files — works for harness + operator)
+    sp = sub.add_parser(
+        "git-doctor",
+        help="Aggressively remove all stale .git/*.lock files. Safe to run anytime.",
+    )
+    sp.set_defaults(func=lambda ctx, args: (_emit(agent_tools.git_doctor(ctx)), 0)[1])
+
     # git-sync (commit + push everything changed; called as agent's last action)
     sp = sub.add_parser(
         "git-sync",

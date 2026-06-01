@@ -18,8 +18,10 @@ trading and writing markdown; pushing to GitHub is a nice-to-have.
 
 from __future__ import annotations
 
+import atexit
 import logging
 import os
+import signal
 import subprocess
 import time
 from pathlib import Path
@@ -34,7 +36,7 @@ DEFAULT_BRANCH = "main"
 
 # How old a lock file must be for us to consider it stale and remove it.
 # A lock newer than this could be a legitimate concurrent git process.
-STALE_LOCK_AGE_SECONDS = 300  # 5 minutes
+STALE_LOCK_AGE_SECONDS = 60  # 1 minute — git operations rarely take longer
 
 # Known lock files git creates. We only sweep these; anything else stays.
 LOCK_FILE_PATTERNS = (
@@ -67,6 +69,58 @@ def _run(cmd: list[str], cwd: Path, *, capture: bool = True) -> tuple[int, str, 
 
 def _is_git_repo(root: Path) -> bool:
     return (root / ".git").exists()
+
+
+def _sweep_all_locks_unconditional(root: Path) -> list[str]:
+    """Aggressively remove ALL .git lock files regardless of age.
+
+    Used by signal handlers and atexit hooks: when this process is dying or
+    has just died, any lock it created is by definition stale. We want to
+    leave the repo clean for the next operation (whether harness or
+    operator).
+    """
+    removed: list[str] = []
+    candidates: list[Path] = [root / p for p in LOCK_FILE_PATTERNS]
+    for sub in (".git/refs/heads", ".git/refs/remotes", ".git/refs/tags"):
+        d = root / sub
+        if d.exists():
+            for p in d.rglob("*.lock"):
+                candidates.append(p)
+    for p in candidates:
+        if not p.exists():
+            continue
+        try:
+            p.unlink()
+            removed.append(str(p.relative_to(root)))
+        except OSError:
+            pass
+    return removed
+
+
+def _install_cleanup_handlers(root: Path) -> None:
+    """Wire SIGTERM / SIGINT / atexit so we never leave a lock behind.
+
+    Idempotent — multiple installs collapse to one handler chain.
+    """
+    cleaned = {"done": False}
+
+    def _cleanup(*_args: Any) -> None:
+        if cleaned["done"]:
+            return
+        cleaned["done"] = True
+        try:
+            _sweep_all_locks_unconditional(root)
+        except Exception:
+            pass
+
+    atexit.register(_cleanup)
+    # Only install signal handlers on the main thread; in worker threads
+    # signal.signal raises ValueError.
+    try:
+        signal.signal(signal.SIGTERM, lambda *a: (_cleanup(), os._exit(143)))
+        signal.signal(signal.SIGINT, lambda *a: (_cleanup(), os._exit(130)))
+    except (ValueError, AttributeError):
+        pass
 
 
 def _sweep_stale_locks(root: Path) -> tuple[list[str], list[str]]:
@@ -184,8 +238,13 @@ def git_sync(
         out["error"] = f"not a git repo: {root}"
         return out
 
+    # Install cleanup handlers so SIGTERM / SIGINT / interpreter exit never
+    # leaves a stale lock behind. Belt-and-suspenders with the stale sweep
+    # below.
+    _install_cleanup_handlers(root)
+
     # Self-heal stale .git/*.lock files from previously-killed git processes.
-    # Locks newer than 5 minutes are left alone (legitimate concurrency).
+    # Locks newer than STALE_LOCK_AGE_SECONDS are left alone (legitimate concurrency).
     removed_locks, kept_locks = _sweep_stale_locks(root)
     if removed_locks:
         out["steps"].append(
