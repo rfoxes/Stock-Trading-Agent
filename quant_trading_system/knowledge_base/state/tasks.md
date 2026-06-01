@@ -11,92 +11,147 @@ is just "the specific things you should do."
 
 ## Status as of the last update
 
-(Filled in by yesterday's Claude — 2026-05-29, Fri, post-close.)
+(Filled in by yesterday's Claude — 2026-06-01, Mon, post-close.)
 
 - **Active strategy:** `equity_trend_following_ema_cross`
-  (`since: 2026-05-27`). Unchanged today. No edits to strategy.md
-  or strategy.py.
-- **Today's `execute`:** 0 intents, 0 submitted, 0 rejected. Quiet
-  day — JPM ADX 20.92 stayed above the 20 exit threshold.
-- **Yesterday's queued exits both filled at Fri open:**
-  - MSFT 44 @ $437.853 (+3.94%, +$731.14, better than $287 estimate)
-  - META 28 @ $628.949 (-7.72%, -$1,472.97, worse than -$1,348 estimate)
-  - Logged both via `log-closed`. Net realized today: -$742 / -0.66%
-    of equity.
-- **Holding 8 longs** (all strategy-aligned):
-  AAPL +14.70%, AMZN +8.83%, GOOGL +12.34%, JPM -4.39%, NVDA +6.77%,
-  QQQ +13.89%, SPY +6.61%, TSLA +7.53%.
-- **Account:** equity $112,177.08 (-0.56% vs. Thu), cash -$59,655.12
-  (narrowed by $36,876 from the exit fills), buying_power $52,521.96.
-- **Regime:** `bull, conf=0.77, adx=26.82` — fifth consecutive
-  bull-trending day.
-- **Gate verification:** new `safety_gate.py` semantics worked
-  correctly on Thu eval AND on Fri live exit window. Two clean
-  sessions. No `daily_loss` rejections today.
-- **Git-sync:** STILL FAILING. `.git/HEAD.lock` and
-  `.git/objects/maintenance.lock` persist; sandbox can't unlink.
-  ORIG_HEAD.lock and index.lock appear cleared. Operator: please
-  finish clearing those last two and `git push origin main`.
+  (`since: 2026-05-27`). Unchanged today.
+- **Today's `execute`:** 0 intents, 0 submitted, 0 rejected, 0 errors.
+- **No fills overnight.** Cash unchanged at -$59,655.14 (same to the
+  penny as Fri close). Same 8 longs.
+- **Account:** equity $110,361.60 (-$1,815.48 / -1.62% vs. Fri),
+  buying_power $50,706.46. Pure MTM drift — no realized P&L.
+- **Regime:** `bull, conf=0.80, adx=29.69` — sixth consecutive
+  bull-trending day; ADX strengthening from 26.82 Fri.
+- **Position movement Fri → today (unrealized %):**
+  AAPL +14.70% → +12.71%, AMZN +8.83% → +4.29%, GOOGL +12.34% → +9.32%
+  (cap-raise hit), JPM -4.39% → -5.26%, NVDA +6.77% → +12.33%
+  (HPE/Computex tailwind), QQQ +13.89% → +14.23%, SPY +6.61% → +6.75%,
+  TSLA +7.53% → +2.48%.
+- **GOOGL $80B equity raise:** AH-announced Sun/Mon. Stock absorbed the
+  dilution print; strategy is technical and did not exit.
+- **JPM watch:** strategy did NOT fire an exit, so ADX presumably still
+  > 20. Position deteriorated ~1 pp on the day.
+- **Gate verification:** N/A today — no orders submitted.
 
-## To do tomorrow (Mon 6/1)
+## **CRITICAL — read first: git-sync architecture changed today**
 
-**Monday is a discontinuity day** — full weekend of news, plus
-pending Iran framework decision (Trump WH Situation Room meeting)
-and live NVDA/Loomer/Tsinghua thread. Read the news_brief carefully.
+The recurring `.git/*.lock` wedge is fixed *architecturally*, not by
+another in-sandbox patch. The harness sandbox CANNOT unlink files inside
+`.git/` (Operation not permitted). So `cli git-sync` no longer tries.
+Instead:
 
-1. **Read last_handoff.md, then news_brief.md.** Mon open could be
-   discontinuous if the Iran framework gets approved/rejected over
-   the weekend.
+1. **`cli git-sync` now writes a JSON marker** into
+   `<repo>/.git-sync-queue/` describing the commit you want made.
+2. A launchd LaunchAgent on the operator's mac
+   (`com.harness.gitrunner`) polls that queue every 30 seconds and runs
+   `git add / commit / push` from outside the sandbox where it has full
+   permission.
+3. A sibling agent (`com.harness.gitlock`) sweeps stale `.git/*.lock`
+   files every 10 seconds as a safety net.
+
+**What you should expect to see** from `cli git-sync --agent trader ...`:
+
+```json
+{"ok": true, "queued": ".git-sync-queue/20260602T...trader_...json", ...}
+```
+
+That's success. `committed`/`pushed` are intentionally `false` — you
+queued the commit; the runner does the rest.
+
+**What to do if markers stack up** in `.git-sync-queue/` (visible via
+`cli git-doctor`):
+
+- The operator hasn't installed the LaunchAgents yet. Tell them to run
+  `bash scripts/install_git_safety.sh` from a real terminal — once.
+- Do NOT try to delete the markers yourself (sandbox can't unlink).
+- Do NOT try to run `git` commands yourself (same reason).
+
+The OPERATOR has not yet confirmed they ran `install_git_safety.sh` —
+the 3 stale `.git/HEAD.lock` / `.git/ORIG_HEAD.lock` /
+`.git/objects/maintenance.lock` files are still on disk. Flag this in
+the operator-questions section if still wedged.
+
+## To do tomorrow (Tue 6/2)
+
+**Tuesday is an elevated overnight-risk day.** Iran formally stopped US
+negotiations Mon and pledged to "fully close" the Strait of Hormuz; WTI
++7.7%, Brent +6.6%. Any overnight Hormuz-closure confirmation or futures
+gap > 2% down would re-classify the news brief as HALT-WORTHY.
+
+1. **Read last_handoff.md, then news_brief.md FIRST.** Iran/Hormuz tape
+   is the dominant overnight watch item.
 
 2. **Standard read-and-snapshot** (manual.md §1-2).
 
-3. **No fills to reconcile from Friday.** Both Thu-queued orders
-   cleared; no fresh orders submitted today.
+3. **No fills to reconcile from Monday.** Strategy submitted nothing.
 
-4. **Run `execute`.** Two main scenarios:
-   - **JPM watch.** ADX 20.92 today (just above 20 threshold).
-     If Mon tape pushes it below 20, expect a JPM exit (-$879 est.
-     = 0.78% of equity, well under cap; should submit cleanly).
-   - **NVDA gap watch.** If the Loomer story escalates over the
-     weekend and NVDA gaps down ≥4% at Mon open, the strategy's
-     gap-down exit rule will fire.
+4. **Run `execute`.** Watch items:
+   - **GOOGL:** position took ~3 pp hit on dilution Mon; technicals
+     held. If Tue tape brings further weakness, strategy may fire an
+     EMA-cross or ADX-fade exit. Don't override.
+   - **JPM:** still the longest-standing watch-item. ADX presumably
+     still > 20 (no exit Mon). If Tue pushes it below, expect a JPM
+     exit at ~-$1,053 (0.95% of equity).
+   - **AMZN / TSLA:** both gave back materially Mon (AMZN -4.5 pp,
+     TSLA -5 pp). If either continues to weaken, an exit signal could
+     trigger.
+   - **NVDA:** +5.5 pp on the day on HPE blowout / Computex
+     follow-through. Healthy trend; expect to hold.
 
-5. **Verify gate behavior** if any exits trigger. Three sessions
-   of correct behavior so far; one more confirms the rescope.
+5. **HALT-WORTHY check:** If the news brief is HALT-WORTHY or pre-market
+   futures show > 2% down gap from Iran escalation, you MAY skip `cli
+   execute` and document the deferral. Discretionary.
 
-6. **Do NOT revert** the safety_gate.py rescope OR the
-   `max_exits_per_run: 5` setting. Both are working as designed.
+6. **Verify the gate** if any exits trigger. Four sessions of correct
+   rescoped behavior confirmed would close that question.
 
-7. **Try `git-sync` early.** If operator cleared the last two
-   locks, three days of carry-over will push together. If still
-   blocked, document and stop the git step.
+7. **Do NOT revert** the safety_gate.py rescope OR
+   `max_exits_per_run: 5`. Three sessions of correct behavior.
 
-8. **(Optional)** Nudge the Saturday research agent — news brief
-   has flagged DELL/NTAP/OKTA/NOW/TEAM (third consecutive
-   session) and MU/AVGO/SNOW (recurring) as universe candidates.
-   The trader can't act on this but a one-line forward in
-   `tasks.md` for the Saturday agent won't hurt.
+8. **Run `cli git-sync` as your last action**, expect to see `"queued"`
+   in the response (not `"committed"`). Then run `cli git-doctor` once
+   to read out the queue state — if there are 4+ pending markers and 3+
+   stale locks, the operator hasn't installed the LaunchAgents yet;
+   say so in `last_handoff.md` and the operator-questions section.
+
+9. **AVGO Wed AMC prep:** the news layer flagged AVGO as the single most
+   actionable upcoming catalyst (consensus $22.11B / $2.40 / AI +140%
+   YoY; options 10.65% expected move). Saturday research agent is the
+   right path. Note it in tomorrow's handoff if not yet added.
 
 ## Open questions for the operator
 
-1. **Git lock files — second ask.** `.git/HEAD.lock` and
-   `.git/objects/maintenance.lock` still present. Please run from
-   a real terminal:
+1. **One-time install — please run from a real terminal:**
    ```
-   cd /Users/rfoxes/Stock-Trading-Agent
-   rm -f .git/HEAD.lock .git/objects/maintenance.lock
-   git push origin main
+   bash /Users/rfoxes/Stock-Trading-Agent/scripts/install_git_safety.sh
    ```
-   Six files have been waiting three days to push.
+   This installs two launchd LaunchAgents:
+   - `com.harness.gitlock` — sweeps stale `.git/*.lock` files every 10s
+   - `com.harness.gitrunner` — processes `.git-sync-queue/` markers
+     every 30s, running git from outside the sandbox
 
-2. **Universe expansion.** News layer has flagged
-   DELL/NTAP/OKTA/NOW/TEAM for three sessions as candidates.
-   Saturday research agent is the right path, but if you want
-   any sooner, add to `state/extra_symbols.md`.
+   After this, the harness's `git-sync` will Just Work. No more "4
+   consecutive days of accumulated edits." The script is idempotent —
+   safe to re-run any time.
 
-3. **Strategy health is small-sample-noisy.** 30-day Sharpe -3.64,
-   cum_return -4.08% vs SPY +5.93%. N=2 realized trades with one
-   outsized META loser. Not yet a rotation signal (no thresholds
-   declared, single bad day, regime still fits), but if the
-   remaining longs trip more exits the headline will worsen.
-   Flagging for visibility, not action.
+   Verify with: `launchctl list | grep harness`
+   Watch live: `tail -f /tmp/harness-gitrunner.log`
+
+2. **Old `.git/*.lock` files**: please also clear these once during the
+   first install (the script does this automatically as part of its
+   final step):
+   ```
+   rm -f /Users/rfoxes/Stock-Trading-Agent/.git/HEAD.lock \
+         /Users/rfoxes/Stock-Trading-Agent/.git/ORIG_HEAD.lock \
+         /Users/rfoxes/Stock-Trading-Agent/.git/objects/maintenance.lock
+   ```
+
+3. **Universe expansion candidates.** News layer flagged for 4
+   consecutive sessions: DELL, NTAP, OKTA, NOW, TEAM, MU, AVGO, SNOW,
+   HPE (new), FLNC (new). The Saturday research agent is the right path,
+   but if any belong in the universe sooner, add to
+   `state/extra_symbols.md`.
+
+4. **Strategy health still small-sample-noisy.** 30-day Sharpe -3.64,
+   cum_return -4.08% vs SPY +6.05% (gap widened). N=2 realized trades.
+   Not yet a rotation signal, but watch.

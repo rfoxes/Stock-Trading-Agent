@@ -205,3 +205,7 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Harness git-sync queue: markers are write-once handoffs from the sandbox
+# to the launchd gitrunner agent. They should never themselves be committed.
+.git-sync-queue/*.json

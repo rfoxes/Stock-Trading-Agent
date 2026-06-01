@@ -65,7 +65,9 @@ D. **Commit and push your changes:** as your last tool call, run
    python3 -m quant_trading_system.cli git-sync --agent research --message "<summary of curation changes>"
    ```
 
-   The helper auto-prefixes with `[research YYYY-MM-DD] ` so every commit is dated and attributed; do NOT include the date or agent name in `--message`. Good summaries: `"added equity_overnight_drift_long, archived equity_vwap_reversion"`, `"no library changes, 3 candidates evaluated and rejected"`. Best-effort — git failures get returned in the JSON but don't fail your run. Note any failure in next week's `research_tasks.md`.
+   The helper auto-prefixes with `[research YYYY-MM-DD] ` so every commit is dated and attributed; do NOT include the date or agent name in `--message`. Good summaries: `"added equity_overnight_drift_long, archived equity_vwap_reversion"`, `"no library changes, 3 candidates evaluated and rejected"`.
+
+   **How this actually works now (2026-06-02 onward):** the sandbox can't run git, so `git-sync` writes a JSON marker into `.git-sync-queue/`. A launchd agent on the operator's mac (`com.harness.gitrunner`, installed via `scripts/install_git_safety.sh`) processes the queue every 30s. `{"ok": true, "queued": "..."}` means success on your side. If markers pile up across weeks the LaunchAgent isn't installed — note it in `research_tasks.md`.
 
 E. Stop. Do not call additional tools.
 

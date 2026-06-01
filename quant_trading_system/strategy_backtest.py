@@ -334,6 +334,11 @@ def run_backtest(
             date=today_ts.date() if hasattr(today_ts, "date") else dt.date.today(),
             params=params,
             watchlist=[symbol],
+            # In a backtest the "universe" collapses to the single symbol
+            # under test — we have no live news/positions/operator extras to
+            # union in. Strategies that read ctx.universe directly will see
+            # the same list as ctx.watchlist here, which is correct.
+            universe=[symbol],
             regime={"regime": "unknown", "confidence": 0.0},  # cheap; could classify if needed
             account=account,
             positions=positions,

@@ -29,7 +29,9 @@ Then follow the workflow in `manual.md` §"Daily workflow" exactly. Run CLI comm
   python3 -m quant_trading_system.cli git-sync --agent trader --message "<one-line summary>"
   ```
 
-  The helper auto-prefixes your message with `[trader YYYY-MM-DD] ` so every commit is dated and attributed; do NOT include the date or agent name in `--message` yourself. Good summaries: `"do-nothing day, broker baseline ambiguous"`, `"rotated to mean_reversion_bollinger, 2 entries"`. Best-effort — if git fails (auth missing, push rejected, etc.), the helper returns the error but does NOT fail your run. If it errored, note it in `last_handoff.md` and stop anyway.
+  The helper auto-prefixes your message with `[trader YYYY-MM-DD] ` so every commit is dated and attributed; do NOT include the date or agent name in `--message` yourself. Good summaries: `"do-nothing day, broker baseline ambiguous"`, `"rotated to mean_reversion_bollinger, 2 entries"`.
+
+  **How this actually works now (2026-06-02 onward):** the Cowork sandbox cannot run git (it can't unlink `.git/*.lock` files — `Operation not permitted`). So `git-sync` does NOT run git. It writes a JSON commit-request marker into `.git-sync-queue/`, and a launchd LaunchAgent on the operator's mac (`com.harness.gitrunner`) picks it up within ~30s, runs `git add / commit / push` from outside the sandbox, and removes the marker. A sibling agent (`com.harness.gitlock`) sweeps stale `.git/*.lock` files every 10s. Both are installed once with `bash scripts/install_git_safety.sh`. You'll see `{"ok": true, "queued": ".git-sync-queue/...json"}` in the response — that's success from your side. If many markers pile up in `.git-sync-queue/` across runs, the LaunchAgent isn't installed; note it in the handoff and tell the operator to run `install_git_safety.sh`.
 
 **Reminders:**
 

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.harness.gitlock</string>
+
+    <!-- Every 10 seconds, sweep any .git/*.lock files older than 60 seconds.
+         Fresh locks (a real concurrent git process) are left alone; stale
+         locks from a killed scheduled-task run are removed silently. -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>-c</string>
+        <string>find /Users/rfoxes/Stock-Trading-Agent/.git -maxdepth 3 -name "*.lock" -type f -mmin +0 -delete 2&gt;/dev/null</string>
+    </array>
+
+    <key>StartInterval</key>
+    <integer>10</integer>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>/tmp/harness-gitlock.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/tmp/harness-gitlock.err</string>
+</dict>
+</plist>

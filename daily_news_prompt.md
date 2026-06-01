@@ -50,7 +50,9 @@ There is no virtualenv.
    python3 -m quant_trading_system.cli git-sync --agent news --message "<headline assessment + counts>"
    ```
 
-   The helper auto-prefixes with `[news YYYY-MM-DD] ` so every commit is dated and attributed; do NOT include the date or agent name in `--message`. Good summaries: `"NORMAL FLOW, 71 items across watchlist"`, `"NOTABLE; FOMC tomorrow"`. Best-effort — if git fails the error is returned but the run does not fail. Note any failure in tomorrow's `news_tasks.md` carry-forwards.
+   The helper auto-prefixes with `[news YYYY-MM-DD] ` so every commit is dated and attributed; do NOT include the date or agent name in `--message`. Good summaries: `"NORMAL FLOW, 71 items across watchlist"`, `"NOTABLE; FOMC tomorrow"`.
+
+   **How this actually works now (2026-06-02 onward):** the sandbox can't run git, so `git-sync` writes a JSON marker into `.git-sync-queue/`. A launchd agent on the operator's mac (`com.harness.gitrunner`, installed via `scripts/install_git_safety.sh`) processes the queue every 30s. `{"ok": true, "queued": "..."}` means success on your side. If markers pile up across days the LaunchAgent isn't installed — flag it in `news_tasks.md` carry-forwards.
 
 9. **Stop.**
 

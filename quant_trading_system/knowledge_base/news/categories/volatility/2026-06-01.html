@@ -10,13 +10,31 @@
   a:hover{text-decoration:underline}
   .empty{color:#666;font-style:italic}
 </style></head><body>
-<h1>volatility — news for 2026-06-01</h1>
-<p class="meta">As of 2026-06-01 post-close</p>
+<h1>volatility — news for 2026-06-01 (Mon)</h1>
+<p class="meta">As of 2026-06-01 post-close PT</p>
 
-<div class="item"><div><strong>VIX context: prior Fri close 15.74; mid-day Mon search prints ~15.32</strong></div><div class="meta">WebSearch/FRED · 2026-06-01 · vol regime</div><div class="summary">WebSearch did not return a confirmed June 1 close; the most recent printed value retrieved was 15.32. Given the Iran-strikes geopolitical event + oil bid + a NVDA-driven tech tailwind, VIX likely held in low-to-mid teens. <strong>Regime classification unchanged: BENIGN-LOW vol.</strong> Term structure assumed contango (no inversion signal). Index IV rank &lt; 50 — NOT a high-IV environment for <code>iron_condor_high_iv</code>. Vol-selling structures favored on a regime basis; vol-buying not warranted. <em>Operational note: the news layer can only confirm what WebSearch returns. The trader should sanity-check VIX directly from broker quotes before any vol-conditioned decision.</em></div></div>
+<div class="item">
+<div><strong>VIX closes 15.32 (-0.42, -2.67%)</strong></div>
+<div class="meta">CBOE via Yahoo · 2026-06-01 close</div>
+<div class="summary">VIX <em>declined</em> on the session despite the Iran-Hormuz escalation and 7-8% oil rally. Open 15.81 → close 15.32. <strong>Volatility regime remains BENIGN-LOW</strong>; index IV rank well below 50. The vol market is currently pricing the Iran event as a controllable supply-side bid, not a systemic risk event. Term structure assumed contango.</div>
+</div>
 
-<div class="item"><div><strong>NVDA single-name IV likely re-elevated</strong></div><div class="meta">inferred from event flow · 2026-06-01</div><div class="summary">Computex keynote + chip-loophole-closure + Loomer thread + Iran tape backdrop all argue NVDA implied vol remains elevated relative to index. This favored asymmetric vol-selling on NVDA into the prior week's brief; the same setup holds today but with somewhat tighter risk-of-vol-spike if the Loomer thread escalates. Not actionable on its own — flagged for the options-skeleton stratrategies.</div></div>
+<div class="item">
+<div><strong>NOT a high-IV environment for iron_condor_high_iv</strong></div>
+<div class="meta">strategy applicability</div>
+<div class="summary">VIX 15.32 + IV rank &lt; 50 on the index means `iron_condor_high_iv` thresholds are not met. Vol-selling structures appropriate; vol-buying structures expensive.</div>
+</div>
 
-<div class="item"><div><strong>AVGO IV: 10.65% expected move on Wed earnings</strong></div><div class="meta">tipranks · 2026-06-01 · options positioning</div><div class="summary">Pre-print AVGO straddle implies a 10.65% binary move. Not a universe symbol but a high-IV name into Wed AMC — relevant to the AI-infra vol cohort. Indirect read on NVDA/GOOGL TPU exposure pre-print.</div></div>
+<div class="item">
+<div><strong>Single-name IV likely elevated on NVDA (Computex + chip-loophole + Loomer thread) and GOOGL (AH $80B cap raise)</strong></div>
+<div class="meta">single-name vol</div>
+<div class="summary">NVDA IV elevated through the Computex + Loomer event cluster; the post-event vol crush is the typical pattern but Loomer-thread tail risk preserves some IV. GOOGL implied vol materially repriced AH on the $80B equity raise (dilution + Berkshire participation). No direct strategy implication beyond informational.</div>
+</div>
+
+<div class="item">
+<div><strong>Vol-of-vol still subdued</strong></div>
+<div class="meta">VVIX / vol-skew</div>
+<div class="summary">VVIX not separately retrieved today; absence of a vol-of-vol spike alongside the geopolitical headlines is consistent with measured-escalation pricing.</div>
+</div>
 
 </body></html>

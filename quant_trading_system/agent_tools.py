@@ -803,28 +803,62 @@ def simulate_strategy(
 
 
 def git_doctor(ctx: ToolContext) -> dict[str, Any]:
-    """Diagnose + auto-fix the most common .git/*.lock wedge.
+    """Report state of the git-sync queue + any stale .git/*.lock files.
 
-    Aggressively removes every stale lock file under .git/ regardless of age.
-    Safe to run from a terminal OR from the harness. Returns what it cleaned up.
+    The harness sandbox CANNOT unlink files inside .git/, so this tool no
+    longer tries. Instead it reports what's wedged and tells the operator
+    how to fix it (one-time install of the launchd agents in
+    scripts/install_git_safety.sh).
     """
-    from quant_trading_system.git_sync import (
-        _sweep_all_locks_unconditional,
-        _install_cleanup_handlers,
-    )
+    from quant_trading_system.git_sync import QUEUE_DIRNAME
     from quant_trading_system.memory import _REPO_ROOT
+    import time as _time
 
-    _install_cleanup_handlers(_REPO_ROOT)
-    removed = _sweep_all_locks_unconditional(_REPO_ROOT)
+    root = _REPO_ROOT
+    lock_files: list[dict[str, Any]] = []
+    git_dir = root / ".git"
+    if git_dir.exists():
+        for p in git_dir.rglob("*.lock"):
+            try:
+                age = int(_time.time() - p.stat().st_mtime)
+            except OSError:
+                age = -1
+            lock_files.append({"path": str(p.relative_to(root)), "age_s": age})
+
+    queue_dir = root / QUEUE_DIRNAME
+    pending_markers = []
+    if queue_dir.exists():
+        pending_markers = sorted(
+            str(p.relative_to(root))
+            for p in queue_dir.glob("*.json")
+        )
+
+    notes: list[str] = []
+    if lock_files:
+        notes.append(
+            f"{len(lock_files)} .git/*.lock file(s) present. The harness "
+            "cannot remove them (sandbox permission boundary). If the "
+            "launchd com.harness.gitlock agent is installed, they'll be "
+            "swept within ~10s. Otherwise run "
+            "scripts/install_git_safety.sh from a real terminal."
+        )
+    if pending_markers:
+        notes.append(
+            f"{len(pending_markers)} commit marker(s) pending in "
+            f"{QUEUE_DIRNAME}/. The com.harness.gitrunner agent processes "
+            "them every 30s. If they keep accumulating, the agent isn't "
+            "installed — run scripts/install_git_safety.sh."
+        )
+    if not notes:
+        notes.append("repo is clean — no stale locks, no pending commit markers.")
+
     return _ok({
-        "repo": str(_REPO_ROOT),
-        "removed_count": len(removed),
-        "removed": removed,
-        "note": (
-            "all .git/*.lock files removed. Safe to re-run git commands now."
-            if removed
-            else "no lock files found — repo is clean."
-        ),
+        "repo": str(root),
+        "stale_lock_count": len(lock_files),
+        "stale_locks": lock_files,
+        "pending_marker_count": len(pending_markers),
+        "pending_markers": pending_markers[:20],
+        "note": " ".join(notes),
     })
 
 
@@ -854,7 +888,13 @@ def git_sync(
         prefix = f"[{agent} {today}] "
         if not message.startswith(prefix):
             full_message = prefix + message
-    return _ok(_do_sync(ctx.settings, message=full_message, push=push, pull_first=pull_first))
+    return _ok(_do_sync(
+        ctx.settings,
+        message=full_message,
+        agent=agent or "manual",
+        push=push,
+        pull_first=pull_first,
+    ))
 
 
 def news_fetch(
