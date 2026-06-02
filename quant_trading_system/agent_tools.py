@@ -1004,12 +1004,171 @@ def execute_strategy(
 
 
 def execute_active_strategy(ctx: ToolContext) -> dict[str, Any]:
-    """Read which strategy is currently active and execute it. No-op if none."""
-    active = memory.read_active_strategy()
-    sid = (active or {}).get("strategy_id", "")
-    if not sid:
-        return _err("no active strategy set; call set_active_strategy first")
-    return execute_strategy(ctx, strategy_id=sid)
+    """Run every strategy in the active set against its claimed symbols.
+
+    Reads ``state/active_strategies.md`` (plural, multi-strategy) and
+    runs each entry against its declared symbols. Each strategy sees only
+    its slice of the universe via ``ctx.watchlist``.
+
+    Falls back to the legacy singular ``state/active_strategy.md`` if the
+    plural file is missing — that strategy runs against its full
+    frontmatter-filtered universe, exactly like before the refactor.
+    Backwards compatible with every prior session.
+
+    Returns a multi-strategy summary including a ``unclaimed_symbols``
+    list (library-gap diagnostic) — symbols the harness is tracking but
+    no active strategy claims. The trader writes those into tasks.md so
+    the Saturday research agent can fill the gap.
+    """
+    from quant_trading_system import strategy_runtime
+
+    return _ok(strategy_runtime.run_active_strategies(
+        settings=ctx.settings,
+        market_data=ctx.market_data,
+        regime_classifier=ctx.regime_classifier,
+        safety_gate=ctx.safety_gate,
+        alpaca_client=ctx.alpaca_client,
+        run_id=ctx.run_id,
+    ))
+
+
+def list_active_strategies(ctx: ToolContext) -> dict[str, Any]:
+    """List every strategy in ``state/active_strategies.md`` with its
+    symbol claims, plus the library-gap diagnostic (symbols in the
+    universe that no active strategy owns).
+    """
+    from quant_trading_system.universe import compute_universe
+
+    claims = memory.read_active_strategies()
+    try:
+        universe = compute_universe(ctx.settings, alpaca_client=ctx.alpaca_client)
+        universe_syms = list(universe.symbols)
+    except Exception as e:
+        universe_syms = []
+        ctx_universe_error = str(e)
+    else:
+        ctx_universe_error = ""
+    gaps = memory.unclaimed_symbols(universe_syms) if universe_syms else []
+    return _ok({
+        "active_strategies": [c.to_dict() for c in claims],
+        "active_count": len(claims),
+        "universe_size": len(universe_syms),
+        "claimed_count": sum(len(c.symbols) for c in claims),
+        "unclaimed_symbols": gaps,
+        "unclaimed_count": len(gaps),
+        "universe_error": ctx_universe_error or None,
+    })
+
+
+def add_active_strategy(
+    ctx: ToolContext,
+    *,
+    strategy_id: str,
+    symbols: list[str],
+    reason: str,
+) -> dict[str, Any]:
+    """Add a strategy to the active set with an explicit symbol-claim list.
+
+    Enforces the no-conflict rule: every symbol can be claimed by at most
+    one active strategy. If any of ``symbols`` is already claimed by
+    another strategy, returns an error with the conflicting symbol(s)
+    listed. Resolve via head-to-head backtest (cli head-to-head), not by
+    manually overriding the claim.
+    """
+    syms_upper = [s.strip().upper() for s in symbols if s.strip()]
+    if not reason or not reason.strip():
+        return _err("--reason is required: every claim must trace to a justification")
+    try:
+        claim = memory.add_active_strategy(
+            strategy_id, symbols=syms_upper, reason=reason.strip(),
+        )
+    except ValueError as e:
+        return _err(str(e))
+    return _ok({"added": claim.to_dict()})
+
+
+def remove_active_strategy(
+    ctx: ToolContext,
+    *,
+    strategy_id: str,
+    reason: str = "",
+) -> dict[str, Any]:
+    """Drop a strategy from the active set. Use when a strategy is
+    archived, or when its symbol claims have been reassigned to another
+    strategy after a head-to-head backtest.
+    """
+    removed = memory.remove_active_strategy(strategy_id, reason=reason)
+    if not removed:
+        return _err(f"strategy {strategy_id!r} was not in the active set")
+    return _ok({"removed": strategy_id, "reason": reason})
+
+
+def head_to_head_backtest(
+    ctx: ToolContext,
+    *,
+    strategy_a: str,
+    strategy_b: str,
+    symbol: str,
+    start: str,
+    end: str,
+) -> dict[str, Any]:
+    """Run both strategies on the same symbol over the same window and
+    report which had higher Sharpe + lower max drawdown.
+
+    This is the canonical mechanism for resolving symbol-claim conflicts:
+    if two strategies want AAPL, the one with the better risk-adjusted
+    return on AAPL's history wins. The trader does NOT pick by feel; the
+    research agent runs this and writes the result into
+    ``active_strategies.md``.
+
+    Light wrapper around ``run_backtest`` — runs it twice and compares
+    the headline metrics. Falls back gracefully if the backtester isn't
+    available or one strategy fails.
+    """
+    try:
+        from quant_trading_system.backtesting.equity_backtester import (
+            EquityBacktester,
+        )
+    except Exception as e:
+        return _err(f"backtester not available: {e}")
+
+    results = {}
+    for sid in (strategy_a, strategy_b):
+        sf = memory.read_strategy(sid)
+        if sf is None:
+            return _err(f"strategy not found: {sid}")
+        try:
+            df = ctx.market_data.get_bars(symbol, "1Day", start=start, end=end)
+        except Exception as e:
+            return _err(f"data fetch failed for {symbol}: {e}")
+        if df.empty:
+            return _err(f"no bars for {symbol} in [{start}, {end}]")
+        try:
+            bt = EquityBacktester(strategy_frontmatter=sf.frontmatter or {})
+            r = bt.run(df, symbol=symbol)
+            results[sid] = {
+                "sharpe": float(r.get("sharpe", 0.0)),
+                "max_drawdown": float(r.get("max_drawdown", 0.0)),
+                "total_return": float(r.get("total_return", 0.0)),
+                "trades": int(r.get("trades", 0)),
+            }
+        except Exception as e:
+            return _err(f"{sid} backtest failed on {symbol}: {e}")
+
+    a, b = results[strategy_a], results[strategy_b]
+    # Winner: higher sharpe, tiebreak on smaller (less negative) max DD.
+    if a["sharpe"] != b["sharpe"]:
+        winner = strategy_a if a["sharpe"] > b["sharpe"] else strategy_b
+    else:
+        winner = strategy_a if a["max_drawdown"] > b["max_drawdown"] else strategy_b
+    return _ok({
+        "symbol": symbol.upper(),
+        "window": {"start": start, "end": end},
+        "a": {"strategy_id": strategy_a, **a},
+        "b": {"strategy_id": strategy_b, **b},
+        "winner": winner,
+        "decision_basis": "higher Sharpe; tiebreak on smaller max drawdown",
+    })
 
 
 def update_strategy_script(

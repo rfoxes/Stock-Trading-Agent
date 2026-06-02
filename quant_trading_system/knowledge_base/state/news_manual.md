@@ -215,6 +215,24 @@ move on. Full-article fetching is reserved for the Saturday research agent.
    Per symbol where something actually HAPPENED (earnings, M&A, regulatory,
    product, management, partnership, lawsuit, capital allocation), one
    line describing the EVENT and its likely fundamental implication.
+   **Each event must be tagged with an algorithmic responder.** Read
+   `state/active_strategies.md` and ask: "Is there a rule in any active
+   strategy that would fire on this kind of event for this symbol?" Tag
+   with one of:
+   - `responder: <strategy_id>` — a specific strategy in the active set
+     will respond if the trigger pattern materializes.
+   - `responder: NONE — library gap` — no active strategy has a rule for
+     this kind of event. The trader will log this as a research-agent
+     priority.
+
+   Example lines:
+   ```
+   - NVDA: HPE Q2 blowout (+40% YoY rev) signals AI-server demand.
+     responder: equity_trend_following_ema_cross (if ADX-confirmed momentum)
+   - AVGO: AMC earnings Wed, options 10.65% expected move.
+     responder: NONE — library gap (no earnings-window strategy active)
+   ```
+
    Symbols with no fresh news get a single line at the bottom:
    "No fresh news: AAPL, AMZN, ...". Do not write "NVDA was down today" —
    the trader can see that.
@@ -244,11 +262,32 @@ move on. Full-article fetching is reserved for the Saturday research agent.
    specific new event (e.g. a named analyst report published today with a
    new dollar figure) makes it fresh.
 
+   ## Library gaps
+   Every event from any section above tagged `responder: NONE — library
+   gap` gets re-listed here as a clean bulleted list, with the suggested
+   research direction. This is the section the trader scans first when
+   writing tomorrow's `tasks.md` — every entry here becomes a research
+   priority. Example:
+   ```
+   - AVGO Wed AMC earnings — no earnings-window strategy active.
+     Suggested research: build event_driven_catalyst with earnings-window
+     entry rules (window: 1 trading day before AMC print to 2 days after).
+   - Energy sector rotation today (XLE +3%) — no sector-rotation strategy.
+     Suggested research: cross-sector momentum overlay.
+   ```
+   "No library gaps today" is a fine section content. NEVER infer a gap
+   that isn't grounded in a concrete event from earlier sections.
+
    ## Recommendations for the trader
    Specific EVENT-driven suggestions, framed as "consider X" not "do X".
    Do not recommend on the basis of price action — the trader handles that.
+   You may NOT recommend the trader submit an order that no active
+   strategy would generate — that would be discretionary trading and is
+   forbidden by the algorithmic-only mandate. Recommendations are about
+   strategy posture, deferral, or attention only.
    E.g.:
-   - "Consider deferring entries on META — earnings AMC."
+   - "Consider deferring entries on META — earnings AMC." *(this is
+     fine — it's about how to weight an existing rule)*
    - "Fed minutes today were dovish; trend-following strategies likely tailwind."
    - "Nothing notable; standard workflow."
    ```

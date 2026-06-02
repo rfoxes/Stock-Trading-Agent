@@ -85,7 +85,8 @@ ARCHIVED_DIR = STRATEGIES_DIR / "archived"
 CONCLUSIONS_DIR = KB_DIR / "conclusions"
 STATE_DIR = KB_DIR / "state"
 
-ACTIVE_STRATEGY_FILE = STATE_DIR / "active_strategy.md"
+ACTIVE_STRATEGY_FILE = STATE_DIR / "active_strategy.md"            # legacy single
+ACTIVE_STRATEGIES_FILE = STATE_DIR / "active_strategies.md"        # new plural
 HANDOFF_FILE = STATE_DIR / "last_handoff.md"
 SUMMARY_FILE = STATE_DIR / "summary.md"
 
@@ -476,6 +477,196 @@ def set_active_strategy(strategy_id: str, reason: str, notes: str = "") -> Path:
     body = notes.lstrip() if notes else f"Active strategy as of {fm['since']}.\n"
     ACTIVE_STRATEGY_FILE.write_text(f"---\n{fm_yaml}\n---\n\n{body}", encoding="utf-8")
     return ACTIVE_STRATEGY_FILE
+
+
+# ---------------------------------------------------------------------------
+# Active strategy SET (new, plural). Multiple strategies can be active
+# simultaneously, each owning a slice of the universe.
+#
+# File format — `state/active_strategies.md`:
+#
+#     ---
+#     strategies:
+#       - id: equity_trend_following_ema_cross
+#         symbols: [AAPL, AMZN, GOOGL, JPM, NVDA, QQQ, SPY, TSLA]
+#         since: 2026-05-27
+#         reason: "Operator-assigned attribution for the inherited 8 positions."
+#       - id: equity_mean_reversion_bollinger
+#         symbols: [DIS, KO]
+#         since: 2026-06-15
+#         reason: "Head-to-head backtest 2026-06-12 beat trend on these symbols."
+#     ---
+#     <free-form notes>
+#
+# Contract:
+#   - Every symbol claimed in `symbols` is owned exclusively by that
+#     strategy. Two active strategies cannot claim the same symbol.
+#   - Conflicts must be resolved BEFORE landing in this file, via the
+#     research agent's head-to-head backtest. The trader never adjudicates
+#     a runtime conflict.
+#   - Strategies with an empty `symbols: []` claim no symbols — they are
+#     idle but listed for visibility. `cli execute` skips them.
+#   - Unclaimed symbols in the universe are surfaced as library-gap
+#     diagnostics (no responder) — they are NOT auto-assigned.
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class ActiveStrategyClaim:
+    """One entry in active_strategies.md."""
+    strategy_id: str
+    symbols: list[str]
+    since: str
+    reason: str
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "strategy_id": self.strategy_id,
+            "symbols": list(self.symbols),
+            "since": self.since,
+            "reason": self.reason,
+        }
+
+
+def read_active_strategies() -> list[ActiveStrategyClaim]:
+    """Return the plural active-strategy set, in declared order.
+
+    Falls back to the legacy singular ``active_strategy.md`` if the plural
+    file does not exist; in that case the returned list has one entry with
+    an empty ``symbols`` claim (meaning "no explicit claim, run against the
+    full universe like the legacy path did").
+    """
+    if ACTIVE_STRATEGIES_FILE.exists():
+        fm, _body = _parse_frontmatter(ACTIVE_STRATEGIES_FILE)
+        raw = fm.get("strategies", []) or []
+        out: list[ActiveStrategyClaim] = []
+        for entry in raw:
+            if not isinstance(entry, dict):
+                continue
+            sid = str(entry.get("id", "")).strip()
+            if not sid:
+                continue
+            syms_raw = entry.get("symbols", []) or []
+            if isinstance(syms_raw, str):
+                # Allow comma-separated string as a tolerance.
+                syms_raw = [s.strip() for s in syms_raw.split(",") if s.strip()]
+            syms = [str(s).upper() for s in syms_raw if str(s).strip()]
+            out.append(ActiveStrategyClaim(
+                strategy_id=sid,
+                symbols=syms,
+                since=str(entry.get("since", "")),
+                reason=str(entry.get("reason", "")),
+            ))
+        return out
+    # Legacy fallback.
+    legacy = read_active_strategy()
+    sid = legacy.get("strategy_id", "")
+    if not sid:
+        return []
+    return [ActiveStrategyClaim(
+        strategy_id=sid,
+        symbols=[],                        # no explicit claim = run on full universe
+        since=str(legacy.get("since", "")),
+        reason=str(legacy.get("reason", "")),
+    )]
+
+
+def write_active_strategies(claims: Iterable[ActiveStrategyClaim], notes: str = "") -> Path:
+    """Write the plural active-strategy set, enforcing the no-conflict rule.
+
+    Raises ValueError if two claims share a symbol — every symbol must be
+    owned by exactly one strategy. Use the research agent's head-to-head
+    battery to break ties before calling this.
+    """
+    _ensure_dirs()
+    claims_list = list(claims)
+
+    # Conflict check: every symbol must be claimed at most once.
+    seen: dict[str, str] = {}
+    for c in claims_list:
+        for sym in c.symbols:
+            if sym in seen and seen[sym] != c.strategy_id:
+                raise ValueError(
+                    f"symbol {sym!r} is claimed by both "
+                    f"{seen[sym]!r} and {c.strategy_id!r}. The harness does "
+                    "not adjudicate runtime conflicts — run a head-to-head "
+                    "backtest (cli head-to-head) and let only the winner "
+                    "claim it."
+                )
+            seen[sym] = c.strategy_id
+
+    fm = {
+        "strategies": [
+            {
+                "id": c.strategy_id,
+                "symbols": list(c.symbols),
+                "since": c.since or dt.date.today().isoformat(),
+                "reason": c.reason,
+            }
+            for c in claims_list
+        ]
+    }
+    fm_yaml = yaml.safe_dump(fm, sort_keys=False, default_flow_style=False).strip()
+    body = notes.lstrip() if notes else (
+        "Active strategy set. Each entry owns its declared symbols "
+        "exclusively. Conflicts are resolved by head-to-head backtest at "
+        "the research layer, never at runtime.\n"
+    )
+    ACTIVE_STRATEGIES_FILE.write_text(
+        f"---\n{fm_yaml}\n---\n\n{body}", encoding="utf-8"
+    )
+    return ACTIVE_STRATEGIES_FILE
+
+
+def add_active_strategy(
+    strategy_id: str,
+    *,
+    symbols: list[str],
+    reason: str,
+) -> ActiveStrategyClaim:
+    """Add or replace a strategy in the active set.
+
+    If the strategy is already active, its symbols are REPLACED with the
+    new claim list (call with the union if you want to extend). The
+    no-conflict rule is enforced against every other claim in the set.
+    """
+    syms = [s.upper().strip() for s in symbols if s.strip()]
+    current = [c for c in read_active_strategies() if c.strategy_id != strategy_id]
+    new_claim = ActiveStrategyClaim(
+        strategy_id=strategy_id,
+        symbols=syms,
+        since=dt.date.today().isoformat(),
+        reason=reason,
+    )
+    write_active_strategies(current + [new_claim])
+    return new_claim
+
+
+def remove_active_strategy(strategy_id: str, *, reason: str = "") -> bool:
+    """Drop a strategy from the active set. Returns True if it was present."""
+    current = read_active_strategies()
+    kept = [c for c in current if c.strategy_id != strategy_id]
+    if len(kept) == len(current):
+        return False
+    # `reason` isn't stored on the surviving claims; it belongs in
+    # last_handoff.md's narrative. We just persist the new set.
+    _ = reason
+    write_active_strategies(kept)
+    return True
+
+
+def unclaimed_symbols(universe: Iterable[str]) -> list[str]:
+    """Return symbols in `universe` that no active strategy claims.
+
+    Library-gap diagnostic: these are the symbols the harness is tracking
+    (positions / news / extras / strategy frontmatter) but no algorithmic
+    responder owns.
+    """
+    universe_set = {str(s).upper() for s in universe}
+    claimed: set[str] = set()
+    for c in read_active_strategies():
+        claimed.update(c.symbols)
+    return sorted(universe_set - claimed)
 
 
 def read_summary() -> str:

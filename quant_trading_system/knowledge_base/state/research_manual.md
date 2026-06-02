@@ -158,6 +158,47 @@ Before spending time implementing a candidate:
 3. If it's structurally different (different entry signal, different
    exit logic, different asset class), it's an **addition candidate**.
 
+## Library gaps are TOP PRIORITY
+
+The trader and news agent flag **library gaps** every weekday — events
+or conditions where no active strategy had an algorithmic responder.
+These show up as:
+- "Library gap" entries in `state/tasks.md` written by the trader after
+  each weekday run.
+- `responder: NONE — library gap` tags in each daily `state/news_brief.md`
+  and a consolidated "## Library gaps" section near the bottom of the brief.
+- `unclaimed_symbols` entries in `cli list-active` output.
+
+**Your first job each Saturday is to clear these.** For each logged gap:
+1. Decide whether the harness already has a strategy that could be
+   *re-activated or re-tuned* to handle it (cheapest fix).
+2. If not, search for and propose a NEW strategy that responds to that
+   event pattern. Run the addition battery. If it passes, add it. If
+   the gap is real but no candidate passes the battery, document the
+   failure in next week's `research_tasks.md` so the gap is visible.
+
+Generic candidate-evaluation (your old default work) is rank-2 priority,
+below clearing gaps. The library exists to give the trader at least one
+algorithmic response to every reasonable market condition the universe
+could throw at it. Coverage matters more than incremental Sharpe.
+
+## Symbol-claim conflicts: head-to-head is the only adjudicator
+
+When you propose a new strategy that wants to claim symbols already
+owned by a strategy in `state/active_strategies.md`, the conflict is
+resolved by `cli head-to-head <a> <b> --symbol X --start ... --end ...`.
+The higher-Sharpe strategy wins; the loser cedes the symbol. The
+operator does NOT pick by feel. The trader CANNOT pick by feel. The
+harness physically refuses to write a conflicting `active_strategies.md`
+— `cli add-active` errors on overlap.
+
+Your job, after running the head-to-head, is to either:
+- Update `state/active_strategies.md` to reflect the winner (the trader
+  will do this with `cli remove-active` / `cli add-active` on Monday based
+  on your finding), OR
+- Document the result in the weekly log if no change is warranted
+  (e.g., new strategy didn't beat incumbent on any contested symbol).
+
 ## Weekly workflow
 
 1. **Read context.**
@@ -165,6 +206,12 @@ Before spending time implementing a candidate:
    - `state/research_tasks.md`.
    - The last 2-4 weekly logs in `knowledge_base/research_log/`.
    - The library: `cli list-strategies`.
+   - **The active set:** `cli list-active` (also shows unclaimed symbols
+     = library gaps).
+   - **This week's logged gaps:** scan `state/tasks.md`, every weekday
+     `state/news_brief.md` from this week, and the "Library gap" entries
+     in each weekday's `state/last_handoff.md`. List them all in your
+     weekly log under "Gaps identified this week".
 2. **Survey M-F activity:**
    - `cli recent-trades --days 7`
    - `state/last_handoff.md` (read-only — never write).

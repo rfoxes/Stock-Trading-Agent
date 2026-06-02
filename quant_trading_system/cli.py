@@ -209,6 +209,41 @@ def cmd_get_active(ctx: ToolContext, args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_list_active(ctx: ToolContext, args: argparse.Namespace) -> int:
+    _emit(agent_tools.list_active_strategies(ctx))
+    return 0
+
+
+def cmd_add_active(ctx: ToolContext, args: argparse.Namespace) -> int:
+    syms = [s.strip() for s in (args.symbols or "").split(",") if s.strip()]
+    _emit(agent_tools.add_active_strategy(
+        ctx,
+        strategy_id=args.strategy_id,
+        symbols=syms,
+        reason=args.reason,
+    ))
+    return 0
+
+
+def cmd_remove_active(ctx: ToolContext, args: argparse.Namespace) -> int:
+    _emit(agent_tools.remove_active_strategy(
+        ctx, strategy_id=args.strategy_id, reason=args.reason or "",
+    ))
+    return 0
+
+
+def cmd_head_to_head(ctx: ToolContext, args: argparse.Namespace) -> int:
+    _emit(agent_tools.head_to_head_backtest(
+        ctx,
+        strategy_a=args.strategy_a,
+        strategy_b=args.strategy_b,
+        symbol=args.symbol,
+        start=args.start,
+        end=args.end,
+    ))
+    return 0
+
+
 def cmd_list_strategies(ctx: ToolContext, args: argparse.Namespace) -> int:
     _emit(agent_tools.list_strategies(
         ctx,
@@ -425,8 +460,49 @@ def _build_parser() -> argparse.ArgumentParser:
     sp.set_defaults(func=cmd_set_active)
 
     # get-active
-    sp = sub.add_parser("get-active", help="Show current active strategy.")
+    sp = sub.add_parser("get-active", help="Show current active strategy (legacy singular).")
     sp.set_defaults(func=cmd_get_active)
+
+    # list-active (plural — the new active strategy set)
+    sp = sub.add_parser(
+        "list-active",
+        help="List all strategies in state/active_strategies.md with their symbol claims + library-gap diagnostic.",
+    )
+    sp.set_defaults(func=cmd_list_active)
+
+    # add-active (claim symbols for a strategy)
+    sp = sub.add_parser(
+        "add-active",
+        help="Add a strategy to the active set with explicit symbol claims. Fails on conflict — resolve via cli head-to-head.",
+    )
+    sp.add_argument("strategy_id")
+    sp.add_argument(
+        "--symbols", required=True,
+        help="Comma-separated list of symbols this strategy owns (e.g. AAPL,NVDA,QQQ).",
+    )
+    sp.add_argument("--reason", required=True, help="Why this strategy owns these symbols.")
+    sp.set_defaults(func=cmd_add_active)
+
+    # remove-active
+    sp = sub.add_parser(
+        "remove-active",
+        help="Drop a strategy from the active set. Its claimed symbols become unclaimed (library gaps).",
+    )
+    sp.add_argument("strategy_id")
+    sp.add_argument("--reason", default="")
+    sp.set_defaults(func=cmd_remove_active)
+
+    # head-to-head (adjudicate symbol-claim conflicts)
+    sp = sub.add_parser(
+        "head-to-head",
+        help="Run two strategies on one symbol, return the higher-Sharpe winner. Canonical conflict resolution.",
+    )
+    sp.add_argument("strategy_a")
+    sp.add_argument("strategy_b")
+    sp.add_argument("--symbol", required=True)
+    sp.add_argument("--start", required=True, help="YYYY-MM-DD")
+    sp.add_argument("--end", required=True, help="YYYY-MM-DD")
+    sp.set_defaults(func=cmd_head_to_head)
 
     # list-strategies
     sp = sub.add_parser("list-strategies", help="List strategies on disk.")

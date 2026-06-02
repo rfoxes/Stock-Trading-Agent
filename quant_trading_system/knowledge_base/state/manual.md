@@ -84,32 +84,97 @@ sandbox's `python3` directly — the harness has no virtualenv to activate.
    Read it carefully but **do not** override individual decisions; that's
    what `update-script` is for if the logic itself is wrong.
 
-5. **Decide whether to rotate or update.** Three possible decisions:
-   - **Keep.** Active strategy is healthy and regime-appropriate. No
-     `set-active` call. No script edits. **Doing nothing is a valid
-     outcome and is often the correct one.** The harness rewards stability.
-   - **Update parameters.** Edit `strategy.md`'s frontmatter via the
-     `Edit` tool. Use this for threshold tweaks, parameter adjustments.
+5. **Decide whether to rotate, update, or log a gap.** Four possible
+   decisions:
+   - **Keep.** The active strategy set is healthy and every action today
+     traced cleanly to a strategy rule. No `add-active` / `remove-active`
+     call. No script edits. Doing nothing on a given day is fine **when
+     no strategy fired and no strategy should have fired**.
+   - **Update parameters.** Edit a strategy's `strategy.md` frontmatter
+     via the `Edit` tool. Use this for threshold tweaks. The strategy
+     remains in the active set.
    - **Update execution.** Edit `strategy.py` via the `Edit` tool OR
      `python3 -m quant_trading_system.cli update-script <id> --file <path>`.
      Use this when the strategy's logic itself genuinely needs to change.
      Keep `.md` and `.py` in sync — if you change the rules, update both.
-   - **Rotate.** Pick a different active strategy with `set-active <id>
-     --reason "..."`. Only do this when the current strategy's health
-     signals breach its declared thresholds OR the regime no longer fits.
-     A single bad day is not a reason to rotate.
+   - **Rotate / re-claim.** Replace a strategy in the active set with
+     `cli remove-active <id> --reason "..."` followed by
+     `cli add-active <other_id> --symbols ... --reason "..."`. Only do
+     this when the displaced strategy's health signals breach its
+     declared thresholds OR the regime no longer fits AND a head-to-head
+     backtest (`cli head-to-head`) demonstrates the replacement is
+     better on the contested symbols. A single bad day is not a reason
+     to rotate. **You never pick a winner by feel.**
+   - **Log a library gap (see §6).** If a material event happened today
+     and no strategy in the set responded, do NOT submit an order. Do
+     NOT loosen entry thresholds. Write the unhandled event into
+     `tasks.md` so the Saturday research agent can build (or surface) a
+     strategy that handles it.
 
-6. **Write `tasks.md` for tomorrow's Claude.** Replace the file with a
+6. **The algorithmic-only / library-gap mandate.**
+
+   Every order — entry, exit, sizing — must trace to an algorithmic rule
+   in one of the active strategies. The trader has zero discretion to
+   submit, modify, or skip orders for any reason that isn't already
+   encoded in a strategy. This is non-negotiable.
+
+   Consequences:
+   - If the active set fires zero entries for many sessions, that is
+     *not* a problem to "fix" by loosening thresholds. Curve-fitting to
+     activity is forbidden.
+   - If news today obviously warranted action (earnings beat, sector
+     rotation, single-name catalyst) but no active strategy responded,
+     **the library is incomplete**. You do not fill the gap by trading;
+     you log it. Format the entry in `tasks.md` like:
+     ```
+     ### Library gap (logged 2026-06-02)
+     Event: AVGO Wed AMC earnings, options 10.65% expected move
+     Why no responder: no active strategy fires on earnings-driven
+                       catalysts in the universe
+     Research priority: build or activate event_driven_catalyst with
+                        earnings-window entry rules
+     ```
+   - The news layer tags every material event with `responder: <id>` or
+     `responder: NONE — library gap` so you can scan the brief and pick
+     up the gaps directly. The Saturday research agent treats logged
+     gaps as top-priority work, ahead of generic candidate research.
+
+7. **Multiple active strategies, partitioned by symbol.**
+
+   The active set is the plural file `state/active_strategies.md` (read
+   it with `cli list-active`). Each entry declares which symbols it
+   owns. `cli execute` runs every active strategy against its claimed
+   symbols. Symbols are owned EXCLUSIVELY — two active strategies
+   cannot claim the same symbol.
+
+   When a conflict arises (e.g., a new strategy wants AAPL but
+   trend-following already claims it), the resolution is ALWAYS:
+   ```
+   cli head-to-head <strategy_a> <strategy_b> --symbol AAPL --start ... --end ...
+   ```
+   The higher-Sharpe strategy wins; the loser cedes the symbol. The
+   trader does not adjudicate by feel. The harness refuses to write a
+   conflicting `active_strategies.md` — `cli add-active` errors if any
+   symbol is double-claimed.
+
+   Symbols in the composed universe that no active strategy claims show
+   up in `cli list-active` as `unclaimed_symbols`. Treat each one as a
+   potential library gap and either (a) claim it with an existing
+   strategy after a head-to-head, or (b) log it for the research agent.
+
+8. **Write `tasks.md` for tomorrow's Claude.** Replace the file with a
    short, focused to-do list (see the file itself for the shape).
+   Include any library gaps you logged today under a clear "Library
+   gaps for the research agent" section.
 
-7. **Write `last_handoff.md`** — the narrative summary of what you did
+9. **Write `last_handoff.md`** — the narrative summary of what you did
    today, observations about the market, and any open questions.
 
-8. **(Optional) Append to this manual's "Recent feedback" section.** Only
-   when there's a real long-term lesson worth carrying forward — not
-   every day.
+10. **(Optional) Append to this manual's "Recent feedback" section.**
+    Only when there's a real long-term lesson worth carrying forward —
+    not every day.
 
-9. **Stop.** Do not call further tools.
+11. **Stop.** Do not call further tools.
 
 ## Key CLI commands
 
@@ -119,8 +184,12 @@ commands you'll use most:
 | Command | Purpose |
 |---|---|
 | `list-strategies` | All strategies on disk + their status / has_script flag |
-| `get-active` / `set-active <id> --reason "..."` | Read / set active strategy |
-| `execute [<id>]` | Run the active strategy's script (the only path to trades) |
+| `list-active` | **Plural active set + library-gap diagnostic. Use this every run.** |
+| `add-active <id> --symbols A,B,C --reason "..."` | Add a strategy to the set with explicit symbol claims; errors on conflict |
+| `remove-active <id> --reason "..."` | Drop a strategy from the set (its symbols become unclaimed) |
+| `head-to-head <a> <b> --symbol X --start ... --end ...` | Canonical conflict resolution: higher-Sharpe wins |
+| `get-active` / `set-active <id> --reason "..."` | Legacy singular interface; superseded by `list-active` |
+| `execute [<id>]` | Runs the FULL active set (each strategy on its claimed symbols). The only path to trades. |
 | `regime` | Classify SPY regime |
 | `account` / `positions` / `open-orders` | Broker state |
 | `health <strategy_id>` | Win rate, Sharpe, drawdown, threshold breaches |

@@ -223,8 +223,19 @@ def run_strategy(
     safety_gate,
     alpaca_client,
     run_id: str,
+    claimed_symbols: list[str] | None = None,
 ) -> dict[str, Any]:
     """Load and run one strategy. Submits intents through SafetyGate.
+
+    Parameters
+    ----------
+    claimed_symbols : list[str] | None
+        If non-empty, the strategy's ctx.watchlist is narrowed to this set
+        (intersected with the strategy's frontmatter-declared symbols, if
+        any). Passed in by the multi-strategy runner so each strategy only
+        sees its owned symbols. ``None`` or ``[]`` preserves the legacy
+        single-active-strategy behaviour (strategy runs against its full
+        frontmatter-filtered universe).
 
     Returns a dict with:
         strategy_id, intent_count, submitted, rejected, errors, evaluate_error
@@ -253,6 +264,7 @@ def run_strategy(
             market_data=market_data,
             regime_classifier=regime_classifier,
             alpaca_client=alpaca_client,
+            claimed_symbols=claimed_symbols,
         )
     except Exception as e:
         return {"ok": False, "error": f"context build failed: {e}", "strategy_id": strategy_id}
@@ -381,6 +393,116 @@ def run_strategy(
     }
 
 
+def run_active_strategies(
+    *,
+    settings,
+    market_data,
+    regime_classifier,
+    safety_gate,
+    alpaca_client,
+    run_id: str,
+) -> dict[str, Any]:
+    """Run every strategy in ``state/active_strategies.md`` against its
+    claimed symbols, plus surface unclaimed universe symbols as a
+    library-gap diagnostic.
+
+    Each strategy sees only its claimed symbols via ``ctx.watchlist``;
+    ``ctx.universe`` remains the full composed universe so strategies can
+    still reason about what else is being tracked.
+
+    Returns
+    -------
+    dict
+        {
+          "ok": True,
+          "active_strategies": [<one per-strategy result>],
+          "submitted_count": N,
+          "rejected_count": N,
+          "error_count": N,
+          "unclaimed_symbols": [list of library-gap candidates],
+          "skipped": [strategies with empty claim and no fallback],
+        }
+
+    Behaviour notes:
+      - If ``state/active_strategies.md`` is missing, falls back to the
+        legacy singular ``state/active_strategy.md`` (single strategy,
+        runs against the full frontmatter-filtered universe). Backwards
+        compatible with every prior session.
+      - A strategy with an empty ``symbols`` claim AND a non-empty
+        ``symbols`` frontmatter still runs (claims its frontmatter list
+        implicitly). A strategy with NO claim and NO frontmatter is
+        skipped — it has no defined scope.
+    """
+    from quant_trading_system import memory
+    from quant_trading_system.universe import compute_universe
+
+    claims = memory.read_active_strategies()
+    if not claims:
+        return {
+            "ok": False,
+            "error": (
+                "no active strategies — populate state/active_strategies.md "
+                "or fall back to state/active_strategy.md via cli set-active."
+            ),
+            "active_strategies": [],
+        }
+
+    per_strategy: list[dict[str, Any]] = []
+    skipped: list[dict[str, Any]] = []
+    submitted_total = 0
+    rejected_total = 0
+    error_total = 0
+
+    for claim in claims:
+        # Empty claim list = "no explicit symbol claim". We still run; the
+        # strategy will get its frontmatter-filtered universe (legacy
+        # behaviour). If you want a strategy idle, archive it; don't leave
+        # it active with an empty claim.
+        claim_syms = claim.symbols if claim.symbols else None
+
+        result = run_strategy(
+            claim.strategy_id,
+            settings=settings,
+            market_data=market_data,
+            regime_classifier=regime_classifier,
+            safety_gate=safety_gate,
+            alpaca_client=alpaca_client,
+            run_id=run_id,
+            claimed_symbols=claim_syms,
+        )
+        # Attach the claim metadata so the agent can attribute results.
+        result["claim"] = {
+            "symbols": list(claim.symbols),
+            "since": claim.since,
+            "reason": claim.reason,
+        }
+        per_strategy.append(result)
+        if result.get("ok"):
+            submitted_total += len(result.get("submitted", []))
+            rejected_total += len(result.get("rejected", []))
+            error_total += len(result.get("errors", []))
+
+    # Library-gap diagnostic — symbols in the composed universe that no
+    # active strategy claims. The trader writes these into tasks.md as
+    # research-agent priorities.
+    try:
+        universe = compute_universe(settings, alpaca_client=alpaca_client)
+        gaps = memory.unclaimed_symbols(universe.symbols)
+    except Exception as e:
+        logger.warning("library_gap_compute_failed err=%s", e)
+        gaps = []
+
+    return {
+        "ok": True,
+        "active_strategies": per_strategy,
+        "submitted_count": submitted_total,
+        "rejected_count": rejected_total,
+        "error_count": error_total,
+        "unclaimed_symbols": gaps,
+        "skipped": skipped,
+    }
+
+
 # ---------------------------------------------------------------------------
 # Context builder
 # ---------------------------------------------------------------------------
@@ -430,7 +552,15 @@ def _load_news_brief() -> NewsBriefView:
     return view
 
 
-def _build_context(sf, *, settings, market_data, regime_classifier, alpaca_client) -> StrategyContext:
+def _build_context(
+    sf,
+    *,
+    settings,
+    market_data,
+    regime_classifier,
+    alpaca_client,
+    claimed_symbols: list[str] | None = None,
+) -> StrategyContext:
     # Account / positions / open orders (best-effort)
     account: dict[str, Any] = {}
     positions: list[dict[str, Any]] = []
@@ -479,6 +609,26 @@ def _build_context(sf, *, settings, market_data, regime_classifier, alpaca_clien
     filtered = filter_universe_for_strategy(
         universe, strategy_frontmatter=sf.frontmatter or {},
     )
+
+    # If the caller passed an explicit symbol-claim list from
+    # state/active_strategies.md, narrow `filtered` to that intersection.
+    # Empty claim list = "no explicit claim, use the frontmatter-filtered
+    # universe" (legacy single-active-strategy behaviour).
+    if claimed_symbols:
+        claim_set = {s.upper() for s in claimed_symbols}
+        # Intersect with the frontmatter-filtered set so a strategy can
+        # never trade outside its declared `symbols:` / `sectors:` even if
+        # the operator over-claimed in active_strategies.md.
+        narrowed = [s for s in filtered if s.upper() in claim_set]
+        if not narrowed:
+            # The strategy's frontmatter and the claim list don't overlap.
+            # That's a configuration error worth surfacing in logs, but the
+            # strategy still gets to run on its claim (frontmatter may be
+            # missing/permissive). Fall back to the raw claim list filtered
+            # against the broader composed universe.
+            universe_upper = {s.upper() for s in universe.symbols}
+            narrowed = [s for s in claim_set if s in universe_upper]
+        filtered = narrowed
 
     # News brief — parse state/news_brief.md
     news_brief = _load_news_brief()

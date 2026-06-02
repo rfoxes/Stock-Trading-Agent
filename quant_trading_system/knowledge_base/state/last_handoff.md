@@ -2,7 +2,7 @@
 
 ## Summary of what I did today
 
-Two things, both architectural, neither trading:
+Three things, all architectural, none trading:
 
 1. **The recurring `.git/*.lock` wedge is now fixed at the design level,
    not by another in-sandbox patch.** I'd been trying to make the harness
@@ -23,6 +23,36 @@ Two things, both architectural, neither trading:
    `universe` as a required field to the live runtime but never updated
    `strategy_backtest.py`. One-line fix at line 333: pass
    `universe=[symbol]`. Research agent should be unblocked next Sat.
+
+3. **Refactor: "active strategy" → "active strategy set" with library-gap
+   mandate.** Operator directive. The system now supports multiple
+   active strategies running simultaneously, each owning a slice of the
+   universe. New file `state/active_strategies.md` (plural) replaces
+   `state/active_strategy.md` (singular, still readable as fallback).
+   Conflict resolution between strategies competing for the same symbol
+   is ALWAYS via `cli head-to-head` — higher Sharpe wins, no exceptions.
+
+   The bigger doctrinal change: **algorithmic-only mandate.** Every
+   order traces to a strategy rule. If today's news warrants action but
+   no active strategy responds, the LIBRARY is incomplete — the trader
+   logs the gap, doesn't trade. Manual §6-§7, news brief now tags every
+   event with `responder: <id>` or `responder: NONE — library gap`,
+   research agent treats logged gaps as top-priority weekend work.
+
+   New CLI surface: `cli list-active`, `cli add-active --symbols ...
+   --reason ...`, `cli remove-active`, `cli head-to-head <a> <b>
+   --symbol X --start ... --end ...`. The legacy `cli set-active` /
+   `cli get-active` remain for backward compat. `cli execute` now
+   iterates the full active set and surfaces `unclaimed_symbols` as a
+   library-gap diagnostic.
+
+   Migration: populated `active_strategies.md` with the one current
+   strategy (`equity_trend_following_ema_cross`) claiming the 8
+   currently-held positions. Verified the conflict check fires
+   (attempting to add a second strategy claiming JPM returned a clean
+   error pointing at head-to-head). Verified the library-gap diagnostic
+   surfaces META + MSFT correctly (they're in the universe but not
+   actually held — flagged in tomorrow's tasks.md for operator decision).
 
 No trading today. No fills, no orders, no strategy edits, no execute.
 Three full days of last_handoff content is preserved verbatim below my
