@@ -638,6 +638,23 @@ def _build_parser() -> argparse.ArgumentParser:
     sp.set_defaults(func=lambda ctx, args: (_emit(agent_tools.universe_view(
         ctx, include_testing=args.include_testing)), 0)[1])
 
+    # promote-candidate (add a symbol to extra_symbols.md + create news folder)
+    sp = sub.add_parser(
+        "promote-candidate",
+        help="Promote a symbol into the universe (appends to extra_symbols.md, creates news folder). Idempotent. Use this when a news-flagged candidate recurs 3+ sessions, or when the operator wants a name added immediately.",
+    )
+    sp.add_argument("symbol", help="Ticker, e.g. MRVL")
+    sp.add_argument("--reason", default="", help="Short rationale for the audit trail.")
+    sp.add_argument(
+        "--agent",
+        choices=["trader", "news", "research", "operator"],
+        default="operator",
+        help="Which agent is promoting (for audit).",
+    )
+    sp.set_defaults(func=lambda ctx, args: (_emit(agent_tools.promote_candidate(
+        ctx, symbol=args.symbol, reason=args.reason, agent=args.agent,
+    )), 0)[1])
+
     # git-doctor (clean up stale .git/*.lock files — works for harness + operator)
     sp = sub.add_parser(
         "git-doctor",

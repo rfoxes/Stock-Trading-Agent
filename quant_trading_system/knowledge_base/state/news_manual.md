@@ -299,13 +299,34 @@ move on. Full-article fetching is reserved for the Saturday research agent.
 8. **Cleanup.** Run `python3 -m quant_trading_system.cli news-cleanup` to
    sweep HTMLs older than 90 days.
 
-9. **Write `state/news_tasks.md`** for tomorrow's news agent. Brief. If you
+9. **Promote recurring candidates into the universe.** Look at the carry-forward
+   list in `news_tasks.md`. For every candidate that has been flagged in
+   the "Candidates for the universe" section for **3+ consecutive sessions**,
+   run:
+
+   ```
+   python3 -m quant_trading_system.cli promote-candidate <SYMBOL> --agent news --reason "<N>-session recurrence; <catalyst summary>"
+   ```
+
+   This is idempotent (re-running on an already-promoted symbol is a
+   no-op) and is the canonical path for getting a news-flagged name into
+   the universe without operator intervention. It appends to
+   `state/extra_symbols.md` and creates the `news/stocks/<SYMBOL>/`
+   folder so future `news-fetch` runs cover it. The trader's `cli
+   universe` call will pick the symbol up on its next run. Strategies
+   will not automatically claim it — the research agent (or a head-to-head
+   call) does that — but the universe coverage is the first step. **Do
+   NOT promote first-time candidates** (single-session events are too
+   noisy); the 3-session bar is intentional.
+
+10. **Write `state/news_tasks.md`** for tomorrow's news agent. Brief. If you
    identified "Candidates for the universe" today, list them in
    `news_tasks.md`'s carry-forwards section so tomorrow's news agent
-   tracks whether the same names keep coming up (recurring catalysts on a
-   non-universe name is a stronger signal than a one-day event).
+   tracks whether the same names keep coming up. Track the recurrence
+   count next to each name so step 9 has a clear input (e.g. `MRVL —
+   session 3 of recurrence; Jensen anointment + AVGO cohort`).
 
-10. **Stop.**
+11. **Stop.**
 
 ## The "halt-worthy" call
 

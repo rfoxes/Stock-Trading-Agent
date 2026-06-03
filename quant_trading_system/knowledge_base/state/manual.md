@@ -217,6 +217,31 @@ trading on any given day is a *derived view* — the union of:
 The `DEFAULT_WATCHLIST` env var in `.env` is now only a *bootstrap
 fallback*, used when none of the above sources have anything.
 
+**Promoting a candidate into the universe.** As of 2026-06-03 there's a
+canonical CLI path for adding a symbol to the universe without hand-editing
+`extra_symbols.md`:
+
+    python3 -m quant_trading_system.cli promote-candidate <SYMBOL> \
+        --agent <trader|news|research|operator> \
+        --reason "<short rationale>"
+
+It's idempotent. It appends the symbol to `state/extra_symbols.md` with a
+dated comment AND creates the `news/stocks/<SYMBOL>/` folder so the news
+layer starts covering it next `news-fetch`. Two routine triggers:
+
+- **News agent:** when a candidate has been flagged in its brief's
+  "Candidates for the universe" section for **3+ consecutive sessions**,
+  it auto-promotes via `--agent news`. See `news_manual.md` step 9.
+- **Trader:** rarely. The trader's algorithmic-only mandate means it
+  shouldn't be promoting names on a hunch. The legitimate case is when
+  the operator's `tasks.md` explicitly says "add SYMBOL today" — then run
+  the CLI with `--agent trader` and note it in `last_handoff.md`.
+
+Adding a symbol to the universe does NOT cause any strategy to claim it.
+Claims happen via `cli add-active` after a head-to-head backtest, or via
+the Saturday research agent. Until claimed, the symbol shows up as
+`unclaimed_symbols` in `cli list-active`.
+
 Inspect the composed universe at any time with:
 
     python3 -m quant_trading_system.cli universe
@@ -325,4 +350,5 @@ P&L drops below -8% — three weeks of data confirm this gate works.")
 
 - **SafetyGate `daily_loss` is evaluated per-batch, not per-order.** When a strategy's `evaluate()` returns multiple sell intents in a single run, the gate sums their combined realised loss against the 2% cap; if the basket exceeds it, *every* intent in the batch is rejected, not just enough to bring it under the line. This is desired behaviour (it prevents a one-day liquidation cascade) but means a strategy with N losing positions will get throttled into a multi-day graduated exit. Don't edit the cap or the strategy to work around this — the gate is doing its job. Observed 2026-05-27 when 3 ADX-fade exits (JPM/META/MSFT, combined -2.3% of equity) were all rejected together.
 - **CORRECTION (2026-05-28): the previous bullet is wrong about what `daily_loss` actually measures.** Reading `brokers/safety_gate.py` lines 337-371: the gate sums `unrealized_pl` across **all** positions with negative unreal (portfolio-wide), adds `_daily_realized_loss` (cumulative session-realized losses), and compares the sum to `MAX_DAILY_LOSS_PCT` × equity. It does NOT look at the proposed order's expected P&L at all. So the gate is effectively a **portfolio-stress halt**: whenever the book's existing unrealized losses (plus today's realized losses) exceed 2% of equity, EVERY order rejects — buys, sells, profitable, unprofitable, any strategy, any symbol. The Wed 2026-05-27 rejection wasn't "the basket exceeded the cap"; it was "the existing book's unreal losses already exceeded the cap, so any order in any batch would reject." Confirmed Thu 2026-05-28 when a single MSFT sell intent with **est. P&L +$267 (a profit)** was rejected at 2.1% > 2.0% because JPM (-$1,051 unreal) + META (-$1,348 unreal) = -$2,400 = 2.13% of equity. The overnight strategy edit adding `max_exits_per_run: 1` smallest-loss-first staggering was built on the previous (incorrect) understanding and does NOT relieve the gate — staggering only helps if the gate measured the proposed sale, which it doesn't. Operationally: when portfolio unreal-loss is near 2% of equity, expect the harness to be in a trade-halt state regardless of what the strategies want to do.
+- **`cli promote-candidate` exists as of 2026-06-03 — use it instead of hand-editing `extra_symbols.md`.** It appends the symbol with an audit trail AND creates the news folder in one step. The news agent calls it after 3-session candidate recurrence; the trader calls it only when the operator's tasks.md explicitly directs. Adding a symbol does not claim it for any strategy — claims still go through `head-to-head` + `add-active`.
 - **RESCOPE (2026-05-28 evening, operator-directed): `daily_loss` now measures per-batch proposed realized loss + cumulative session realized, NOT portfolio-wide unrealized.** Both bullets above describe the OLD behaviour; the gate has been changed. New behaviour in `safety_gate.py` lines 337-415: for each order, compute estimated realized P&L if it's a sell against an existing long position (qty × (estimated_sell_price − avg_entry); the gate uses the order's `limit_price` if set, otherwise the position's `current_price`). Negative P&L = `order_realized_loss`. Total = `order_realized_loss + abs(_daily_realized_loss)`. If `total / equity > MAX_DAILY_LOSS_PCT`, reject. If approved and the sell would book a loss, `_daily_realized_loss` accrues that loss so the next order in the same batch sees the cumulative number. Buys, sells without a matching long, and shorts take a zero-loss path (they don't count against the cap). This means: a profitable exit will never reject for daily_loss; a single losing exit only rejects if its own loss > 2% equity; a basket of losing exits will get throttled order-by-order once the cumulative crosses 2%, with the *remaining* orders rejected (not the whole batch). The rejection message now includes the per-order and prior-realized breakdowns. Confirmed working Thu evening: 2 intents (MSFT +$267, META -$1,348) both passed; combined 1.20% of equity. Going forward, the right mental model is "the gate caps how much the strategy can *book* on any single day from active closes," not "the gate halts trading whenever the book looks bad."

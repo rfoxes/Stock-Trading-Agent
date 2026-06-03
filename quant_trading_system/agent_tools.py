@@ -977,6 +977,73 @@ def universe_view(ctx: ToolContext, *, include_testing: bool = False) -> dict[st
     return _ok(universe.to_dict())
 
 
+def promote_candidate(
+    ctx: ToolContext,
+    *,
+    symbol: str,
+    reason: str = "",
+    agent: str = "",
+) -> dict[str, Any]:
+    """Promote a symbol into the universe by appending it to extra_symbols.md
+    and creating its news folder.
+
+    Used by the news agent (recurring-candidate flow) and by the trader
+    (when the operator wants a specific name added immediately). Idempotent
+    — re-running with the same symbol is a no-op apart from logging.
+
+    Args:
+        symbol: ticker (e.g. "MRVL"). Case-insensitive; stored uppercase.
+        reason: short human-readable rationale (e.g. "3+ session recurrence
+            in news brief candidates section"). Recorded as a comment line.
+        agent: which agent is promoting ("news", "trader", "research", or "").
+            Used only in the comment for audit.
+
+    Returns:
+        {"ok": True, "promoted": True/False, "symbol": ..., "already_present": ...,
+         "extra_symbols_path": ..., "news_folder_created": ...}
+        promoted=False means the symbol was already in extra_symbols.md.
+    """
+    from pathlib import Path
+    from quant_trading_system.universe import EXTRA_SYMBOLS_FILE, symbols_from_operator
+    from quant_trading_system.news_service import STOCKS_DIR
+
+    sym = (symbol or "").strip().upper()
+    if not sym or not sym.isalnum() or not (1 < len(sym) <= 5):
+        return _err(f"invalid symbol: {symbol!r} (expect 2-5 uppercase alnum chars)")
+
+    already = sym in symbols_from_operator()
+    extras_path = Path(EXTRA_SYMBOLS_FILE)
+    extras_path.parent.mkdir(parents=True, exist_ok=True)
+    if not extras_path.exists():
+        extras_path.write_text(
+            "# Extra symbols\n#\n# Operator/agent-declared additions to the harness universe.\n#\n",
+            encoding="utf-8",
+        )
+
+    if not already:
+        today = dt.date.today().isoformat()
+        agent_tag = f"{agent}, " if agent else ""
+        reason_tag = f": {reason}" if reason else ""
+        block = f"\n# Added {today} ({agent_tag}promote-candidate){reason_tag}\n{sym}\n"
+        with extras_path.open("a", encoding="utf-8") as f:
+            f.write(block)
+
+    # Ensure the news folder exists so news-fetch starts tracking next run.
+    folder = STOCKS_DIR / sym
+    created = not folder.exists()
+    folder.mkdir(parents=True, exist_ok=True)
+
+    return _ok({
+        "promoted": not already,
+        "symbol": sym,
+        "already_present": already,
+        "extra_symbols_path": str(extras_path),
+        "news_folder_created": created,
+        "reason": reason,
+        "agent": agent,
+    })
+
+
 def execute_strategy(
     ctx: ToolContext,
     *,

@@ -15,6 +15,14 @@
 # Financials:   BAC GS WFC MS
 # Consumer:     WMT COST PG KO
 # Industrials:  CAT BA DE
-# Today's-add ticker tape goes below this line. Currently empty.
+# Today's-add ticker tape goes below this line.
+
+# Added 2026-06-03 (trader, operator-directed): news-flagged candidates with
+# 5+ session recurrence. Get them into the universe ahead of Sat research's
+# head-to-head battery so a strategy can be claimant before they're stale.
+MRVL CSCO HPE
 
 ---
+
+# Added 2026-06-03 (operator, promote-candidate): Computex Day-3 sustained; STRONG candidate per news brief 6/3
+ARM

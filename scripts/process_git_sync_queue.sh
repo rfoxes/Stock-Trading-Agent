@@ -21,17 +21,26 @@ set -u
 
 REPO_ROOT="/Users/rfoxes/Stock-Trading-Agent"
 QUEUE_DIR="${REPO_ROOT}/.git-sync-queue"
-LOCK_FILE="/tmp/harness-gitrunner.lock"
+LOCK_DIR="/tmp/harness-gitrunner.lockd"
 LOG_PREFIX="$(date '+%Y-%m-%dT%H:%M:%S%z') gitrunner:"
 
 cd "$REPO_ROOT" || { echo "$LOG_PREFIX cannot cd $REPO_ROOT"; exit 1; }
 
-# Single-instance guard.
-exec 9>"$LOCK_FILE"
-if ! flock -n 9; then
-    # Another invocation is processing the queue. Quiet exit.
-    exit 0
+# Single-instance guard — mkdir is atomic on POSIX (works on macOS without
+# requiring flock, which ships with Linux util-linux but not with macOS).
+# If the lockdir already exists and is older than 5 minutes, it's stale
+# (a prior run crashed before the trap fired) and we forcibly reclaim it.
+if ! mkdir "$LOCK_DIR" 2>/dev/null; then
+    if [ -n "$(find "$LOCK_DIR" -maxdepth 0 -mmin +5 2>/dev/null)" ]; then
+        echo "$LOG_PREFIX reclaiming stale lock $LOCK_DIR"
+        rmdir "$LOCK_DIR" 2>/dev/null || true
+        mkdir "$LOCK_DIR" 2>/dev/null || exit 0
+    else
+        # Another invocation is processing the queue. Quiet exit.
+        exit 0
+    fi
 fi
+trap 'rmdir "$LOCK_DIR" 2>/dev/null || true' EXIT
 
 # Nothing to do?
 if [ ! -d "$QUEUE_DIR" ]; then

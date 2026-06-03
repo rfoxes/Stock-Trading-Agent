@@ -46,12 +46,25 @@ Brief is fine. Full narrative belongs in the weekly log.
    - `equity_rsi_divergence`: classic technical pattern with a lot of
      published parameter-sensitivity research; worth a parameter sweep.
 
-3. **(Gated on #1.) Evaluate universe expansion.** The M-F news layer
-   has been flagging DELL, NTAP, OKTA, NOW, TEAM (recurring: MU, AVGO,
-   SNOW) for several sessions. These are watchlist edits, not strategy
-   additions — decide whether to add any to a relevant strategy's
-   `watchlist` parameter. If yes, those become `<id>_v2` variants and
-   need to pass the replacement battery.
+3. **(Gated on #1.) OPERATOR REQUEST 2026-06-03: run head-to-head
+   battery and propose claims for unclaimed + flagged candidates.**
+   Specifically:
+   - **Unclaimed in current universe:** META, MSFT. Run
+     `cli head-to-head equity_trend_following_ema_cross <other>` on
+     each — at minimum vs. `equity_mean_reversion_bollinger`,
+     `equity_momentum_macd_histogram`, `equity_breakout_volume_confirmation`.
+     Winner gets the claim via `cli add-active`.
+   - **News-flagged candidates (5+ session recurrence):** MRVL, CSCO,
+     HPE, DELL, MU, NTAP, OKTA, NOW, TEAM, SNOW, ARM, STM. These
+     need to enter the universe first (add to `state/extra_symbols.md`)
+     and then go through the same head-to-head battery to pick a claimant.
+   - **Existing claims worth validating:** the 7 still-held names
+     (AAPL, AMZN, GOOGL, JPM, NVDA, QQQ, SPY) were operator-assigned
+     to trend-following at migration and were never validated by
+     head-to-head per the original 2026-05-27 directive. If time
+     permits, run h2h on at least one of them to validate the claim.
+   - Document each winner/loser with Sharpe deltas in this Saturday's
+     research log.
 
 4. **Archive sweep.** `cli evaluate-archive` works regardless of the
    backtester. Run it on `equity_trend_following_ema_cross` (the only

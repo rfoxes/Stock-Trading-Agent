@@ -9,119 +9,142 @@ file is just "the specific things you should do."
 
 ---
 
-## Status as of the last update (Tue 2026-06-02, post-close)
+## Status as of the last update (Wed 2026-06-03, post-close)
 
 - **Active set:** one strategy — `equity_trend_following_ema_cross`
-  owning [AAPL, AMZN, GOOGL, JPM, NVDA, QQQ, SPY, TSLA]. Verify with
+  owning [AAPL, AMZN, GOOGL, JPM, NVDA, QQQ, SPY, TSLA]. **TSLA closed
+  today (filled $418.23, logged +0.0353).** 7 longs held. Verify with
   `cli list-active`. Unclaimed in universe: META, MSFT.
-- **Today's execute:** 1 intent, 1 submitted, 0 rejected. **TSLA full
-  exit (48 shares, market, day) — ADX(14)=18.9 fade, est. P&L +$846.**
-  Order_id `ee8663af-4644-46b6-b1a9-fa0c326a1393`. AH paper — should
-  fill at Wed open.
-- **Account:** equity $110,981.21 (+$619.61 / +0.56% vs Mon), buying_power
-  $51,326.07, cash -$59,655.14 (unchanged).
-- **Regime:** bull, conf 0.80, ADX 29.69 (7th consecutive bull day; flat
-  vs Mon).
-- **Mon→Tue unrealized %:** AAPL +12.71→+15.92, AMZN +4.29→+3.00,
-  GOOGL +9.32→+7.20, JPM -5.26→-3.86, NVDA +12.33→+11.09,
-  QQQ +14.23→+15.05, SPY +6.75→+7.07, TSLA +2.48→+4.37.
+- **Today's execute:** 0 intents, 0 submitted, 0 rejected, 0 errors.
+  Correct algorithmic outcome — no per-symbol ADX/EMA rule fired despite
+  -0.74% S&P / -0.89% Nasdaq sell on Iran shock + hot ADP+ISM +
+  AVGO Q3 AI guide light.
+- **Account:** equity $108,875.55 (-$2,105.66 / -1.90% vs Tue),
+  buying_power $69,295.61, cash -$39,579.94 (improved by ~$20K on TSLA
+  exit cash).
+- **Regime:** bull, conf 0.80, ADX 29.69 (8th consecutive bull day).
+- **Strategy 30d health (improved Tue→Wed):** orders_submitted 3,
+  orders_rejected 4, trades_closed 3, **win_rate 0.6667** (was 0.50),
+  **rolling_sharpe -0.200** (was -3.64), **cum_return -0.7%** vs SPY
+  +5.99% (-6.68 pp gap vs -10.8 pp Tue).
+- **Tue→Wed unrealized %:** AAPL +15.92→+15.69, AMZN +3.00→+1.07,
+  GOOGL +7.20→+5.53, JPM -3.86→-3.89, NVDA +11.09→+7.17 (-3.92pp,
+  cohort-pressure on AVGO Q3 AI guide), QQQ +15.05→+14.07,
+  SPY +7.07→+5.92.
 
-## To do tomorrow (Wed 6/3)
+## To do tomorrow (Thu 6/4)
 
-1. **Read last_handoff.md, then news_brief.md FIRST.** AVGO + CRWD
-   print AMC tonight — watch the brief's assessment, but you have no
-   exposure to either (logged library gaps).
+1. **Read last_handoff.md, then news_brief.md FIRST.** The big Thu
+   open risk is **NVDA gap-down** from AVGO AH cohort-spillover
+   (-5-8% AH on Q3 AI guide $16B vs $17.2B consensus). Watch the
+   brief for confirmation.
 
-2. **Standard read-and-snapshot.** Include `cli list-active`.
+2. **Standard read-and-snapshot.** Include `cli list-active` and
+   `cli git-doctor`.
 
-3. **Reconcile TSLA close.** The Tue TSLA sell (48 shares) should have
-   filled at Wed open. After running `cli positions`, if TSLA is gone,
-   compute the realized P&L fraction and log it:
-   ```
-   python3 -m quant_trading_system.cli log-closed equity_trend_following_ema_cross TSLA <pnl_fraction>
-   ```
-   `pnl_fraction` = (filled_avg_price − avg_entry 403.98) / avg_entry.
-   At Tue close mark this would be ~+0.0437 (+4.37%), but use the
-   actual fill. If for some reason TSLA didn't fill and is still on
-   the books, do NOT log-closed; document the open order in your handoff.
+3. **No reconciliation expected.** TSLA already logged. No other
+   open orders Wed close.
 
-4. **Run `cli execute`.** Watch items going in:
-   - **GOOGL** — Day 3 of $80B raise dilution; another -3-4% session
-     could fire EMA-cross / ADX-fade.
-   - **JPM** — still the standing ADX-fade candidate (held through Tue
-     at ADX ≥ 20 even as other names faded).
-   - **NVDA** — AI EO + HPE tailwind continues; expected hold.
-   - **AMZN** — mild fade Tue; no event.
-   - **AAPL, QQQ, SPY** — green; expected hold.
+4. **Run `cli execute`.** Specific algorithmic risks tomorrow:
+   - **NVDA** — top exit-fire candidate if AH cohort sell-through
+     materializes. Already shed 3.92pp Wed; ADX(14) didn't trip but
+     likely close to threshold. **If exit fires, it's clean — news
+     context aligns (AVGO Q3 AI guide light spillover).**
+   - **GOOGL** — Day-3 $84.75B (upsized from $80B) dilution
+     overhang. Another -3-4% session could fire EMA-cross/ADX-fade.
+   - **JPM** — still the standing ADX-fade candidate; held ≥20 for
+     5+ sessions through multiple catalysts (Cliffwater credit-stress,
+     yield surge).
+   - **AMZN, AAPL** — broad-sell hit, no idiosyncratic catalyst;
+     expected hold.
+   - **SPY, QQQ** — Tue's 8-session win streak broke Wed -0.74/-0.89%;
+     one bad day ≠ trend reversal. Two consecutive -1%+ would
+     put index trend rules in play.
 
-5. **HALT-WORTHY check:** unchanged criteria (FOMC, held-name earnings,
-   futures gap >2%, geopolitical shock). Iran-Hormuz softened Tue but
-   it's still a live overhang.
+5. **HALT-WORTHY check:** unchanged criteria (FOMC, held-name
+   earnings, futures gap >2%, geopolitical shock). Iran-Kuwait/Bahrain
+   is a live overhang but futures gap was <2% Wed. Watch for further
+   escalation overnight. VIX 15.77 (BENIGN-LOW unchanged).
 
-6. **Library gaps — log any new ones from `news_brief.md`.** Carry the
-   list below into the next `tasks.md` if no responder is built in the
-   meantime. **AVGO + CRWD print Wed AMC** — the news brief on Thu will
-   either reaffirm the earnings-window gap (if either printed and
-   nothing in the library responded) or, if Saturday's research agent
-   has built `event_driven_catalyst`, validate the new responder.
+6. **Library gaps — log any new ones.** Carry forward the list
+   below. Several new this Wed:
+   - cohort-spillover from peer earnings (NVDA ← AVGO)
+   - geopolitical / oil-shock overlay (Iran-Kuwait/Bahrain)
+   - rate-regime overlay (10Y yield breakout → duration risk)
+   - bank-name credit-stress sensitivity (JPM ← Cliffwater)
 
 7. **Do NOT revert** safety_gate.py rescope, `max_exits_per_run`,
    git-sync queue architecture, `active_strategies.md`, or launchd
    plists.
 
-8. **Run `cli git-sync --agent trader --message "..."` as last action.**
-   Expect `"queued"` in the response — that's success. Then `cli
-   git-doctor` once. If pending_marker_count > 3 or stale_lock_count > 0,
-   the operator hasn't installed the LaunchAgents — flag in handoff.
+8. **Run `cli git-sync --agent trader --message "..."` as last
+   action.** Expect `"queued"` in the response — that's success.
+   Then `cli git-doctor` once. If pending_marker_count > 3 or
+   stale_lock_count > 0, flag in handoff (operator install run is
+   confirmed complete; persistent backlog would indicate the
+   LaunchAgent stopped).
 
 ## Library gaps for the research agent (carry to research_tasks.md next Sat)
 
-- **AVGO Wed 6/3 AMC earnings** — consensus $22.11B / $2.40 / AI +140%
-  YoY; options 10.65% expected move. No earnings-window strategy in
-  active set. Sat research priority: build/activate
-  `event_driven_catalyst` with earnings-window entry rules. AVGO not
-  in universe — needs `extra_symbols.md` addition if strategy is to
-  use it. (Operator decision pending; will be moot post-Wed.)
-- **CRWD Wed 6/3 AMC earnings** — consensus $1.36B / $1.07. Same gap
-  shape as AVGO. Outside universe.
-- **GOOGL secondary-offering dilution overlay** — no "secondary-offering
-  dilution gap" rule. Trend-follower treats dilution like any gap.
-  Multi-month overhang (remaining $40B ATM tranche starts Q3).
-- **OpenAI Robotics → TSLA -$75B competitive event** — no
-  "competitor-product-launch" overlay. Trend-follower reacted via
-  ADX/EMA (TSLA exit fired Tue) but cannot distinguish the catalyst
-  from generic weakness. Suggested: news-event-driven overlay that
-  adjusts position sizing on confirmed competitor-product-launch for
-  named holdings.
-- **Trump AI Security EO** — no "policy-tailwind sizing" overlay.
-  NVDA / GOOGL would be beneficiaries of a thematic-overlay for
-  policy-event positive sizing.
+- **NEW Wed: AVGO Q3 AI guide light → NVDA cohort spillover.**
+  No "cohort-spillover from peer earnings" rule. Direct unhedged
+  exposure on held NVDA. Suggested: peer-earnings-event overlay
+  (adjust posture when named cohort peer prints guide miss within
+  ±2 sessions).
+- **NEW Wed: Iran-Kuwait/Bahrain missile shock.** No "geopolitical
+  shock / oil-spike risk-off" overlay. Suggested: macro-shock event
+  overlay (oil >X gap, breaking-news shock → tighten stop discipline).
+- **NEW Wed: hot ADP+ISM → rate-hike chatter.** No "rate-policy-shift
+  sizing" rule. Trend-follower has no Treasury-yield sensitivity.
+  Suggested: rate-regime overlay (10Y yield breakout → dampen
+  long-duration tech weight).
+- **NEW Wed: Cliffwater 5% redemption gate (JPM exposure).** No
+  "credit-stress" overlay for JPM. Suggested: bank-name credit-stress
+  sensitivity sizing.
+- **GOOGL $84.75B raise Day-3 (upsized from $80B Tue)** — no
+  "secondary-offering dilution gap" rule. Multi-month overhang
+  (remaining ATM tranche Q3+). Trend-follower treats dilution-gap
+  like any gap.
+- **OpenAI Robotics → TSLA -$75B competitive event (Tue carry-over)** —
+  no "competitor-product-launch" overlay. Moot now that TSLA exited.
+- **Trump AI Security EO (Day-2)** — no "policy-tailwind sizing"
+  overlay for NVDA / MSFT / ORCL beneficiaries.
 - **EU cloud procurement rules** — no "regulatory-headwind sizing"
   rule for AMZN / MSFT / GOOGL cloud exposure.
-- **META, MSFT** — still in the universe (Strategy frontmatter or
-  extras) but no active strategy claims them, no positions held.
-  Operator decision pending: drop from universe or claim with
+- **AVGO not in universe + earnings-window strategy** — Wed AMC
+  print materialized as expected (beat top/bottom, light Q3 AI
+  guide). Use case for AVGO now is "exposure to the dip-buy"
+  rather than "catch the print." Decision: leave gap until
+  earnings-window strategy is built generally (covers CRWD, MU,
+  NVDA, etc).
+- **CRWD 4-for-1 split announced** — no corporate-action handler.
+  Not held; informational.
+- **META, MSFT carry-over** — still unclaimed in universe (not
+  held). Operator decision pending: drop from universe or claim with
   trend-following.
-- **DELL, HPE, FLNC, MU, NTAP, OKTA, NOW, TEAM, SNOW** — flagged 5+
-  consecutive sessions by news as universe candidates; no active
-  strategy claims any of them. Same options as before: expand
-  trend-following's claim list (after a head-to-head on each symbol
-  vs. its current best) or build a multi-name momentum strategy.
-- **MRVL** — NEW STRONG CANDIDATE per Tue news brief. +33% on Jensen
-  "next trillion" anointment; $250B market cap; NVDA $2B stake
-  validated. Optical-interconnect / networking-chip thesis.
+- **DELL, HPE, FLNC, MU, NTAP, OKTA, NOW, TEAM, SNOW, MRVL, CSCO,
+  STM, ARM** — universe-expansion candidates flagged repeatedly.
+  CSCO new strong (11 PT raises in a week). STM new (SpaceX-IPO
+  optionality). MRVL still strong post-Tue Jensen anointment.
 
 ## Open questions for the operator
 
-1. **Please run `bash scripts/install_git_safety.sh` once from a real
-   terminal.** Idempotent. One-time fix for the git-lock wedge.
-   Verify with `launchctl list | grep harness`.
+1. **GIT-SYNC LAUNCHAGENT NOT DRAINING (re-flagged).** Tue handoff
+   claimed install was complete and operational. Wed git-doctor shows
+   pending_marker_count=8, including Tue's own trader marker. Either
+   the install didn't complete, the LaunchAgent crashed, or its
+   runner script is erroring. Please verify
+   `launchctl list | grep harness` and check runner logs. Markers are
+   safe on disk; queue will drain whenever fixed. Top operator
+   priority.
 
-2. **AVGO Wed AMC** — last chance to add to `state/extra_symbols.md`
-   before Wed close. Moot if the print happens without the symbol
-   being included.
+2. **NVDA Thu open is the main visibility item.** If AVGO AH
+   translates to NVDA -3-5% Thu open, an ADX-fade exit is plausible.
+   This would be the second held name to exit on a peer-earnings
+   cohort catalyst (after TSLA Tue on OpenAI Robotics). Not a strategy
+   issue — it's the strategy doing its job — but worth knowing.
 
-3. **Strategy health gap widening.** 30d cum_return -4.08% vs SPY
-   +6.72% (-10.8 pp, +0.8 pp wider than Mon). Small-sample (N=2) but
-   consistent gap. If TSLA exit fills profitably tomorrow, realized
-   improves by ~0.76 pp.
+3. **Strategy health gap to SPY narrowed materially.** Tue -10.8 pp,
+   Wed -6.68 pp (+4.1pp improvement from TSLA realized + rolling
+   window). N=3 realized so still small-sample; not yet a basis to
+   keep or rotate either way. Continue to monitor.
