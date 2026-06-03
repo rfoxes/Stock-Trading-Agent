@@ -6,58 +6,60 @@ Yesterday's news agent writes this. Replace, don't append.
 
 ## Status as of the last update
 
-- **Last brief assessment:** NOTABLE (2026-06-02 Tue, post-close). Three discrete events on the universe: (1) **OpenAI Robotics division launched** by Sam Altman — direct Optimus competitor; **TSLA -3.57% / ~$75B market cap erased intraday**. (2) **GOOGL Day-2 of the $80B raise**: stock -4% on dilution digestion; Berkshire $10B participation now publicly framed as a Buffett bull-marker; remaining $40B ATM tranche (Q3) is a multi-month overhang. (3) **Trump signed AI Security Executive Order** — voluntary frontier-model testing framework formalizes federal AI procurement, centering NVDA silicon and GOOGL cyber (Wiz/Mandiant). **Mon-flagged Iran-Hormuz HALT-WORTHY escalation did NOT materialize**: no overnight closure, oil retraced (WTI ~$91 -1%, Brent $94.58 -0.42%), S&P closed at new ATH 7,609.78 (+0.13%). VIX held near 15-low-16 (Mon close 15.32 last confirmed). HPE Q2 confirmed (+25% Tue; FY26 raised). Jensen anointed MRVL "next trillion" (+33%).
-- **Universe last covered:** 10-name watchlist. Alpaca News returned 124 items: NVDA 34, GOOGL 17, TSLA 15, META 15, AMZN 13, MSFT 11, SPY 6, QQQ 6, AAPL 4, JPM 3. All six category HTMLs written. Cleanup deleted 0 (cutoff 2026-03-04).
+- **Last brief assessment:** NOTABLE (2026-06-03 Wed, post-close). Three event stacks: (1) **AVGO Q2 print BEAT top/bottom; Q3 AI guide LIGHT** ($16B vs $17.2B cons); stock -5-8% AH — direct AI-cohort read-through to held NVDA. (2) **Hot ADP 122K + ISM Services 54.5** stack → Treasury yields surge → Yardeni July-hike call. (3) **Iran missiles on Kuwait/Bahrain overnight** — infrastructure damage, ≥1 killed; oil toward $100; partial materialization of Mon's HALT-WORTHY criterion but futures gap <2%. Combined: S&P -0.74%, Nasdaq -0.89%, Dow -1.21% from Tue's record. **GOOGL raise UPSIZED to $84.75B from $80B** — fresh datapoint Day-3 dilution digestion. CRWD also beat / raised FY / 4-for-1 split / -3% intraday sell-the-news. AAPL took #2 cap rank from GOOGL on the dilution. AMZN took Fortune 500 revenue crown from WMT (13y first). VOO crossed $1T AUM (first ETF ever). VIX 15.77 (+0.45 vs Mon 15.32) — regime BENIGN-LOW unchanged. Per Tue trader handoff: TSLA exit submitted (48 sh @ market, est. +$846 on ADX 18.9 < 20); JPM ADX stayed ≥20 (no exit).
+- **Universe last covered:** 10-name watchlist (AAPL, AMZN, GOOGL, JPM, META, MSFT, NVDA, QQQ, SPY, TSLA). Alpaca News returned 97 items: NVDA 28, GOOGL 14, AAPL 12, MSFT 11, AMZN 7, META 6, QQQ 6, SPY 6, TSLA 6, JPM 1. All six category HTMLs written. Cleanup deleted 0 (cutoff 2026-03-05).
 
 ## Notable carry-forwards
 
-- **TSLA-OpenAI Robotics is the single most important new event on a held position.** Tomorrow's news agent should check first thing for: (a) Day-2 follow-through (sustained re-rating vs. one-day pop), (b) sell-side TSLA price-target action sized to OpenAI Robotics competition, (c) any Musk / Tesla counter-announcement on Optimus production timeline acceleration, (d) Fremont retrofit progress updates, (e) any clarification on NVDA's open robotics platform pricing / chip availability to Tesla rivals (NVDA-Tesla relationship dimension).
-- **GOOGL Day-3 of the $80B raise.** Look for: (a) Berkshire allocation finalization (any incremental commit?), (b) sell-side EPS-dilution sizing models (UBS/Goldman/MS — none surfaced detailed dilution math yet on Day 2), (c) Class A vs. C divergence at issuance prices ($351.81 vs. $348.20) — did the spread widen or compress, (d) Anthropic S-1 follow-through coverage given GOOGL's $2B + 5GW TPU/Broadcom commit shows up in Anthropic stake-mark.
-- **AVGO Wed June 3 AMC print is THE catalyst tomorrow.** Consensus rev $22.11B / EPS $2.40 / AI $10.7B (+140% YoY). Options 10.65% implied move. EPS estimates +11.1% over 90 days. HPE blowout last night raises beat-probability. **Tomorrow's brief should:** (a) preview detailed pre-print positioning (PT raises, options skew, key metrics to watch), (b) cover the AMC reaction (post-close beat / miss, FY guide, AI rev mix), (c) read-through to NVDA / TPU / GOOGL / MRVL / SMCI.
-- **CRWD Wed AMC print** alongside AVGO. Consensus $1.36B / $1.06-1.07. CRWD +70% prior 4 sessions — confirms or breaks the software-rally. Preview + reaction in tomorrow's brief.
-- **HPE Day-2 follow-through.** Sell-side PT raises off the +40% rev / FY26 raised guide. Direct AI-server cohort tailwind to NVDA / DELL / SMCI / AVGO. Recurring carry-forward — operator inclusion for `state/extra_symbols.md` overdue.
-- **MRVL +33% Jensen-anointment.** Sustained re-rating or one-day pop? PT actions tomorrow are the signal. NVDA $2B MRVL stake validation. NEW STRONG CANDIDATE for `state/extra_symbols.md` (alongside HPE, DELL, AVGO, MU, ARM).
-- **Trump AI Security EO follow-on.** Tomorrow: any analyst sizing of federal procurement-pipeline dollar value for NVDA / GOOGL / CSCO? Mandiant / Wiz cyber-revenue line attribution? Any Anthropic Project Glasswing detail (CSCO / MSFT / NVDA partners)?
-- **EU cloud procurement rules follow-on.** Any analyst sizing of EU-public-sector cloud revenue exposure for AMZN / MSFT / GOOGL? Brussels press conference detail.
-- **Anthropic S-1 follow-on.** ~$965B valuation → AMZN $4B + GOOGL $2B stake-mark. IPO floodgates framing (SpaceX, OpenAI to follow). Liquidity-drain framing widely cited.
-- **Iran-Hormuz watch sustained.** Mon-flagged HALT-WORTHY did not trigger. Tomorrow: any renewed escalation / pre-cash oil gap >5/bbl / Trump-Iran-deal-within-a-week framing follow-through? Track to confirm wind-down trajectory.
-- **JPM** strategy watch-item per Mon handoff. ADX 20.92 Fri close (above 20). No JPM news argues either way today. If Tue tape pushed ADX below 20, expect Tue exit ~$879.
-- **VIX confirmation needed for Tue close** (Mon was 15.32; Tue not yet in published feeds at runtime).
-- **Operational: `git-sync` queue-based mechanism debut.** Per Mon trader handoff, success is now `{"queued": ...}`, not `committed/pushed`. If `cli git-doctor` shows `pending_marker_count > 3` or `stale_lock_count > 0`, operator install of `install_git_safety.sh` is still pending.
+- **AVGO post-print Day-2 read-through to NVDA.** The Q3 AI guide LIGHT ($16B vs $17.2B cons) is the bear take on the custom-silicon thesis. Tomorrow: (a) sell-side reaction notes — are NVDA AI-revenue forecasts being touched, (b) MRVL / AVGO Day-2 follow-through (sustained re-rating vs one-day pop), (c) any GOOGL TPU read-through, (d) any sell-side reframing of $73B AVGO backlog as bullish vs $17.2B/$16B guide-undershoot as bearish.
+- **GOOGL Day-4 of the now-$84.75B raise.** Look for: (a) Class A vs C divergence at issuance, (b) sell-side EPS-dilution sizing models (UBS/Goldman/MS — still no detailed dilution math 3 days in), (c) any incremental Berkshire commit, (d) Anthropic S-1 stake-mark follow-through.
+- **Iran-Kuwait/Bahrain escalation Day-2.** Critical first-thing check: (a) overnight Brent/WTI prints, (b) any closure announcement of regional ports, (c) Trump response framing, (d) any further missile activity, (e) Strait of Hormuz transit status update.
+- **ADP+ISM hot-stack Day-2 reaction.** Tomorrow's NFP (Fri AM if scheduled) becomes the trifecta. Yardeni dissenting July-hike call — any sell-side desks echo? Watch Treasury 10Y level and CME June probability shift.
+- **Trump AI EO Day-3 sell-side coverage.** NVDA / GOOGL / CSCO / MSFT / ORCL / PLTR procurement-pipeline sizing. Tue carry-forward unanswered.
+- **EU cloud procurement rules follow-on.** Any analyst sizing of EU-public-sector cloud revenue exposure for AMZN / MSFT / GOOGL? Brussels press conference detail. Tue carry-forward unanswered.
+- **Anthropic S-1 follow-on.** ~$965B valuation → AMZN $4B + GOOGL $2B stake-mark. Tue carry-forward unanswered.
+- **MRVL Day-3 of Jensen "next trillion" anointment.** NVDA $2B stake validation. Sustained re-rating signal needed.
+- **CRWD Day-2 of 4-for-1 split + raised FY guide.** Software-cohort fundamentals healthy; sell-the-news context may reverse if AVGO read-through pressure spills into software.
+- **JPM** strategy watch-item per Tue handoff. Cliffwater private credit datapoint is sentiment-only. No JPM-specific event today argues either way. ADX still ≥20 per Tue.
+- **Operational: `git-sync` queue-based mechanism is now OPERATIONAL.** **Operator ran `bash scripts/install_git_safety.sh` during the Wed news run.** The `com.harness.gitrunner` LaunchAgent is installed and will drain the 7-marker backlog within several 30s polling cycles. Tomorrow's `cli git-doctor` should show `pending_marker_count ≤ 1` (only the in-flight marker). If markers still ≥ 3 on Thu run, escalate — install may need re-validation.
 
-## To do tomorrow (next news run, Wed 2026-06-03)
+## To do tomorrow (next news run, Thu 2026-06-04)
 
 1. Run the standard workflow (`news_manual.md` §"Workflow").
-2. **TSLA Day-2 first.** Optimus moat status; any Musk counter-announcement; sell-side action sized to OpenAI Robotics; NVDA-Tesla relationship dimension on the open robotics platform.
-3. **GOOGL Day-3.** Day-3 dilution digestion; sell-side EPS-impact sizing; Class A/C spread movement; Anthropic S-1 stake-mark detail.
-4. **AVGO Wed-AMC preview + reaction.** Pre-print positioning detailed (PT raises, options skew, AI rev mix consensus, FY guide expectations). Then post-close beat/miss + FY-guide reaction.
-5. **CRWD Wed-AMC preview + reaction.** Software-cohort framing.
-6. **HPE Day-2 follow-through.** Sell-side PT raises; NVDA / DELL / SMCI / AVGO read-through detail.
-7. **MRVL Day-2 follow-through.** Sustained re-rating vs. one-day pop. NVDA $2B stake validation.
-8. **Trump AI Security EO sell-side coverage.** NVDA / GOOGL / CSCO procurement-pipeline sizing.
-9. **EU cloud procurement rules analyst coverage.** AMZN / MSFT / GOOGL revenue-exposure quantification.
-10. **Iran-Hormuz status check.** Confirm wind-down trajectory or flag re-escalation.
-11. **VIX Tue + Wed close confirmation.**
-12. **Macro calendar Wed:** ADP private payrolls; ISM Services PMI; nothing front-page-grade expected.
+2. **AVGO Day-2 first.** Sell-side actions on Q3 AI guide light; any reframing; NVDA / MRVL / GOOGL TPU read-through. Did Wall Street take the $73B backlog as the bullish signal or the $16B Q3 AI guide as the bearish one?
+3. **GOOGL Day-4 (now-$84.75B raise).** Day-4 dilution; sell-side EPS-impact sizing; Class A/C spread; Berkshire incremental commit check.
+4. **Iran-Kuwait/Bahrain Day-2 status.** Overnight oil prints; Trump response; Strait of Hormuz transit status. Critical re-escalation check.
+5. **NVDA Thu-open behavior.** Did the AVGO AH spillover materialize? Trend-follower will respond to price action; news context tracks.
+6. **CRWD Day-2 (4-for-1 + raised FY).** Sustained re-rating or sell-the-news continuation. Software-cohort tone.
+7. **MRVL Day-3.** Jensen anointment sustained vs faded.
+8. **HPE / DELL / CSCO Day-N follow-through.** AI-server cohort momentum continuation.
+9. **Trump AI EO Day-3 sell-side coverage.** Procurement-pipeline sizing.
+10. **EU cloud procurement rules** — analyst quantification.
+11. **Macro calendar Thu:** weekly jobless claims; nothing front-page-grade expected. Fri AM may have NFP — set up the preview.
+12. **VIX Thu close** + IV rank levels.
+13. **Yardeni July-hike call** — any sell-side echoes? Watch CME / Polymarket shifts.
 
 ## Open questions for the operator
 
-- **AVGO inclusion in `state/extra_symbols.md` before Wed-AMC print is the cleanest universe-expansion case with imminent catalyst.** 6th consecutive session flagged. Sat research agent is the proper expansion path, but Wed-AMC will be over by Sat.
-- **HPE inclusion** — Q2 blowout confirmed (+25% Tue), FY26 raised. Operator should consider for `state/extra_symbols.md`.
-- **MRVL inclusion** — NEW: Jensen "next trillion" anointment +33%; NVDA $2B stake committed. Optical-interconnect cohort case.
-- **DELL inclusion** — 6th consecutive carry-forward. AI-server cohort all-time-high pattern.
-- **MU inclusion** — recurring. $1T cap framing; June 24 earnings near.
-- **ARM inclusion** — Computex Day-3 sustained re-rating. Oracle joined Arm AGI CPU ecosystem.
-- **OpenAI Robotics → TSLA: discretionary intervention NOT recommended** (algorithmic-only mandate). But operator should be aware the strategy has no specific competitor-product-launch rule. Library gap logged for Sat research agent.
+- **AVGO inclusion in `state/extra_symbols.md` post-print.** Q2 print is now in the past — the "fast-track before catalyst" framing is moot. Worth including for the next print cycle plus continuous cohort read-through. 7th consecutive session flagged.
+- **CSCO inclusion** — NEW STRONG CANDIDATE. Eleven sell-side PT raises in a week; AI-server-laggard catch-up case crystallizes. Worth adding.
+- **HPE inclusion** — 7th consecutive carry-forward; Q2 +25% / FY26 raised.
+- **MRVL inclusion** — Jensen "next trillion" anointment +33%; NVDA $2B stake.
+- **DELL inclusion** — 7th consecutive carry-forward; doubled in a month.
+- **MU inclusion** — recurring; Q3 print ~June 24.
+- **ARM inclusion** — Computex sustained; Oracle joined AGI CPU ecosystem.
+- **STM inclusion** — NEW; +190% YTD on Starlink relationship pre-SpaceX IPO.
+- **Iran-Kuwait/Bahrain escalation: operator awareness.** Mon HALT-WORTHY did not trigger Tue. Today's missile strikes materialized partially. If oil gaps >5/bbl overnight or if futures gap >2% Thu open, Thu's news brief may flip HALT-WORTHY.
+- **`bash scripts/install_git_safety.sh` COMPLETED during Wed news run.** LaunchAgent now active; backlog draining. No further operator action on the git layer.
 
 ## Operational notes
 
-- `cli news-fetch` returned 124 items cleanly (no proxy errors). NVDA density 34 (Trump AI EO + MRVL anointment + open robotics platform + Korean dinner + chip-loophole / AI-rally density).
-- WebSearch returned useful results for: JOLTS April (BLS), Brent / WTI (TradingEconomics), S&P 500 record close (Yahoo / CNBC), Trump AI Security EO details (The Hill / NBC), AVGO consensus (Alphastreet / Seeking Alpha / Trefis), CRWD consensus (Zacks / TradingView), HPE Q2 confirmed (Yahoo / 24/7 / GuruFocus), FOMC June probability (Polymarket / CME / Bitcoin News), Anthropic S-1 valuation $965B + stake-mark to AMZN / GOOGL (Tokenist / Bitcoin News / How2Shout), MRVL +33% Jensen-anointment (CNBC / CEOWORLD / Yahoo), OpenAI Robotics / Tesla -$75B (Benzinga / CoinCentral / dnyuz).
-- WebSearch did NOT return clean daily-movers list for Tue June 2 (3rd consecutive session of this gap — Fri / Mon / Tue). Outlier-movers reconstructed from Alpaca News headlines. May be a same-day data-freshness issue on Slickcharts / Yahoo movers endpoints. Try with explicit "Tuesday June 2 2026 close" framing if needed tomorrow.
-- **`git-sync` queue-based mechanism debut.** Trader on Mon shipped a queue-based architecture (`.git-sync-queue/` JSON markers processed by launchd on the host). Success criterion is now `{"queued": true, "queued": "<path>"}`, not committed/pushed. Will retry as last step today. If operator has not run `install_git_safety.sh`, markers will accumulate.
+- `cli news-fetch` returned 97 items cleanly (no proxy errors). NVDA density 28 (Trump EO Day-2 + Jensen Computex follow-on + ARK rotation + healthcare-AI partnership cohort + AVGO read-through). Total down from Tue's 124, primarily on Alpaca News density compression around mid-week.
+- WebSearch returned useful results for: AVGO Q2 print + Q3 AI guide light + AH reaction (TradingKey / StockTitan / Trefis / EBC / Yahoo / Shacknews), CRWD Q1 print + 4-for-1 split (StockStory / Yahoo / 24/7 Wall St / Public.com), ADP 122K (CNBC / ADP), ISM Services 54.5 (TradingEconomics), Yardeni July-hike (Benzinga), VIX 15.77 (FRED), S&P -0.74% + Iran missiles (TheStreet), Iran-Hormuz status (CNBC / Wiki 2026 Strait of Hormuz crisis), FOMC June 96.9% hold (Polymarket / CME), Trump AI EO 60-day framework (Benzinga / TechPolicy.Press / aoshearman).
+- WebSearch did NOT return clean daily-movers list for Wed June 3 (**4th consecutive session of this gap — Fri / Mon / Tue / Wed**). Outlier-movers reconstructed from Alpaca News headlines. Pattern strongly suggests same-day data-freshness issue on slickcharts / Yahoo movers endpoints. Try with explicit "Wednesday June 3 2026 close" framing or wait until evening tomorrow.
+- **`git-sync` queue-based mechanism is now OPERATIONAL.** Operator ran `install_git_safety.sh` during the Wed news run. Today's marker (`20260603T224754Z_news_6-830209.json`) and the 6 prior markers from Mon/Tue trader+news runs will be processed by the LaunchAgent. A follow-up sync was queued after this acknowledgment edit. Success criterion remains `{"queued": ...}`.
 - Previous notes:
   - "WebSearch returns nothing useful for 'CPI release' queries; use 'CPI <month> <year>' instead" — not exercised today; leave the note.
-  - "WebSearch for 'biggest gainers/losers' + specific date returns slickcharts/Yahoo Finance summary lists reliably" — DID NOT WORK Fri, Mon, Tue (3-session pattern now). Pattern suggests endpoint same-day staleness; try later in evening for same-day or use prior-day query framing.
-  - "When a major geopolitical event happens over the weekend, search the multi-source major outlets (NPR/Fox/NBC/CNBC) rather than just the search query alone — they cross-confirm the facts faster than a single source." — applied successfully again today (multi-source confirmed Iran wind-down, oil retracement, Hormuz no-closure).
-  - VIX Tue close not yet in published feeds at runtime; Mon close 15.32 last confirmed. Try Wed AM for Tue close confirmation.
+  - "WebSearch for 'biggest gainers/losers' + specific date returns slickcharts/Yahoo Finance summary lists reliably" — DID NOT WORK Fri, Mon, Tue, Wed (**4-session pattern now**). Pattern strongly suggests endpoint same-day staleness; try later in evening for same-day or use prior-day query framing.
+  - "When a major geopolitical event happens over the weekend, search the multi-source major outlets (NPR/Fox/NBC/CNBC) rather than just the search query alone — they cross-confirm the facts faster than a single source." — applied successfully today (TheStreet + CNBC + Wikipedia cross-confirmed Iran-Kuwait/Bahrain strikes).
+  - VIX Wed close 15.77 confirmed; Tue close still not directly confirmed but Wed level implies Tue was in 15.3-15.5 band.

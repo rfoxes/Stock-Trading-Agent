@@ -1,96 +1,102 @@
-# News brief for 2026-06-02 (Tue, post-close)
+# News brief for 2026-06-03 (Wed, post-close)
 
 ## Headline assessment
 
-**NOTABLE.** Three real single-name events landed on the active universe today, but none escalates to HALT-WORTHY. (1) **OpenAI announced a dedicated humanoid-robotics division** — direct Optimus competitor — and TSLA shed ~$75B in market cap (-3.57%). Discrete fundamental catalyst on a held position. (2) **GOOGL slid ~4% on the $80B raise digestion**, with Berkshire's $10B participation now confirmed at fixed prices; Cramer's "real slog" framing took hold during the cash session. The Mon-AH dilution gap played out within normal range. (3) **Trump signed an AI Security Executive Order** centering NVDA silicon and GOOGL cyber (Wiz/Mandiant) in federal procurement — voluntary framework, no mandatory regulation. **The Mon-flagged Iran-Hormuz HALT-WORTHY escalation did NOT materialize**: no overnight closure, oil retraced (WTI ~$91 -1%, Brent $94.58 -0.42%), and the S&P closed at a fresh ATH (7,609.78). Vol regime BENIGN-LOW unchanged. **Not HALT-WORTHY** because: no FOMC, no earnings on held names, futures didn't gap >2%, geopolitical tape softened, and the GOOGL/TSLA moves are already in cash-session price action (strategy can act on them via standard rules).
+**NOTABLE.** Three discrete event-stacks landed on a single session and produced a coordinated risk-off reversal from Tue's record. (1) **AVGO Q2 print BEAT top/bottom but Q3 AI guide LIGHT** ($16B vs $17.2B consensus); stock -5-8% AH — direct AI-cohort read-through to held NVDA. (2) **ADP 122K + ISM Services 54.5 both HOT** — Treasury yields surged, rate-hike chatter revived (Yardeni called July hike). (3) **Iran launched missiles at Kuwait and Bahrain overnight** — infrastructure damaged, ≥1 killed, oil headed toward $100 — partial materialization of Mon's HALT-WORTHY criterion. **Combined: S&P -0.74%, Nasdaq -0.89%, Dow -1.21%, breadth-wide sell from records.** Capital allocation: **GOOGL raise UPSIZED to $84.75B from $80B** (Day 3 dilution digestion + bigger overhang). **Not HALT-WORTHY** because: no FOMC, no held-name earnings, futures gap was modest (S&P -0.74% close, not >2%), VIX held below 16 (vol market did not flag regime change), and the AVGO AH move is on a non-held cohort name. Trader has algorithmic-only mandate — if any active rule fires on held names tomorrow, the news context aligns with the trigger. CRWD also beat, raised FY, announced 4-for-1 split; stock -3% intraday on sell-the-news.
 
 ## Watchlist + positions
 
-- **TSLA — MATERIAL DISCRETE EVENT.** OpenAI Robotics division announced; Sam Altman hiring full-stack hardware engineers for humanoid robots to build infrastructure / assist skilled labor. Direct competitor to Tesla's Optimus (Fremont S/X line currently being retrofitted into Optimus assembly cell). TSLA -3.57% / ~$75B market cap erased intraday. NVDA simultaneously released an open robotics platform that also competes with Optimus (arms Tesla rivals with Chinese hardware option). Compounding: Gary Black flagged SpaceX IPO filing change as the overnight TSLA-down driver. Trader holds TSLA — position +2.48% unrealized as of Mon close per handoff. Fundamental implication: Optimus competitive moat narrowed; one-day re-rating likely just the start.
-  - responder: equity_trend_following_ema_cross (price-driven; will respond via EMA-cross / ADX-fade if weakness sustains into Wed-Thu)
+- **NVDA — COHORT SENTIMENT DENT.** AVGO post-print Q3 AI guide LIGHT ($16B vs $17.2B consensus) is the read-through risk: custom-silicon narrative intact at the top line (Q3 AI rev still +200% YoY), but the consensus undershoot dings the broader AI-capex story heading into NVDA's mid-August print. Layered positive: Trump AI EO Day-2 (NVDA silicon centered in any federal "covered frontier model" testing), Jensen Huang Computex follow-on (open robotics platform, AI-PC reinvention, healthcare-AI cohort), ARK trimmed AMD to load NVDA Mon (Polymarket NVDA end-2026 odds 75%). Senator Whitehouse $215K disposal is a sentiment-only insider datapoint. Net: positive fundamental backdrop, AH cohort-pressure overlay.
+  - responder: equity_trend_following_ema_cross (price-driven; EMA-cross / ADX-fade will fire on the gap if AH cohort sell-through materializes Thu open)
 
-- **GOOGL — MATERIAL DISCRETE EVENT (Day 2 of the $80B raise).** Stock -4% intraday on dilution digestion. Berkshire $10B participation now publicly framed as Buffett finally fixing his "missed Google" regret — bull framing. Counterweight: Cramer warns of "real slog" ahead; Wall Street question of "why tap markets with $126B in cash on hand?" went unanswered crisply (implied answer: capex-commitment scale via the Anthropic 5GW TPU deal exceeds operating-CF horizon). Class A/C dilution mechanics have not fully repriced — ongoing pressure expected. Trader holds 56 GOOGL shares (+9.32% unrealized as of Mon close per handoff).
-  - responder: equity_trend_following_ema_cross (price-driven; EMA-cross / ADX-fade will fire on the gap if Tue weakness compresses the trend)
+- **GOOGL — MATERIAL DISCRETE EVENT (Day 3, raise UPSIZED).** Alphabet priced the equity raise at $84.75B — $4.75B larger than Tue's announced $80B size. Stock flat-then-lower intraday on the upsize. Berkshire $10B participation still bull anchor; Cramer "real slog" framing persists; market lost #2 cap-rank to AAPL on the dilution. Polymarket does not see a Apple-vs-Google comeback near-term. Multi-month overhang (remaining ATM tranche Q3+) intact. Held position +7.20% Tue close per handoff.
+  - responder: equity_trend_following_ema_cross (price-driven; EMA-cross / ADX-fade will fire on further weakness)
 
-- **NVDA — POSITIVE FUNDAMENTAL TAILWIND.** Three layers: (1) Trump's AI Security EO centers NVDA hardware — every tested frontier model runs on NVDA silicon, formalizing federal procurement-pipeline ties. (2) HPE Q2 blowout confirmed last night (rev $10.68B +40%, AI orders $2.1B, FY26 raised) validates the AI-server demand cohort heading into NVDA's next print. (3) Jensen Huang at Computex called Marvell "next trillion-dollar" (MRVL +33%, NVDA's $2B MRVL stake validated) and unveiled NVDA's open robotics platform. Korean tech power dinner with Samsung / SK Hynix deepens AI-memory partnerships. Offsetting: Burry put position remains; Loeb sold 90% of NVDA Q1; TSMC 15% 3nm price hike rumor persists; Bear Cave / Citron disclosure-rules backdrop a sentiment-only headwind.
-  - responder: equity_trend_following_ema_cross (positive trend support; no new exit-justifying news)
-
-- **MSFT — NO POSITION-AFFECTING EVENT.** Stock -3.66% on profit-taking as Anthropic files S-1. Qualcomm "Year of the Agent" launched at Microsoft Build (positive AI-ecosystem context). EU cloud procurement rules a mild Azure headwind. Position exited Fri; context remains positive for re-entry if a trend signal fires.
-  - responder: NONE — no position; no library-gap implication
-
-- **AAPL — NO FRESH EVENT.** Tim Cook eyeing $200B eyewear market (Bloomberg-framing, not earnings-grade). META subscription launch + smart-glasses competitive framing layered against AAPL's eyewear ambition. No catalyst.
+- **AAPL — NO FUNDAMENTAL EVENT, REGAINED #2 CAP.** Apple regained #2 cap-rank from GOOGL on the $84.75B raise mechanics. Pre-WWDC framing (Siri 2.0 overhaul rumored) covered by Benzinga. NVDA AI-PC push noted as a competitive read for the Mac ecosystem — analysts call moat intact. No catalyst.
   - responder: equity_trend_following_ema_cross (no event change)
 
-- **AMZN — NO FRESH AWS EVENT, POSITIVE STAKE-MARK.** Anthropic S-1 filing carries AMZN's $4B commit + 5GW capacity deal — IPO will mark AMZN's Anthropic stake to public-market value (~$965B implied valuation). EU cloud procurement headwind on AWS. Bezos / Blue Origin pad-repair timeline pushed (not market-moving).
+- **AMZN — NO POSITION-AFFECTING EVENT, OVERTAKES WMT ON FORTUNE 500 REV.** AMZN took the Fortune 500 2025 revenue crown from WMT (first time in 13 years). Long-run framing only — not a near-term catalyst. AWS no fresh material event. Held position +3.00% Tue close per handoff.
   - responder: equity_trend_following_ema_cross (no event change)
 
-- **META — DIRECT PRODUCT EVENT (no position).** Launched worldwide optional subscription tiers + expanded default teen safety filters. Revenue-diversification beyond ads is the framing. Rosenblatt $1,015 PT cited. META not currently held.
-  - responder: NONE — META not in active position set. Library gap NOT triggered (no held exposure).
+- **MSFT — DIRECT PRODUCT EVENT + POLICY TAILWIND.** Microsoft + Mayo Clinic healthcare-AI partnership launched (Suleyman framing: "AI's most important use case"). MSFT named alongside ORCL and PLTR as the front-runners for Trump's 60-day "trusted partner" framework (Treasury / NSA / CISA define "covered frontier model"). Dan Ives: MSFT AI opportunity is "mispriced." Microsoft separately raised the bar on its Majorana 2 quantum 3-year commercial target. Suleyman: "less concerned" about Google/Meta/OpenAI competitive backdrop. MSFT not currently held (exited Fri); fundamentals supportive for re-entry on a trend signal.
+  - responder: NONE — MSFT unclaimed in active set. Library gap NOT triggered (no held exposure; re-entry awaits trend signal).
 
-- **JPM — NO FRESH SINGLE-NAME EVENT.** Dimon: "blockchain will replace financial market infrastructure" (executive framing, mild long-run positive). Softbank/Son framing JPM in AI-physical-thesis backdrop. ADX 20.92 Fri close remains the standing watch-item per handoff; no JPM-specific event today argues either way on the exit.
-  - responder: equity_trend_following_ema_cross (ADX-fade exit candidate if Tue tape pushed indicator below 20)
+- **META — DIRECT PRODUCT EVENT (no position).** META launched Instagram Automated AI Business Agent worldwide — expanding non-ad revenue diversification. Stock jumped intraday. Rosenblatt $1,015 PT framing carries forward from Tue. Layered on Tue's subscription-tier + teen-safety launches. META not held.
+  - responder: NONE — META unclaimed in active set; library gap NOT triggered.
 
-- **SPY / QQQ — INDEX-LEVEL RECORD CLOSE.** S&P closed 7,609.78 (+0.13%), Nasdaq 27,093.90 (+0.03%), Dow 51,307.79 (+0.45%). 8-session winning streak ties rarest since 1995 (pattern note: forward returns historically below long-run normal after similar streaks — not a trade signal). Cap-weighted index gain masking nine-of-eleven sectors lower.
-  - responder: equity_trend_following_ema_cross (positive trend confirmation for index positions)
+- **TSLA — NO FRESH POSITION EVENT (exited Tue close).** TSLA exit submitted Tue (48 shares, market, day) on ADX(14)=18.9 < 20 exit threshold; est. P&L +$846. Today no fresh single-name material catalyst; SpaceX IPO formalized at $75B raise / $135/share with $2T Polymarket valuation framing, ten Trump officials hold up to $44M in SpaceX/xAI. Foxconn Cavira Model Y competitor launched. Position exited; news context informational only.
+  - responder: equity_trend_following_ema_cross (position exited; no event-driven re-entry rule)
 
-- **No fresh single-name news:** AAPL.
+- **JPM — TANGENTIAL CREDIT-STRESS DATAPOINT.** Cliffwater private credit fund capped redemptions at 5% Q2 after 17% redemption requests. Private-credit liquidity stress signal — relevant to JPM IB / wealth franchise framing but no direct earnings catalyst today. Per Tue handoff, JPM ADX stayed ≥20 — exit did not fire. No JPM-specific event today argues either way on the trend rule.
+  - responder: equity_trend_following_ema_cross (ADX-fade still standing watch-item; news today does not move the needle)
+
+- **SPY — INDEX SELL FROM RECORD.** S&P -0.74% from Tue's 7,609.78 ATH. VOO crossed $1T AUM (first ETF ever) — competitive note for SPY but not a tradable event. Yardeni July-hike call is a sentiment-only event for index.
+  - responder: equity_trend_following_ema_cross (price-driven; will respond to any sustained breakdown)
+
+- **QQQ — NASDAQ -0.89% FROM RECORD.** Tech sell led by AVGO post-print read-through + AI cohort de-risk + rate-hike chatter. 9-week AI winning streak finally breaks.
+  - responder: equity_trend_following_ema_cross (price-driven)
+
+- **No fresh single-name news:** none — every universe symbol had at least one event or framing today.
 
 ## Sector themes
 
-- **AI infrastructure — re-rating widens further.** HPE Q2 blowout (FY26 raised to 29-33% growth, $3.5B FCF) plus Jensen anointing MRVL "next trillion" (+33%) plus NVDA's open robotics platform and Korean memory power-dinner all stack positive. Direct cohort beneficiaries: NVDA, MSFT, GOOGL (TPU via Anthropic), DELL, SMCI, MRVL, HPE, AVGO (Wed catalyst), Coherent (ATH).
-- **Capital allocation — AI-capex equity-raise cycle institutionalizing.** GOOGL $80B raise (Day 2) + Anthropic S-1 confidential filing at ~$965B + SpaceX amended S-1 + expected OpenAI IPO together represent the largest concentrated AI-driven equity issuance cycle on record. Yardeni-style "liquidity drain" framing now widely cited. Mild dilution-narrative overhang on all hyperscalers until issuance prices print.
-- **Policy / regulatory — Trump AI EO + EU cloud rules layered.** US side: voluntary frontier-model testing framework formalizes federal AI procurement (NVDA, GOOGL, CSCO at center). EU side: tighter cloud procurement rules pressure AMZN / MSFT / GOOGL state-tender share. Net: bifurcating regulatory environment — US tilts pro-procurement, EU tilts anti-concentration.
-- **Robotics — Tesla Optimus moat narrowed.** OpenAI Robotics + NVDA open platform on the same day represent a coordinated competitive event against Optimus. Industrial robotics (per former Meta CTO) the near-term scaling tier. Speculative SpaceX-Tesla merger thesis (Ives 2027) revived as a sentiment offset.
+- **AI infrastructure — cohort sentiment-dented on AVGO Q3 AI guide LIGHT.** AVGO Q3 AI guide $16B vs $17.2B consensus is the bear-take of the week. Top-line growth still +200% YoY but consensus undershoot is the first concrete negative datapoint for the custom-silicon thesis since the Tue Jensen MRVL anointment. Direct beneficiaries (NVDA, MRVL, GOOGL TPU, AVGO) all under post-print de-rate pressure. HPE / DELL / CSCO laggard names still positive (Cisco 11 sell-side PT raises this week).
+- **Macro — rate-hike chatter revives on hot ADP+ISM stack.** ADP 122K + ISM Services 54.5 both above consensus drove Treasury yields and revived July-hike speculation. CME / Polymarket still price 0.6% June hike, but Yardeni's contrarian call cited. Trend-following directly exposed: rate-up environment pressures multiples on held tech names.
+- **Geopolitics — Iran-Hormuz partial-escalation.** Iran missile strikes on Kuwait and Bahrain overnight; oil toward $100. Mon's HALT-WORTHY criterion partially triggered — but futures didn't gap >2% so the threshold not met. Brent crossed $93-95 again. Direct read: input-cost pressure on consumer names; risk-off bid into Treasuries despite hot macro (yield surge moderated by safe-haven flow).
+- **Capital allocation / liquidity-drain — GOOGL upsized to $84.75B; SpaceX $75B IPO formalized.** GOOGL raise +$4.75B vs Tue's announced $80B. SpaceX targets $75B at $135/share. Combined with pending Anthropic S-1 and expected OpenAI IPO, the AI-driven equity supply cycle is institutionalizing. Yardeni-style "liquidity drain" framing now mainstream.
+- **Private credit stress — Cliffwater 17% redemption requests, 5% gate imposed.** Single-fund datapoint but the second high-profile private-credit liquidity story in 60 days. Relevant to large-bank franchise framing.
 
 ## Candidates for the universe
 
-- **AVGO** — Wed June 3 AMC. Consensus rev $22.11B / EPS $2.40 / AI $10.7B (+140% YoY); options 10.65% implied move; EPS estimates +11.1% over 90 days. **Highest-priority expansion case — print in <24 hours.** HPE blowout last night raises base-rate beat probability. Sat research agent should fast-track AVGO into `state/extra_symbols.md`. Recurring carry-forward (now 5+ sessions).
-- **MRVL** — +33% on Jensen "next trillion" anointment. $250B market cap; NVDA $2B committed. Optical-interconnect / networking-chip thesis endorsed by NVDA. NEW STRONG CANDIDATE. Worth flagging for Sat research.
-- **HPE** — Q2 blowout confirmed (+25-26% Tue). Raised FY26 guide / FCF +75%. Carry-forward from Mon evening; case strengthens.
-- **DELL** — All-time high again Tue per the AI-server cohort momentum. 6th consecutive carry-forward (operator inclusion now overdue).
-- **MU** — Recurring; case sustained ($1T cap framing; June 24 earnings).
-- **ARM** — Computex day winner sustained; Oracle joined Arm's AGI CPU ecosystem (additional design-win datapoint).
-- **CRWD** — Wed June 3 AMC. Software-cohort marker; consensus $1.36B / $1.07. Not a universe-priority but the print sets sector tone.
-- **Coherent (COHR)** — ATH on the optical-interconnect / Jensen-MRVL halo. Worth tracking.
-- **IBM** — +30% in a week (Trump CEO praise + $10B quantum). Sentiment-driven move, but the quantum-investment datapoint is event-grade.
-- **No new fundamental movers outside the universe** beyond the above. WebSearch for "biggest gainers/losers" returned only landing-page summaries (same gap as prior 2 sessions); outlier-movers list reconstructed from Alpaca News headlines (MRVL +33%, HPE +25%, IBM +30% weekly, AMD pullback, INTC -slip).
+- **AVGO** — Q2 print today materialized. Beat top-line ($22.19B / +48%), beat EPS ($2.44 / +88% net profit YoY). Q3 AI guide LIGHT ($16B vs $17.2B) is the bear take. Stock -5-8% AH. Recurring carry-forward; print is now in the past — universe-expansion case becomes "exposure to the dip-buy" framing rather than "catch the print." Still STRONG candidate for `state/extra_symbols.md`.
+- **MRVL** — Day-2 of Tue's +33% Jensen "next trillion" anointment. Custom-silicon cohort marker. AVGO Q3 light guide will pressure MRVL near-term; sustained vs one-day-pop question remains the read. STRONG candidate.
+- **HPE** — Q2 blowout +25% Tue carried forward; +19% mentioned in cohort articles today. FY26 guide raised. 6th consecutive carry-forward.
+- **DELL** — Doubled in a month per Benzinga AI-server cohort framing. 7th consecutive carry-forward.
+- **CSCO** — Eleven sell-side PT raises in a week per Benzinga "after Dell/HPE surge" framing. AI-server laggard catch-up case crystallizes. NEW STRONG CANDIDATE.
+- **MU** — Recurring; Q3 print ~June 24; 940% rally context; $1T cap framing.
+- **ARM** — Computex Day-3; Oracle joined Arm AGI CPU ecosystem (Tue).
+- **CRWD** — Q1 beat / raised FY / 4-for-1 split. Sell-the-news AH -3% intraday. Software-cohort marker.
+- **STM (STMicroelectronics)** — +190% YTD on Starlink relationship pre-SpaceX IPO. NEW; SpaceX-linked optionality if IPO closes.
+- **No new fundamental movers outside the above** — WebSearch failed to return clean daily-movers list for Wed 6/3 (4th consecutive session — Fri / Mon / Tue / Wed). Pattern strongly suggests same-day endpoint staleness. Outlier-mover reconstruction from Alpaca News headlines: STM, MRVL, HPE, CSCO, DELL, MU, ARM all positive carry-overs; AMD overbought (RSI 75.34).
 
 ## Macro / sector context
 
-- **JOLTS April: openings 7.6M (rising); hires/separations both decline to 5.1M / 5.0M.** Modest separations-side loosening without openings collapse. Background data; no rate-policy read-through.
-- **S&P 500 record close 7,609.78 (+0.13%); 8-session winning streak ties rarest since 1995.** Forward-return base rate after similar streaks is below long-run normal (pattern note only).
-- **FOMC June 16-17 (Warsh's first meeting): ~97-99% hold per CME FedWatch / prediction markets.** April CPI 3.8% YoY (Middle East energy shock) keeps cuts off the near-term agenda.
-- **Iran-Hormuz tape softened.** No overnight closure; oil retraced (WTI ~$91, Brent $94.58). The Mon-flagged HALT-WORTHY escalation criterion (futures gap >2% down) did NOT trigger.
-- **EU cloud procurement rules** = mild AMZN/MSFT/GOOGL fundamental headwind, not yet quantified.
-- **Trump AI Security EO** = mild NVDA/GOOGL fundamental positive (federal procurement pipeline formalized).
+- **ADP May private payrolls: 122K vs 117K cons — highest since Jan 2025.** Education/health +57K, trade/transport +36K. Wage growth steady (4.4% stayers / 6.6% switchers).
+- **ISM Services PMI May: 54.5 vs 53.8 cons — 3-mo high.** Business activity 57.7, new orders 57.3, but employment 47.9 (3rd consecutive contraction; hiring freezes cited).
+- **S&P 500 -0.74% / Nasdaq -0.89% / Dow -1.21%** — record reversal driven by hot macro + Iran shock + AVGO AH disappointment positioning.
+- **Iran missiles on Kuwait and Bahrain overnight** — infrastructure damaged, ≥1 killed. Oil toward $100. Brent ~$93-95. Strait of Hormuz declared "closed" since March 4 remains operative status.
+- **FOMC June 16-17: 96.9% hold (Polymarket 98%, CME 99.4%).** Yardeni dissenting July-hike call. Zero-cuts-2026 Polymarket-dominant outcome at 68.8%.
+- **GOOGL raise upsized to $84.75B from $80B** — fresh capital allocation event.
+- **VOO crossed $1T AUM** — first ETF ever. Structural passive-investing milestone.
+- **VIX 15.77 (+0.45 vs Mon 15.32).** Move under 3-point threshold; regime BENIGN-LOW unchanged. Vol market did NOT price the breadth-wide sell as regime-changing.
 
 ## Library gaps
 
-- **AVGO Wed-AMC earnings (Jun 3)** — AVGO not in active universe (no held exposure even if it were); separately, no earnings-window strategy exists in the active set. Suggested research: build `event_driven_catalyst` with earnings-window entry rules (window: 1 trading day before AMC print to 2 days after; trigger on consensus-beat + raised-guidance pattern). Combine with universe-expansion to include AVGO.
-- **CRWD Wed-AMC earnings (Jun 3)** — Same gap shape as AVGO. Software-cohort earnings-window strategy missing; CRWD outside universe.
-- **GOOGL $80B equity raise (Day 2)** — No "secondary-offering dilution gap" rule in the active strategy set. Current trend-following will react to the resulting price action without distinguishing dilution-gap from regular-gap. Suggested research: capital-allocation-event overlay (detect announcement → dampen position size on held name during 2-5 day repricing window).
-- **OpenAI Robotics → TSLA -$75B competitive event** — No "competitor-product-launch" rule in the active set. Trend-follower will react to the price move via EMA/ADX, but cannot distinguish the discrete-catalyst -3.57% from generic weakness. Suggested research: news-event-driven overlay that adjusts position sizing on confirmed competitor-product-launch signal for a named holding.
-- **Trump AI Security EO** — No "policy-tailwind sizing" rule in the active set. Trend-follower will benefit if NVDA / GOOGL trends accelerate but does not specifically capture the procurement-pipeline thesis. Suggested research: thematic-overlay for policy-event positive sizing.
-- **EU cloud procurement rules** — No "regulatory headwind" sizing rule for AMZN/MSFT/GOOGL cloud exposure. Suggested research: sector / sub-sector revenue-exposure overlay.
-- **No held position has an FDA-binary / M&A-confirmed / management-change-confirmed catalyst today.** No additional gaps triggered beyond the above.
+- **AVGO post-print -5-8% AH cohort read-through to held NVDA** — no "cohort-spillover from peer earnings" rule in active set. Trend-follower will see whatever NVDA price action results Thu open without distinguishing the cause. Suggested research: peer-earnings-event overlay that adjusts position posture on held name when a named cohort peer prints a guide miss within ±2 sessions.
+- **GOOGL Day-3 $84.75B raise (upsized)** — no "secondary-offering dilution gap" rule (same gap as Tue). Trend-follower treats the dilution-gap like any gap. Suggested research: capital-allocation-event overlay (detect upsizing → dampen position size on held name during the 2-5 day repricing window).
+- **Iran missiles on Kuwait/Bahrain** — no "geopolitical shock / oil-spike risk-off" overlay. Trend-follower will react to whatever index action results without distinguishing the catalyst. Suggested research: macro-shock event overlay (oil >X gap, breaking-news shock detection → tighten stop discipline).
+- **Hot ADP+ISM stack → yield surge → rate-hike chatter** — no "rate-policy-shift sizing" rule. Trend-follower has no Treasury-yield sensitivity awareness. Suggested research: rate-regime overlay (10Y yield breakout → dampen long-duration tech weight; trend-follower has no concept of duration risk).
+- **Trump AI EO 60-day "trusted partner" framework (Day 2)** — no "policy-tailwind sizing" rule for NVDA / MSFT / ORCL beneficiaries (carried from Tue).
+- **AVGO not in universe + Q3 AI guide light** — no earnings-window strategy AND no AVGO exposure. Gap shape same as Tue carry-forward.
+- **CRWD 4-for-1 split announced** — no corporate-action handler. Trader does not hold CRWD; informational only.
+- **Cliffwater private credit redemption gate** — no "credit-stress" overlay relevant to JPM held position. Suggested research: bank-name credit-stress sensitivity sizing.
 
 ## Recommendations for the trader
 
-- **Standard workflow recommended.** No HALT-WORTHY criterion met. Iran-Hormuz gap risk dissolved cleanly; no held-position earnings; no FOMC.
-- **TSLA position-specific awareness.** OpenAI Robotics is a discrete competitor-launch event on a held name. The strategy will respond via EMA/ADX rules to the resulting price action; news context does NOT argue cancel if an exit signal fires (the -3.57% move + competitive moat narrowing reads as a fundamental headwind layered on the technical setup). If no exit signal fires, the news context does not by itself justify discretionary intervention (algorithmic-only mandate per handoff).
-- **GOOGL position-specific awareness.** Day 2 of the $80B raise digestion produced a clean -4% session. Berkshire participation bull-framing has surfaced. The remaining $40B ATM tranche (starting Q3) is a multi-month overhang. Same algorithmic-only posture: if EMA-cross / ADX-fade fires, news context does not argue cancel.
-- **NVDA: positive tailwind day** layered on Fri's ADX-healthy print and Mon's Computex follow-through. Trump AI EO + HPE blowout + Jensen anointing MRVL all support the trend-following hold. No fundamental case to override.
-- **JPM: ADX 20.92 Fri close still the standing watch-item per handoff.** No JPM-specific news argues either way today. If Tue tape pushed ADX below 20, expect strategy to fire exit ~$879 magnitude (well under any size gate). News context: cancel-the-exit not warranted.
-- **MSFT re-entry context supportive** if a trend signal fires (Qualcomm "Year of the Agent" + AI-ecosystem backdrop). EU cloud rules a mild offset.
-- **Vol regime BENIGN-LOW unchanged.** VIX held near 15-low-16. Index IV rank well below 50; `iron_condor_high_iv` thresholds NOT met. NVDA / TSLA single-name IV elevated by the day's discrete events.
-- **AVGO Wed-AMC** is the Wed-morning prep priority. Consensus $22.11B / $2.40 / AI +140% YoY; options 10.65% implied move. HPE blowout last night increases beat-probability.
-- **Algorithmic-only mandate (per handoff)** — none of the above is a discretionary trade recommendation. If any active rule fires on the held names, news context aligns with the trigger. If no rule fires, no trade.
+- **NOTABLE, NOT HALT-WORTHY. Standard workflow recommended with elevated attention.** The Iran-Kuwait/Bahrain escalation is partial materialization of Mon's flag but the >2% futures-gap criterion did not trigger; futures only gapped modestly on the news and the S&P closed -0.74%. No FOMC, no held-name earnings.
+- **NVDA: cohort pressure overlay.** AVGO Q3 AI guide LIGHT may drive NVDA gap-down on Thu open. If EMA-cross / ADX-fade fires on NVDA, news context aligns with the trigger (cohort sentiment dent is a fundamental tailwind to weakness, not a contrarian buy signal). If no rule fires, the underlying NVDA thesis (Trump EO + Computex follow-on + ARK rotation) remains intact.
+- **GOOGL: Day-3 dilution overhang sustained.** $84.75B raise is +$4.75B vs Tue's announced size. Same algorithmic-only posture: if EMA-cross / ADX-fade fires on GOOGL, news context does NOT argue cancel; if no rule fires, no discretionary trade.
+- **JPM: ADX-fade watch-item per handoff still standing.** Cliffwater datapoint is sentiment-only — does not move the JPM-specific algorithmic read.
+- **TSLA: position exited Tue.** No re-entry signal in active rule set. If TSLA fill price differs materially from Tue close mark ($421.62 implied), reconcile via `cli log-closed`.
+- **Vol regime BENIGN-LOW unchanged.** VIX 15.77 (+0.45 vs Mon). IV rank below 50 — `iron_condor_high_iv` thresholds NOT met. Single-name IV elevated on NVDA post-EO / Computex / cohort-AVGO layering.
+- **Index trend continuation watch.** Tue's 8-session winning streak (rarest since 1995) ended today; Wed -0.74% does NOT yet signal trend breakdown. If Thu sees follow-through to the downside, SPY / QQQ EMA-cross will be the first to fire.
+- **Algorithmic-only mandate (per handoff).** None of the above is a discretionary trade recommendation. If any active rule fires on held names, news context aligns. If no rule fires, no trade.
 
 ## Operational notes
 
-- `cli news-fetch` returned **124 items cleanly** (no proxy errors). Densities: NVDA 34, GOOGL 17, TSLA 15, META 15, AMZN 13, MSFT 11, SPY 6, QQQ 6, AAPL 4, JPM 3. Tech sector aggregate 55; consumer_discretionary 15; index 8; financials 3.
-- All six category HTMLs written (macro, earnings, geopolitics, policy, volatility, options_flow). Daily summary written.
-- WebSearch returned useful results for: JOLTS April release, S&P 500 close (7,609.78), Brent/WTI close (Brent $94.58), Trump AI Security EO (The Hill / NBC), AVGO consensus (Alphastreet / Seeking Alpha), CRWD consensus (Zacks), HPE Q2 confirmed details (Yahoo / 24/7), FOMC probability (Polymarket / CME), Anthropic S-1 valuation ($965B), MRVL +33% Jensen trillion-dollar (CNBC), OpenAI Robotics / Tesla $75B (Benzinga / CoinCentral / dnyuz).
-- WebSearch did NOT return clean daily-movers list for Tue June 2 (same gap as Mon and Fri); outlier-movers reconstructed from Alpaca headlines. Persistent note for the news_tasks.md carry-forward.
-- VIX June-2 close not yet published in feed sources at runtime (Mon close 15.32 remains last confirmed); flagged for tomorrow's confirmation.
-- `git-sync` will retry via the new queue-based mechanism per Mon trader handoff. Success criterion is now `{"queued": ...}`, not `{"committed/pushed": true}`. If `cli git-doctor` shows `pending_marker_count > 3` or `stale_lock_count > 0` afterward, the operator has not run `install_git_safety.sh` yet.
+- `cli news-fetch` returned **97 items cleanly** (no proxy errors). Densities: NVDA 28, GOOGL 14, AAPL 12, MSFT 11, AMZN 7, META 6, QQQ 6, SPY 6, TSLA 6, JPM 1. Tech sector aggregate 41; consumer_discretionary 6; index 8; financials 1.
+- All six category HTMLs written (macro, earnings, geopolitics, policy, volatility, options_flow). Daily summary written (15 front-page items).
+- WebSearch returned strong results for: AVGO Q2 print + Q3 AI guide light + AH stock reaction (TradingKey / StockTitan / Trefis / EBC), CRWD Q1 print + 4-for-1 split + sell-the-news AH (StockStory / Yahoo / 24/7), ADP 122K (CNBC / ADP), ISM Services 54.5 (TradingEconomics), Yardeni July-hike call (Benzinga), VIX 15.77 (FRED), S&P 500 -0.74% close + Iran missiles Kuwait/Bahrain (TheStreet), Iran-Hormuz status (CNBC / Wiki 2026 Strait of Hormuz crisis), FOMC June 96.9% hold (Polymarket / CME), Trump AI EO 60-day framework (Benzinga / TechPolicy.Press / aoshearman).
+- **WebSearch did NOT return clean daily-movers list for Wed 6/3 — 4th consecutive session of the gap (Fri / Mon / Tue / Wed).** Outlier-mover reconstruction from Alpaca News headlines surfaced STM (+190% YTD), MRVL (Tue +33% sustained), HPE (+19% / +25% cohort references), CSCO (11 PT raises), DELL (doubled in a month), MU (940% rally), ARM (Computex sustained). Pattern strongly suggests same-day endpoint staleness on slickcharts / Yahoo movers. Try after-hours or "Wednesday June 3 2026 close" framing tomorrow.
+- VIX Tue close still not separately confirmed in feeds; Wed close 15.77 implies Tue was in the 15.3-15.5 band.
+- `git-sync` queue-based mechanism is now **OPERATIONAL** as of Wed runtime — **operator ran `bash scripts/install_git_safety.sh`** during this session. Success criterion is `{"queued": ...}`. The `com.harness.gitrunner` LaunchAgent will drain the backlog (7 markers at runtime, including this run's) within the next several 30-second polling cycles. No further operator action required on the git layer.
