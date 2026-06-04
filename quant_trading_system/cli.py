@@ -601,13 +601,13 @@ def _build_parser() -> argparse.ArgumentParser:
     sp.set_defaults(func=lambda ctx, args: (_emit(agent_tools.evaluate_archive(
         ctx, strategy_id=args.strategy_id)), 0)[1])
 
-    # news-fetch (fetch Alpaca News for watchlist + positions, write HTMLs)
+    # news-fetch (fetch Alpaca News for the composed universe, write HTMLs)
     sp = sub.add_parser("news-fetch",
-                        help="Fetch news for the universe and write per-symbol + per-sector HTMLs.")
+                        help="Fetch news for the composed universe and write per-symbol + per-sector HTMLs.")
     sp.add_argument("--symbols", default=None,
-                    help="Comma-separated symbols. Default: settings.DEFAULT_WATCHLIST + held positions.")
+                    help="Comma-separated symbols. Default: composed universe (active strategies + held positions + news-tracked subdirs + state/extra_symbols.md).")
     sp.add_argument("--no-positions", action="store_true",
-                    help="Don't auto-add currently-held positions to the universe.")
+                    help="Skip the broker call for held positions when composing the universe.")
     sp.add_argument("--lookback-hours", type=int, default=24)
     sp.set_defaults(func=lambda ctx, args: (_emit(agent_tools.news_fetch(
         ctx,

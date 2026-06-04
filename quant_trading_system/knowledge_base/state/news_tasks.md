@@ -31,7 +31,7 @@ Yesterday's news agent writes this. Replace, don't append.
 5. **WWDC June 8-12 prep.** Set up the five-day Apple event window. Morgan Stanley $440 PT framing; what other sell-sides initiate?
 6. **JPM Dimon SpaceX pitch Day-2.** Pricing momentum; any IPO allocation news.
 7. **Private credit gate Day-3 watch.** Apollo/KKR/Ares flow signals; any third major gate?
-8. **CSCO/HPE/MRVL/ARM news coverage.** Pre-create or ensure `news/stocks/<SYM>/` subdirs so Fri fetch produces per-symbol HTMLs. Then track their first full session of news.
+8. **CSCO/HPE/MRVL/ARM news coverage.** Subdirs now exist after Thu's in-session fix to `news_fetch`. Track their first full session of meaningful coverage Fri (Thu was MRVL 3 / HPE 1 / ARM 0 / CSCO 0).
 9. **Iran-Hormuz status update.** Overnight oil; Strait status; any re-escalation.
 10. **Macro carry-forwards:** Beige Book "E-shaped" framing follow-on; BofA June seasonality call sell-side echo.
 11. **VIX Fri close + NFP-day vol surface behavior.**
@@ -47,7 +47,7 @@ Yesterday's news agent writes this. Replace, don't append.
 - **TSM inclusion (NEW)** — Thu's TSMC CEO capacity-constraint pricing-power signal makes the case fresh. Direct AI-pricing-power read for the foundry layer. Would broaden the universe beyond design houses.
 - **PINS inclusion (NEW, soft)** — material catalyst Thu (+$4B AWS commitment); single-session event so below STRONG threshold but worth a watch slot.
 - **`bash scripts/install_git_safety.sh` LaunchAgent status.** Per Wed handoff, claimed install completed but `cli git-doctor` showed pending_marker_count=8. **Operator action: verify `launchctl list | grep harness` and gitrunner logs.** Markers persist on disk; nothing is lost. Top operator priority carries forward.
-- **ARM/CSCO/HPE/MRVL subdirectory creation.** Operator added these to universe Thu (before this run) but their `news/stocks/<SYM>/` subdirs don't exist. Fri's news-fetch will likely still skip them unless subdirs are pre-created OR the fetcher logic is updated to auto-create on first encounter.
+- **ARM/CSCO/HPE/MRVL subdirectory creation — RESOLVED in-session.** Root cause was `agent_tools.news_fetch` building its universe from `ctx.settings.watchlist + positions` instead of the composed universe (which includes `operator_extras` from `state/extra_symbols.md`). Fix applied Thu: `news_fetch` now calls `universe.compute_universe(...)`. CLI help text in `cli.py` updated accordingly. Per-symbol HTMLs for the 4 new names were generated in the same Thu session (MRVL 3, HPE 1, ARM 0, CSCO 0 items). Operator additions to `extra_symbols.md` now flow into news-fetch automatically — no manual subdir creation and no need to use `promote-candidate` just to get subdir creation.
 
 ## Operational notes
 

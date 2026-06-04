@@ -904,22 +904,36 @@ def news_fetch(
     include_positions: bool = True,
     lookback_hours: int = 24,
 ) -> dict[str, Any]:
-    """Fetch Alpaca News for the universe (watchlist + held positions) and
-    write per-symbol + per-sector HTMLs under knowledge_base/news/.
+    """Fetch Alpaca News for the composed universe and write per-symbol +
+    per-sector HTMLs under knowledge_base/news/.
+
+    When `symbols` is None, the universe is the composed one from
+    `universe.compute_universe`: active strategies' declared symbols,
+    currently-held positions, news-tracked subdirs, and operator-added
+    symbols in `state/extra_symbols.md`. The env-var DEFAULT_WATCHLIST is
+    only the bootstrap fallback when nothing else has anything (handled
+    inside compute_universe). This means operator additions to
+    extra_symbols.md are picked up automatically on the next run — no need
+    to also pre-create the news subdir (the fetch will create it as a
+    side-effect of writing the per-symbol HTML).
 
     Returns a summary dict; the news agent uses this to know what got written.
     """
     from quant_trading_system import news_service
+    from quant_trading_system.universe import compute_universe
 
-    universe = set(s.upper() for s in (symbols or ctx.settings.watchlist))
-    if include_positions and ctx.alpaca_client is not None:
-        try:
-            for p in ctx.alpaca_client.get_positions():
-                sym = str(p.get("symbol", "")).upper()
-                if sym:
-                    universe.add(sym)
-        except Exception as e:
-            logger.warning("news_fetch_position_lookup_failed err=%s", e)
+    if symbols:
+        # Explicit override — respect the caller's list verbatim.
+        universe = {s.upper() for s in symbols if s and s.strip()}
+    else:
+        # Use the composed universe (strategies + positions + news-tracked +
+        # operator_extras + bootstrap fallback). compute_universe already
+        # consults the broker for held positions when alpaca_client is set.
+        composed = compute_universe(
+            ctx.settings,
+            alpaca_client=ctx.alpaca_client if include_positions else None,
+        )
+        universe = set(composed.symbols)
     if not universe:
         return _err("empty universe; nothing to fetch")
     return _ok(news_service.fetch_and_write(
