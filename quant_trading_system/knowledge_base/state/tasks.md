@@ -9,151 +9,144 @@ file is just "the specific things you should do."
 
 ---
 
+## STANDING POLICY (do not ignore, do not "defer to research")
+
+**Every symbol in the universe MUST be claimed by an active strategy.**
+This is the P0 ZERO-UNCLAIMED RULE in `manual.md`. The `cli execute`
+command will REFUSE to run if any symbol is unclaimed. If you hit
+unclaimed symbols, claim them via `cli add-active` BEFORE you attempt
+execute. Character-match assignment (per the heuristic table at the
+top of `manual.md`) is permitted as a first pass — head-to-head is
+the research agent's later validation step, not a gate for the trader.
+
+Operator was enraged on 2026-06-04 because previous Claudes logged
+unclaimed symbols as "library gaps" instead of acting. If you repeat
+that mistake tomorrow, expect consequences.
+
+---
+
 ## Status as of the last update (Thu 2026-06-04, post-close)
 
-- **Active set:** one strategy — `equity_trend_following_ema_cross` owning
-  [AAPL, AMZN, GOOGL, JPM, NVDA, QQQ, SPY, TSLA]. 7 longs held (TSLA closed
-  Wed). Verify with `cli list-active`. **Unclaimed in universe: ARM, CSCO,
-  HPE, META, MRVL, MSFT** (4 operator-added Thu: ARM, CSCO, HPE, MRVL).
-- **Today's execute:** 0 intents, 0 submitted, 0 rejected, 0 errors.
-  Correct algorithmic outcome — NORMAL FLOW day, no rule fired.
-- **Account:** equity $110,697.80 (+$1,822.25 / +1.67% vs Wed),
-  buying_power $142,235.69, cash -$39,579.96 (unchanged).
-- **Regime:** bull, conf 0.81, ADX 30.71 (9th consecutive bull day).
-- **Strategy 30d health (unchanged count fields; SPY rolled):**
-  orders_submitted 3, orders_rejected 4, trades_closed 3, win_rate 0.6667,
-  rolling_sharpe -0.200, cum_return -0.7% vs SPY +5.37% (-6.07pp gap,
-  improved from -6.68pp Wed via rolling-window math).
-- **Wed→Thu unrealized %:** AAPL +15.69→+14.73, AMZN +1.07→+2.05,
-  **GOOGL +5.53→+9.54 (+4.01pp, Apple-Gemini contract win)**,
-  **JPM -3.89→-0.69 (+3.20pp, financials rotation)**,
-  **NVDA +7.17→+8.78 (+1.61pp, Siri 2.0 Blackwell anchor offset AVGO drag)**,
-  QQQ +14.07→+13.79, SPY +5.92→+6.58.
-- **Git-sync LaunchAgent OPERATIONAL** as of Thu git-doctor
-  (pending_marker_count=1, only `marker_test.json`). Wed/Tue top operator
-  priority RESOLVED.
+- **Active set: 7 strategies, 17/17 universe symbols claimed.**
+  Verify with `cli list-active` and confirm `unclaimed_count == 0`.
+  - `equity_trend_following_ema_cross`: AAPL, AMZN, GOOGL, JPM, NVDA, QQQ, SPY, TSLA
+  - `equity_momentum_macd_histogram`: META, MSFT
+  - `equity_breakout_volume_confirmation`: ARM, MRVL
+  - `equity_mean_reversion_bollinger`: CSCO
+  - `equity_rsi_divergence`: HPE
+  - `equity_event_driven_catalyst`: AVGO, MU
+  - `equity_sector_rotation_momentum`: DELL
+- **Today's execute (post-fix):** 1 intent — META buy 17 shares from
+  `equity_momentum_macd_histogram` (MACD histogram crossed above 0).
+  Submitted; sitting at `accepted` for Fri open.
+- **First-pass-of-the-day misfire:** 8 bogus orders submitted (then
+  cancelled) before the runtime fix narrowed `ctx.positions` to claimed
+  symbols. ALL CANCELLED before any fill. Don't reissue.
+- **Account:** equity $110,697.80 (unchanged from morning snapshot).
+- **Regime:** bull, conf 0.81, ADX 30.71.
+- **Code/manual changes today (do not revert):**
+  1. `agent_tools.execute_active_strategy` — unclaimed-gate added.
+  2. `cli.py` — `--allow-unclaimed` flag added to `execute`.
+  3. `strategy_runtime._build_context` — narrows `positions` and
+     `open_orders` to `claimed_symbols` when claim is non-empty.
+     **This is the critical bug fix.** Without it, every strategy
+     would generate exits for every other strategy's positions.
+  4. `manual.md` — P0 rule at top + workflow step 3b + section 5/6
+     updates.
+  5. `equity_event_driven_catalyst/strategy.md` — status `testing`
+     → `active`.
 
 ## To do tomorrow (Fri 6/5)
 
-1. **Read last_handoff.md, then news_brief.md FIRST.** **NFP releases Fri
-   8:30 AM ET** — week's biggest macro event. Brief will summarize the
-   reaction. Read the brief's headline assessment carefully — print could
-   shift the tape's posture significantly.
+1. **Read last_handoff.md, then news_brief.md FIRST.** NFP Fri 8:30
+   AM ET is the week's biggest macro event — will already be in
+   today's tape by your run time.
 
-2. **Standard read-and-snapshot.** Include `cli list-active` and
-   `cli git-doctor` (expect pending_marker_count low; LaunchAgent draining).
+2. **Standard read-and-snapshot.** Run `cli list-active` and CONFIRM
+   `unclaimed_count == 0` before doing anything else.
 
-3. **No open-orders reconciliation expected** — Thu was a flat day with
-   no trades.
+3. **If `unclaimed_count > 0`** (new symbol entered the universe via
+   news-agent promote, operator extra, or a new position spawned):
+   claim it via `cli add-active` using the character-match heuristic
+   in `manual.md`. Then re-check. Then proceed. `cli execute` will
+   refuse otherwise.
 
-4. **Run `cli execute`.** Specific algorithmic risks tomorrow:
-   - **NFP-driven shock scenarios:**
-     - Hot print (>200K) → yield surge → trend-tech weakness candidate;
-       NVDA/AAPL/GOOGL could see ADX fade if -3-5% sessions follow.
-     - Cold print (<100K) → rate-cut rally → JPM ADX could compress
-       further as financials rotation reverses; trend-tech firms up.
-     - In-line (130-180K) → no immediate impact; standard workflow.
-   - **JPM** — still standing ADX-fade candidate but rotation Thu pushed
-     ADX higher; longer leash now.
-   - **GOOGL** — Day-5 dilution overhang on $84.75B raise; Apple-Gemini
-     contract is the dominant fundamental driver.
-   - **NVDA** — Siri-Blackwell narrative is bullish; cohort drag from
-     AVGO weakening. Expected hold absent NFP shock.
-   - **AAPL** — holding into WWDC Mon-Fri next week.
-   - **AMZN, SPY, QQQ** — no specific catalyst; expected hold.
+4. **Reconciliation:** check if META buy from Thu filled or stayed
+   queued. If filled, the position is owned by
+   `equity_momentum_macd_histogram`. If cancelled/rejected at Fri
+   open, log it.
 
-5. **HALT-WORTHY check:** unchanged criteria (FOMC, held-name earnings,
-   futures gap >2%, geopolitical shock). NFP itself is NOT halt-worthy
-   under the current rules (no event-window rule exists). VIX 16.06 Thu,
-   sub-threshold. Watch for VIX > 19 on NFP shock as a regime signal.
+5. **Run `cli execute`.** Specific things to watch:
+   - **META** — already has a buy queued from Thu. If MACD signal
+     persists Fri, no new entry intent. If MACD reverts, the existing
+     order may sit unfilled (if limit) or fill at Fri open (if market;
+     it was market order, so it fills).
+   - **All other strategies** — first full day operating Friday.
+     Watch for any of the 7 strategies generating intents. With the
+     runtime fix in place, each strategy ONLY sees its own positions
+     and watchlist, so cross-talk is impossible.
+   - **NFP-driven shocks:**
+     - Hot print (>200K) → yield surge → tech weakness; expect
+       potential ADX-fade fires on NVDA / AAPL / GOOGL.
+     - Cold print (<100K) → rate-cut rally → JPM ADX could compress.
+     - In-line (130-180K) → no immediate impact.
 
-6. **Library gaps — log any new ones.** Carry forward the list below.
-   Two new this Thu (event-window related):
-   - **NEW: Tier-1 customer-win event** (Apple-Gemini drove GOOGL +4pp Thu;
-     algorithm has no rule for this signal type).
-   - **NEW: WWDC June 8-12 event-window on held AAPL** (no event-window
-     rule).
-   - **NEW: NFP macro-event-window** (no rule).
+6. **HALT-WORTHY check:** unchanged criteria. VIX 16.06 Thu close.
 
-7. **Do NOT revert** safety_gate.py rescope, `max_exits_per_run`,
-   git-sync queue architecture, `active_strategies.md`, launchd plists,
-   or `agent_tools.news_fetch` universe fix.
+7. **Library gaps — log any new ones.** The list below carries forward
+   the event-overlay gaps that are NOT addressed by the new claims.
+   Unclaimed symbols are NOT library gaps anymore (P0 rule).
 
-8. **Run `cli git-sync --agent trader --message "..."` as last action.**
-   Expect `"queued"` in the response. Then `cli git-doctor` once. With
-   LaunchAgent now operational, pending_marker_count should stay low
-   (≤3). If pending_marker_count > 5 or stale_lock_count > 0, re-flag
-   in handoff.
+8. **Run `cli git-sync --agent trader --message "..."` as last
+   action.** Then `cli git-doctor` once. Pending_marker_count should
+   stay low (LaunchAgent operational since Wed evening).
 
 ## Library gaps for the research agent (carry to research_tasks.md next Sat)
 
-- **NEW Thu: Tier-1 customer-win event (Apple-Gemini → GOOGL +4pp Thu).**
-  No "product-tier-1-customer-win" rule. Same signal-type as NVDA Blackwell
-  anchor + AAPL Siri 2.0. Suggested: enterprise-anchor-win event overlay
-  (when a held name is named as anchor cloud/silicon/customer in a Tier-1
-  deal, tilt position posture for 5-10 day repricing window).
-- **NEW Thu: AAPL WWDC June 8-12 event-window.** No "event-window posture"
-  rule. Trader has no concept of a 5-day product-launch window on a held
-  name. Suggested: event-window overlay (defer entries / tighten exits
-  inside the window).
-- **NEW Thu: NFP / CPI / FOMC macro-event-window.** No "macro-event-window"
-  rule. Suggested: macro-event-window overlay (defer entries / hold exits
-  on print mornings).
-- **AVGO peer-earnings cohort-spillover (Wed→Thu carry, played out as
-  mixed signal — NVDA actually gained Thu despite cohort drag).** No
-  "cohort-spillover from peer earnings" rule. Empirical Thu result
-  weakens the "always-negative" framing of this gap; suggest research
-  agent test BOTH directions.
-- **Iran-Hormuz / oil-spike risk-off (Wed gap, calmed Thu).** No
-  "geopolitical shock / oil-spike risk-off" overlay. Lower priority now.
-- **Hot ADP+ISM → yield surge → rate-hike chatter (Wed gap).** No
-  "rate-policy-shift sizing" rule. Trend-follower has no Treasury-yield
-  sensitivity.
-- **Cliffwater + Blackstone BCRED 2-day private-credit-gate cluster (JPM
-  exposure).** No "credit-stress" overlay for JPM. Wed/Thu carry — Thu
-  played out as moot (rotation tailwind dominated).
-- **GOOGL Day-5 $84.75B raise** — no "secondary-offering dilution gap"
-  rule. Multi-week overhang. Thu the Apple-Gemini news dominated.
-- **TSMC capacity-constraint pricing-power signal** — no "supply-side
-  pricing-power" overlay.
-- **Trump AI EO 60-day "trusted partner" framework (Day-3)** — no
-  "policy-tailwind sizing" overlay for NVDA / MSFT / ORCL beneficiaries.
-- **EU cloud procurement rules** — no "regulatory-headwind sizing" rule
-  for AMZN / MSFT / GOOGL.
-- **AVGO not in universe + earnings-window strategy** — print past;
-  decision is to leave gap until earnings-window strategy is built
-  generally (covers CRWD Q1 ~Aug, MU ~June 24, NVDA ~Aug, ORCL ~June 18).
-- **CRWD 4-for-1 split** — no corporate-action handler. Informational.
-- **META, MSFT carry-over** — still unclaimed (not held). MSFT Thu got
-  "undervalued" framing; META Thu got FCC undersea cable tailwind + ARK
-  +$3.5M. Operator decision pending.
-- **ARM, CSCO, HPE, MRVL operator-added Thu** — now in universe but
-  unclaimed. Need head-to-head vs trend-following OR purpose-built
-  strategy from research agent. CSCO 11 PT raises in a week + STM
-  SpaceX-IPO optionality + MRVL Jensen-anointment all still STRONG.
-- **DELL, FLNC, MU, NTAP, OKTA, NOW, TEAM, SNOW, STM** — universe-expansion
-  candidates flagged repeatedly by news agent. Several at 8+ sessions
-  consecutive (DELL, STM). Auto-promote threshold is 3 sessions —
-  news agent should be calling promote-candidate for these.
+These are EVENT-OVERLAY gaps, not unclaimed-symbol gaps. Every
+universe symbol is now claimed; what's missing is rule TYPES that
+respond to event signals.
+
+- **Validate the 6 new first-pass strategy assignments via
+  head-to-head:**
+  - `equity_momentum_macd_histogram` vs `equity_trend_following_ema_cross` on META, MSFT
+  - `equity_breakout_volume_confirmation` vs `equity_trend_following_ema_cross` on ARM, MRVL
+  - `equity_mean_reversion_bollinger` vs `equity_trend_following_ema_cross` on CSCO
+  - `equity_rsi_divergence` vs `equity_trend_following_ema_cross` on HPE
+  - `equity_event_driven_catalyst` vs `equity_trend_following_ema_cross` on AVGO, MU
+  - `equity_sector_rotation_momentum` vs `equity_trend_following_ema_cross` on DELL
+- **Tier-1 customer-win event overlay** (Apple-Gemini → GOOGL +4pp
+  Thu; Siri 2.0 Blackwell → NVDA/AAPL).
+- **AAPL WWDC June 8-12 event-window posture rule.**
+- **NFP / CPI / FOMC macro-event-window rule.**
+- **Peer-earnings cohort-spillover overlay** (AVGO → NVDA/MU/MRVL).
+- **Geopolitical / oil-spike risk-off overlay.**
+- **Rate-policy-shift sizing rule** (10Y yield breakout).
+- **Credit-stress sector overlay** (Cliffwater + Blackstone gates
+  → JPM).
+- **Capital-allocation / dilution-gap overlay** (GOOGL $84B raise).
+- **TSMC capacity-constraint supply-side pricing-power overlay.**
+- **Trump AI EO policy-tailwind sizing rule.**
+- **EU cloud procurement regulatory-headwind rule.**
+- **Corporate-action handler** (CRWD 4-for-1 split style).
 
 ## Open questions for the operator
 
-1. **AAPL WWDC June 8-12 next week.** Trader has no event-window rule;
-   will execute normally through it. If WWDC reveals are bullish, AAPL
-   rises on the tape with no algorithmic edit needed. If it disappoints,
-   EMA-cross / ADX-fade may fire mid-week. **Operator-visibility item.**
+1. **`cli open-orders` is broken** (`'dict' object has no attribute
+   'id'`). Worked around today via direct Alpaca API. Needs fix in
+   `agent_tools.get_open_orders`.
 
-2. **Strategy health gap to SPY narrowing slowly.** Mon -10.8pp → Wed
-   -6.68pp → Thu -6.07pp. Still N=3 realized; no rotation argument
-   either way. Will continue to monitor as the window rolls.
+2. **Journal will show 8 bogus `order_submitted` events** from the
+   first run's misfire (META buy, AAPL/AMZN/GOOGL/JPM/NVDA/QQQ/SPY
+   sells, all cancelled before fill). May want to clean those or leave
+   as audit trail.
 
-3. **4 operator-added symbols (ARM, CSCO, HPE, MRVL) unclaimed.**
-   Universe now 14, of which 8 claimed + 6 unclaimed. Need decision on
-   whether to claim the new 4 with trend-following (after head-to-head)
-   or wait for purpose-built strategies from Sat research agent.
+3. **First-pass strategy assignments need head-to-head validation
+   Saturday.** Don't expect them to be optimal until the research
+   agent runs the battery.
 
-4. **Auto-promote threshold check.** News agent should be calling
-   `cli promote-candidate` for any candidate flagged 3+ consecutive
-   sessions. Several names (DELL, STM, CSCO, MU) appear to qualify but
-   haven't been promoted recently. Verify auto-promote is firing as
-   intended in news agent.
+4. **AAPL WWDC June 8-12 starts Monday.**
+
+5. **Universe could grow further** if news agent promotes more
+   candidates or operator adds extras. Whatever it grows to, the
+   unclaimed-gate ensures you'll handle it.
