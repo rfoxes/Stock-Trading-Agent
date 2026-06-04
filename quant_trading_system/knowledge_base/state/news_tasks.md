@@ -7,7 +7,7 @@ Yesterday's news agent writes this. Replace, don't append.
 ## Status as of the last update
 
 - **Last brief assessment:** NORMAL FLOW (2026-06-04 Thu, post-close). AVGO Q2-print Day-1 cash reaction was the loudest event (-12.59% to $418.91; ~$300B mcap vaporized; Q3 AI guide $16B vs $17.2B) but analyst PT raises ran the opposite direction (Jefferies $550, Wells Fargo $545, Morningstar ~$650; "intentionally sandbagged" framing) and broad tape recovered (S&P +0.41% to 7,584.31, Health Care +3.14%, Financials +2.67%, Real Estate +1.87% led; Nasdaq -0.09% on chip-cohort drag). Material positive Thu single-name catalysts: **Apple Siri 2.0 to launch Sept 2026 with iOS 27 using NVDA Blackwell B200 GPUs in Google Cloud + Gemini** — Tier-1 enterprise win flowing AAPL/NVDA/GOOGL. **AMZN €10B European warehouse robotics + $4B Pinterest AWS commitment**. **JPM tech-to-financials rotation + Dimon personally pitching SpaceX $75B IPO to 2,500 wealthy clients**. **FCC undersea cable rules favor META/GOOGL**. Private-credit gate Day-2 (Blackstone BCRED 10% requested / 5% fulfilled, Day-2 of Cliffwater cluster). Jobless claims 225K highest since Feb but holiday-distorted. VIX 16.06 (+0.29) sub-threshold; 1-day VIX +29.3% to 11.48 = NFP pre-event hedging. Iran-Hormuz calmed (oil eased). House war-powers 215-208 symbolic. **NFP May releases Fri 6/5 at 8:30 AM ET — the week's real macro event.**
-- **Universe last covered:** 14-name (AAPL, AMZN, ARM, CSCO, GOOGL, HPE, JPM, META, MRVL, MSFT, NVDA, QQQ, SPY, TSLA). Universe grew from 10 → 14 since Wed (operator added ARM, CSCO, HPE, MRVL to extra_symbols.md). Alpaca News returned 84 items: NVDA 17, META 11, GOOGL 9, MSFT 9, AMZN 8, AAPL 7, JPM 6, QQQ 6, TSLA 6, SPY 5. **Per-symbol HTMLs NOT generated for ARM/CSCO/HPE/MRVL** because their `news/stocks/<SYM>/` subdirs did not exist at fetch time. All six category HTMLs written. Daily summary written. Cleanup deleted 0 (cutoff 2026-03-06).
+- **Universe last covered:** **17-name** (AAPL, AMZN, ARM, AVGO, CSCO, DELL, GOOGL, HPE, JPM, META, MRVL, MSFT, MU, NVDA, QQQ, SPY, TSLA). Universe grew 10 → 14 (operator Wed-overnight: ARM/CSCO/HPE/MRVL) → 17 (news-agent Thu in-session: AVGO/DELL/MU promoted under §9 3-session rule). Final Thu Alpaca densities: AVGO 32, NVDA 16, META 10, GOOGL 9, AMZN 8, MSFT 8, AAPL 7, JPM 6, QQQ 6, TSLA 6, SPY 5, MU 5, MRVL 3, DELL 2, HPE 1, ARM 0, CSCO 0. **Code fix to `news_fetch`** so operator extras flow through automatically (was using `settings.watchlist + positions`; now uses `compute_universe`). All six category HTMLs written. Daily summary written. Cleanup deleted 0 (cutoff 2026-03-06).
 
 ## Notable carry-forwards
 
@@ -24,7 +24,7 @@ Yesterday's news agent writes this. Replace, don't append.
 
 ## To do tomorrow (next news run, Fri 2026-06-05)
 
-1. Run the standard workflow (`news_manual.md` §"Workflow").
+1. Run the standard workflow (`news_manual.md` §"Workflow"). **Specifically re-read §9 every run** and ACT on any candidate at 3+ session recurrence — do not defer as an operator question (operator confirmed Thu).
 2. **NFP May print review — Fri 8:30 AM ET.** This is the headline Fri event. Cover the print (consensus, beat/miss, AHE, UR, LFPR), the curve reaction (yield surge or relief), the FOMC odds shift (CME/Polymarket), any sell-side reframing of the Yardeni July-hike call. Front-load this in the brief.
 3. **AVGO Day-2 cohort follow-through.** Sell-side digestion of Thu's PT-raise wave; Day-2 cohort behavior on NVDA/MRVL/MU.
 4. **AAPL/NVDA/GOOGL Apple Siri-Blackwell Day-2.** Sell-side reactions; any cohort enterprise-win read-through; TSM-Apple-NVDA value-chain framing.
@@ -40,9 +40,7 @@ Yesterday's news agent writes this. Replace, don't append.
 
 ## Open questions for the operator
 
-- **AVGO inclusion in `state/extra_symbols.md`.** 8th consecutive session flagged. Print is past; new framing is "exposure to the dip" + next-cycle prep. Worth promoting.
-- **MU inclusion** — Q3 print in 20 days (June 24); -7% Thu sympathy; STRONG candidate.
-- **DELL inclusion** — 8th consecutive carry-forward; AI-server cohort.
+- **AVGO / DELL / MU — PROMOTED Thu in-session** under `news_manual.md §9` 3-session rule. All three now in `state/extra_symbols.md`; subdirs exist; news coverage live. Strategy assignment pending research-agent / head-to-head.
 - **STM inclusion** — 2nd session of STRONG-candidate framing; +190% YTD on Starlink relationship pre-SpaceX IPO.
 - **TSM inclusion (NEW)** — Thu's TSMC CEO capacity-constraint pricing-power signal makes the case fresh. Direct AI-pricing-power read for the foundry layer. Would broaden the universe beyond design houses.
 - **PINS inclusion (NEW, soft)** — material catalyst Thu (+$4B AWS commitment); single-session event so below STRONG threshold but worth a watch slot.

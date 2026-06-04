@@ -378,4 +378,23 @@ use — that's the trader's call. You just surface the events.
 after 5 paginated requests — keep the page cap at 5"; "WebSearch returns
 nothing useful for 'CPI release' queries; use 'CPI <month> <year>' instead.")
 
-(empty)
+- **2026-06-04: ACT on the 3-session promotion rule; don't defer it as an
+  operator question.** Step 9 grants the news agent authority to promote
+  any candidate that has been flagged in "Candidates for the universe" for
+  3+ consecutive sessions. Prior runs treated qualifying carry-forwards
+  (AVGO 8 sessions, DELL 8 sessions, MU recurring) as "open questions for
+  the operator" rather than acting. That's wrong — re-read the rule each
+  run and execute the promotions before writing the brief. The operator
+  approved this discipline explicitly. Use the carry-forward session
+  counts in `news_tasks.md` as the input; run `cli promote-candidate
+  <SYM> --agent news --reason "<N>-session recurrence; <catalyst>"`
+  for every qualifier. Idempotent. Re-classify the symbol in the brief
+  from "Candidate" → universe member with the new responder tag.
+- **2026-06-04: `news_fetch` bug fix — it now uses `compute_universe`,
+  not `settings.watchlist`.** Operator additions to `extra_symbols.md`
+  flow through automatically. No need to pre-create subdirs.
+- **2026-06-04: `SYMBOL_TO_SECTOR` map in `news_service.py` is incomplete.**
+  ARM/CSCO/HPE/MRVL/AVGO/DELL/MU all roll up to `uncategorized` until
+  the map is updated. Not blocking but worth a one-line PR (all 7 are
+  `technology` except… all 7 are `technology`). Carry-forward research-agent
+  task.

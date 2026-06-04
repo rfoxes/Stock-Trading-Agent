@@ -55,15 +55,20 @@
 
 ## Candidates for the universe
 
-- **AVGO** — Q2 print is past. Analyst PTs RAISED Thu despite price plunge — bullish-thesis reaffirmation. The "exposure to the dip" framing intensifies for next cycle. STRONG candidate; 8th consecutive session flagged.
-- **MU** — Q3 print ~June 24 (in 20 days). Sympathy -7% on AVGO read-through Thu. Earnings-window catalyst approaching. STRONG candidate.
-- **DELL** — AI-server cohort name; mentioned alongside HPE/CSCO in AI-capacity-constraint framing. 8th consecutive carry-forward.
-- **STM** — +190% YTD on Starlink relationship; SpaceX IPO directly bid the SpaceX-linked name space. NEW STRONG carry-forward (session 2).
-- **CRWD** — Day-2 of 4-for-1 split + raised FY guide. Software cohort marker; Hock Tan's "AI not hurting software" framing helps the bull case. Sustain-vs-fade question still open.
-- **TSM** — promoted to candidate by Thu's TSMC CEO comments (capacity-constrained "very long time," hints at price hikes). Direct AI-pricing-power read; would bring foundry exposure to the universe. NEW.
-- **PINS** — material catalyst Thu (+ on $4B AWS commitment). One-session catalyst; below STRONG threshold but worth tracking.
+**Promotions executed this session (per `news_manual.md §9` 3-session rule, operator approved discipline correction Thu):**
 
-**Note on the four operator-added symbols (ARM, CSCO, HPE, MRVL):** these have been added to the universe via `state/extra_symbols.md` per Wed handoff. They are now eligible for news-fetch but the Thu run did not produce per-symbol HTMLs (subdirs missing). Operator/Fri-run should ensure `news/stocks/{ARM,CSCO,HPE,MRVL}/` directories exist for Fri coverage.
+- **AVGO PROMOTED** — `cli promote-candidate AVGO --agent news` ran. 8-session recurrence; Q2 print past (beat top/bottom, Q3 AI guide light); analyst PT raises Thu (Jefferies 550, WF 545, Morningstar ~650). 32 Alpaca items fetched post-promote.
+- **DELL PROMOTED** — 8-session recurrence; AI-server cohort marker; TSMC pricing-power read-through. 2 Alpaca items fetched post-promote.
+- **MU PROMOTED** — Recurring carry-forward; Q3 print ~June 24 (in 20 days); -7% Thu sympathy on AVGO read-through. 5 Alpaca items fetched post-promote.
+
+**Remaining candidates (not yet at 3-session bar):**
+
+- **STM** — +190% YTD on Starlink relationship; SpaceX IPO-linked. Session 2 of STRONG-candidate framing.
+- **TSM** — NEW Thu; TSMC CEO capacity-constraint pricing-power signal. Foundry-layer exposure case.
+- **CRWD** — Day-2 of 4-for-1 split + raised FY guide. Software cohort marker.
+- **PINS** — single-session catalyst Thu ($4B AWS commitment); below STRONG threshold.
+
+**Universe now 17 members** (was 14 entering this session, +3 from this run's promotions): AAPL, AMZN, ARM, AVGO, CSCO, DELL, GOOGL, HPE, JPM, META, MRVL, MSFT, MU, NVDA, QQQ, SPY, TSLA. Strategies have not yet claimed AVGO/DELL/MU — research-agent assignment pending; trader will see them but no active rule will fire on them yet.
 
 ## Macro / sector context
 
@@ -103,7 +108,8 @@
 
 ## Operational notes
 
-- `cli news-fetch` returned **86 items cleanly after the in-session fix** (initial run was 84 for 10 symbols; re-run after fix covered all 14 — added MRVL 3, HPE 1, ARM 0, CSCO 0; net +2 items because META dropped 11 → 10 and MSFT 9 → 8 between the two runs). Final densities: NVDA 17, META 10, GOOGL 9, MSFT 8, AMZN 8, AAPL 7, JPM 6, QQQ 6, TSLA 6, SPY 5, MRVL 3, HPE 1, ARM 0, CSCO 0. Sector aggregates: technology 35, uncategorized 4 (ARM/CSCO/HPE/MRVL), index 6, financials 6, consumer_discretionary 6. Total down from Wed 97 — consistent with NORMAL FLOW assessment.
+- `cli news-fetch` returned **124 items in the final pass** (after AVGO/DELL/MU promotion). Final densities across 17 symbols: AVGO 32, NVDA 16, META 10, GOOGL 9, AMZN 8, MSFT 8, AAPL 7, JPM 6, QQQ 6, TSLA 6, SPY 5, MU 5, MRVL 3, DELL 2, HPE 1, ARM 0, CSCO 0. Sector aggregates: technology 34, uncategorized 36 (ARM/AVGO/CSCO/DELL/HPE/MRVL/MU — `SYMBOL_TO_SECTOR` map needs updating), index 6, financials 6, consumer_discretionary 6.
+- **Runs this session**: 1) initial 10-name fetch (84 items, pre-fix); 2) post-fix 14-name fetch (86 items); 3) post-promote-AVGO/DELL/MU spot fetch on the 3 new names (39 items); 4) final full-universe fetch covering all 17 (124 items). The 4th run is the on-disk state of record.
 - **Universe grew 10 → 14** since Wed: operator added ARM, CSCO, HPE, MRVL to `state/extra_symbols.md`. **Code fix applied this session:** `agent_tools.news_fetch` now uses `universe.compute_universe(...)` instead of `ctx.settings.watchlist + positions`, so operator-added extras flow through automatically on future runs. The `write_symbol_html()` helper auto-creates `news/stocks/<SYM>/` subdirs as a side-effect of the first write — no separate subdir-creation step needed. `cli.py` help text updated to match. Per-symbol HTMLs for the 4 new names now exist on disk.
 - All six category HTMLs written (macro, earnings, geopolitics, policy, volatility, options_flow). Daily summary written (~13 front-page items).
 - WebSearch returned strong results for: AVGO Day-1 reaction + analyst PT raises (Motley Fool / Yahoo / Invezz / IBTimes), Apple Siri 2.0 NVDA Blackwell + Google Cloud (MacRumors / 9to5Mac / AppleInsider / MacDailyNews), VIX 16.06 close (Saxo), S&P 7,584.31 + Nasdaq 26,830.96 (TheStreet), jobless claims 225K (Bloomberg / Reuters), House war powers 215-208 (CNN / NPR / Time), Blackstone BCRED gate (SEC filings + Benzinga), FOMC June 97.8% hold (Polymarket / CME).

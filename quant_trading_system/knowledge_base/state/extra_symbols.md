@@ -26,3 +26,12 @@ MRVL CSCO HPE
 
 # Added 2026-06-03 (operator, promote-candidate): Computex Day-3 sustained; STRONG candidate per news brief 6/3
 ARM
+
+# Added 2026-06-04 (news, promote-candidate): 8-session recurrence; Q2 print past (beat top/bottom, Q3 AI guide light); analyst PT raises Thu (Jefferies 550, WF 545, Morningstar ~650); custom-silicon cohort marker
+AVGO
+
+# Added 2026-06-04 (news, promote-candidate): 8-session recurrence; AI-server cohort marker; doubled in a month per Benzinga; TSMC capacity-constraint pricing-power read-through
+DELL
+
+# Added 2026-06-04 (news, promote-candidate): recurring carry-forward; Q3 print ~June 24 (in 20 days); -7% Thu sympathy on AVGO read-through; 940% rally context
+MU
