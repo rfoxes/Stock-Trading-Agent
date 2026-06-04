@@ -15,7 +15,7 @@ parameters:
   atr_period: 14
   max_hold_days: 7
   min_negative_unreal_pct_for_news_exit: 0.0
-status: testing
+status: active
 ---
 
 # Event-Driven Catalyst

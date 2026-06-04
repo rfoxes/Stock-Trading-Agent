@@ -269,7 +269,10 @@ def cmd_execute(ctx: ToolContext, args: argparse.Namespace) -> int:
     if args.strategy_id:
         _emit(agent_tools.execute_strategy(ctx, strategy_id=args.strategy_id))
     else:
-        _emit(agent_tools.execute_active_strategy(ctx))
+        _emit(agent_tools.execute_active_strategy(
+            ctx,
+            allow_unclaimed=getattr(args, "allow_unclaimed", False),
+        ))
     return 0
 
 
@@ -525,6 +528,14 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Run a strategy's strategy.py and submit its intents. Omit strategy_id to use the active strategy.",
     )
     sp.add_argument("strategy_id", nargs="?", default=None)
+    sp.add_argument(
+        "--allow-unclaimed", action="store_true",
+        help=(
+            "Override the P0 unclaimed-gate. By default execute REFUSES to run if any "
+            "universe symbol has no active strategy claim (operator policy 2026-06-04). "
+            "Use this flag only for one-off diagnostic runs, never in the scheduled daily workflow."
+        ),
+    )
     sp.set_defaults(func=cmd_execute)
 
     # update-script (edit a strategy's strategy.py)
@@ -638,12 +649,23 @@ def _build_parser() -> argparse.ArgumentParser:
     sp.set_defaults(func=lambda ctx, args: (_emit(agent_tools.universe_view(
         ctx, include_testing=args.include_testing)), 0)[1])
 
-    # promote-candidate (add a symbol to extra_symbols.md + create news folder)
+    # promote-candidate (add a symbol to extra_symbols.md + symbol_sectors.md + create news folder)
     sp = sub.add_parser(
         "promote-candidate",
-        help="Promote a symbol into the universe (appends to extra_symbols.md, creates news folder). Idempotent. Use this when a news-flagged candidate recurs 3+ sessions, or when the operator wants a name added immediately.",
+        help="Promote a symbol into the universe (appends to extra_symbols.md + symbol_sectors.md, creates news folder). Idempotent. Use this on a news-flagged candidate at 3+ session recurrence OR on a single-event qualifier (see news_manual.md §9).",
     )
     sp.add_argument("symbol", help="Ticker, e.g. MRVL")
+    sp.add_argument(
+        "--sector",
+        required=True,
+        choices=sorted([
+            "technology", "financials", "consumer_discretionary",
+            "consumer_staples", "healthcare", "energy", "industrials",
+            "materials", "utilities", "real_estate",
+            "communication_services", "index", "crypto",
+        ]),
+        help="Required. Sector classification recorded in state/symbol_sectors.md. Prevents the symbol from rolling up to 'uncategorized' in the sector view.",
+    )
     sp.add_argument("--reason", default="", help="Short rationale for the audit trail.")
     sp.add_argument(
         "--agent",
@@ -652,7 +674,7 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Which agent is promoting (for audit).",
     )
     sp.set_defaults(func=lambda ctx, args: (_emit(agent_tools.promote_candidate(
-        ctx, symbol=args.symbol, reason=args.reason, agent=args.agent,
+        ctx, symbol=args.symbol, sector=args.sector, reason=args.reason, agent=args.agent,
     )), 0)[1])
 
     # git-doctor (clean up stale .git/*.lock files — works for harness + operator)

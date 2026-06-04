@@ -299,25 +299,72 @@ move on. Full-article fetching is reserved for the Saturday research agent.
 8. **Cleanup.** Run `python3 -m quant_trading_system.cli news-cleanup` to
    sweep HTMLs older than 90 days.
 
-9. **Promote recurring candidates into the universe.** Look at the carry-forward
-   list in `news_tasks.md`. For every candidate that has been flagged in
-   the "Candidates for the universe" section for **3+ consecutive sessions**,
-   run:
+9. **Promote candidates into the universe.** Two tiers, both via the same
+   command. **Always include `--sector` (required as of 2026-06-04)** —
+   the legacy promote-without-sector path was removed because new symbols
+   were rolling up to `uncategorized` in the sector view. The CLI lists
+   the allowed sectors; the news universe is ~90% `technology`, so when
+   in doubt that's the right pick for a chip / software / internet name.
 
    ```
-   python3 -m quant_trading_system.cli promote-candidate <SYMBOL> --agent news --reason "<N>-session recurrence; <catalyst summary>"
+   python3 -m quant_trading_system.cli promote-candidate <SYMBOL> \
+     --sector <sector> \
+     --agent news \
+     --reason "<criterion>: <catalyst summary>"
    ```
 
-   This is idempotent (re-running on an already-promoted symbol is a
-   no-op) and is the canonical path for getting a news-flagged name into
-   the universe without operator intervention. It appends to
-   `state/extra_symbols.md` and creates the `news/stocks/<SYMBOL>/`
-   folder so future `news-fetch` runs cover it. The trader's `cli
-   universe` call will pick the symbol up on its next run. Strategies
-   will not automatically claim it — the research agent (or a head-to-head
-   call) does that — but the universe coverage is the first step. **Do
-   NOT promote first-time candidates** (single-session events are too
-   noisy); the 3-session bar is intentional.
+   The command is idempotent (re-running on an already-promoted symbol
+   is a no-op apart from logging). It appends to
+   `state/extra_symbols.md`, writes the sector to
+   `state/symbol_sectors.md`, and creates the `news/stocks/<SYMBOL>/`
+   folder. Strategies will not automatically claim the new symbol — the
+   research agent (or a head-to-head call) does that — but the universe
+   coverage is the first step.
+
+   **Tier A — 3-session recurrence (the default rule).** For every
+   candidate flagged in "Candidates for the universe" for **3+ consecutive
+   sessions** in `news_tasks.md`'s carry-forwards, promote it. This is
+   the noise-filter for general thematic recurrence (cohort framing,
+   sustained sell-side attention, ETF-flow mentions). Re-read the rule
+   every run; **do NOT defer qualifiers as "open questions for the
+   operator"** — the operator has explicitly approved this discipline
+   (2026-06-04 feedback).
+
+   **Tier B — single-event triggers (added 2026-06-04).** Some catalysts
+   are strong enough that one session of evidence is sufficient. Promote
+   on first appearance when ANY of the following is true:
+
+   1. **Confirmed M&A target.** Named acquisition / merger where the
+      candidate is the target (not the acquirer). Suspended from the
+      rule once the deal closes — the symbol no longer trades freely.
+   2. **FDA approval or rejection** on a binary catalyst date. The event
+      itself is the trigger; "FDA panel meeting scheduled" alone is not
+      enough.
+   3. **Earnings beat + raised guidance + stock +5% post-print.** All
+      three conditions must hold. A beat without a raise is the typical
+      "in-line" reaction; a beat-and-raise without the price confirmation
+      means the market disagreed.
+   4. **Sell-side initiation cluster: 3+ banks initiate coverage or raise
+      PTs in the same week.** This is the structural sell-side
+      attention threshold — single-bank upgrades don't qualify.
+   5. **Tier-1 customer-win disclosure.** Named anchor-customer commit
+      (e.g. an Apple-anchors-Gemini Tier-1 win). Press-release or
+      verifiable analyst note required; speculative "rumored to be
+      considering" doesn't qualify.
+
+   **Caps and discipline:**
+
+   - **Daily cap: 2 single-event promotions per news run.** Recurrence
+     promotions (Tier A) are uncapped — those have already passed the
+     3-session filter. If more than 2 single-event qualifiers appear in
+     one session, promote the 2 strongest and carry the rest forward.
+   - **Sunset suggestion.** Any auto-promoted symbol with **0 news
+     items across 30 consecutive sessions AND no active position** should
+     be logged in `news_tasks.md` open-questions for the operator to
+     review. Do NOT auto-remove — removal stays operator-only to avoid
+     thrash and to preserve audit trail.
+   - **Never invent a tier-B qualifier.** The five triggers are exhaustive.
+     If a candidate doesn't clearly meet one, fall back to tier A.
 
 10. **Write `state/news_tasks.md`** for tomorrow's news agent. Brief. If you
    identified "Candidates for the universe" today, list them in

@@ -29,7 +29,7 @@ from typing import Any, Iterable
 import requests
 
 from quant_trading_system.config import Settings
-from quant_trading_system.memory import KB_DIR
+from quant_trading_system.memory import KB_DIR, STATE_DIR
 
 logger = logging.getLogger(__name__)
 
@@ -43,14 +43,38 @@ SUMMARY_DIR = NEWS_DIR / "daily_summary"
 _NEWS_API = "https://data.alpaca.markets/v1beta1/news"
 DEFAULT_RETENTION_DAYS = 90
 
+SYMBOL_SECTORS_FILE = STATE_DIR / "symbol_sectors.md"
+
+# Allowed sectors. Must match the list documented in
+# state/symbol_sectors.md. Strategies and the universe layer consume this
+# set; do NOT introduce new sectors without updating all three.
+ALLOWED_SECTORS: frozenset[str] = frozenset({
+    "technology",
+    "financials",
+    "consumer_discretionary",
+    "consumer_staples",
+    "healthcare",
+    "energy",
+    "industrials",
+    "materials",
+    "utilities",
+    "real_estate",
+    "communication_services",
+    "index",
+    "crypto",
+})
+
 
 # ---------------------------------------------------------------------------
-# Sector classification (small hardcoded map; the current watchlist is small)
+# Sector classification — seed defaults + runtime-loaded overrides
 # ---------------------------------------------------------------------------
 
-# Override / extend by editing this dict. If a symbol isn't here, the news
-# agent should fall back to "uncategorized" rather than guess.
-SYMBOL_TO_SECTOR: dict[str, str] = {
+# Seed defaults. These are the original 10 watchlist names. Everything else
+# lives in `state/symbol_sectors.md` (which `promote-candidate --sector`
+# writes to) and is merged in at import time by `_load_sector_overrides()`.
+# If you add an entry here, also document it as a seed in
+# state/symbol_sectors.md.
+_SEED_SYMBOL_TO_SECTOR: dict[str, str] = {
     "SPY": "index",
     "QQQ": "index",
     "AAPL": "technology",
@@ -63,14 +87,103 @@ SYMBOL_TO_SECTOR: dict[str, str] = {
     "JPM": "financials",
 }
 
+
+def _load_sector_overrides() -> dict[str, str]:
+    """Parse `state/symbol_sectors.md` for `<TICKER>: <sector>` entries.
+
+    Returns an empty dict if the file doesn't exist. Lines starting with
+    `#` are comments. Unknown sectors are dropped with a warning so a
+    typo can't silently corrupt the sector roll-up.
+    """
+    if not SYMBOL_SECTORS_FILE.exists():
+        return {}
+    out: dict[str, str] = {}
+    try:
+        text = SYMBOL_SECTORS_FILE.read_text(encoding="utf-8")
+    except OSError as e:
+        logger.warning("symbol_sectors_read_failed err=%s", e)
+        return {}
+    import re as _re
+    # Tickers are 1-5 uppercase alnum chars, optional .X or -X suffix.
+    # Anything that doesn't strictly match is prose, not a ticker — skip
+    # silently so the markdown body of the file doesn't trigger warnings.
+    _TICKER_RE = _re.compile(r"^[A-Z][A-Z0-9]{0,4}(?:[.\-][A-Z]{1,2})?$")
+    for raw in text.splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#") or line.startswith("```"):
+            continue
+        if ":" not in line:
+            continue
+        sym, sec = line.split(":", 1)
+        sym = sym.strip()
+        # Drop any leading markdown list markers / bullets.
+        sym = sym.lstrip("-*+ \t").rstrip()
+        # Drop trailing comment / annotation.
+        sec = sec.strip().split("#", 1)[0].strip().lower()
+        # Strip any wrapping markdown formatting from the sector value too.
+        sec = sec.strip("`*_ ")
+        sym_upper = sym.upper()
+        if not _TICKER_RE.match(sym_upper) or not sec:
+            continue
+        if sec not in ALLOWED_SECTORS:
+            logger.warning(
+                "symbol_sectors_unknown_sector sym=%s sector=%s (dropped); "
+                "see state/symbol_sectors.md for the allowed set",
+                sym_upper, sec,
+            )
+            continue
+        out[sym_upper] = sec
+    return out
+
+
+# Final map: seed ∪ overrides (overrides win on conflict).
+SYMBOL_TO_SECTOR: dict[str, str] = dict(_SEED_SYMBOL_TO_SECTOR)
+SYMBOL_TO_SECTOR.update(_load_sector_overrides())
+
+
+def reload_sector_overrides() -> dict[str, str]:
+    """Re-read `state/symbol_sectors.md` and refresh SYMBOL_TO_SECTOR.
+
+    Call this from long-running processes after `promote-candidate` writes
+    a new entry. The CLI doesn't need it (each invocation re-imports).
+    """
+    SYMBOL_TO_SECTOR.clear()
+    SYMBOL_TO_SECTOR.update(_SEED_SYMBOL_TO_SECTOR)
+    SYMBOL_TO_SECTOR.update(_load_sector_overrides())
+    return SYMBOL_TO_SECTOR
+
+
 CATEGORIES = (
     "macro", "earnings", "geopolitics", "policy",
     "volatility", "options_flow",
 )
 
+# Per-process warn-once cache so unresolved symbols make noise in the logs
+# without spamming once per item.
+_UNCATEGORIZED_WARNED: set[str] = set()
+
 
 def sector_for(symbol: str) -> str:
-    return SYMBOL_TO_SECTOR.get(symbol.upper(), "uncategorized")
+    """Resolve a symbol's sector, warning once per symbol when unknown.
+
+    An "uncategorized" return means the symbol is in the universe but
+    nobody has classified it. The news agent surfaces these in
+    `news_tasks.md` via `fetch_and_write`'s `pending_sector_assignment`
+    list; the right fix is to re-run `cli promote-candidate <SYM>
+    --sector <sector>` or hand-edit `state/symbol_sectors.md`.
+    """
+    sym = symbol.upper()
+    sec = SYMBOL_TO_SECTOR.get(sym)
+    if sec is None:
+        if sym not in _UNCATEGORIZED_WARNED:
+            logger.warning(
+                "symbol_uncategorized sym=%s — add an entry to "
+                "state/symbol_sectors.md (or rerun promote-candidate "
+                "with --sector)", sym,
+            )
+            _UNCATEGORIZED_WARNED.add(sym)
+        return "uncategorized"
+    return sec
 
 
 def ensure_dirs() -> None:
@@ -252,12 +365,16 @@ def fetch_and_write(
         "symbols": {},
         "sectors": {},
         "total_items": 0,
+        "pending_sector_assignment": [],
     }
 
     # Group symbols by sector so we batch the Alpaca call (Alpaca accepts comma-sep)
     by_sector: dict[str, list[str]] = {}
     for s in symbols:
-        by_sector.setdefault(sector_for(s), []).append(s.upper())
+        sec = sector_for(s)
+        by_sector.setdefault(sec, []).append(s.upper())
+        if sec == "uncategorized":
+            summary["pending_sector_assignment"].append(s.upper())
 
     # Per-symbol fetch + write
     all_items_by_symbol: dict[str, list[dict[str, Any]]] = {}

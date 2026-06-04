@@ -995,18 +995,24 @@ def promote_candidate(
     ctx: ToolContext,
     *,
     symbol: str,
+    sector: str,
     reason: str = "",
     agent: str = "",
 ) -> dict[str, Any]:
-    """Promote a symbol into the universe by appending it to extra_symbols.md
-    and creating its news folder.
+    """Promote a symbol into the universe by appending it to extra_symbols.md,
+    recording its sector in symbol_sectors.md, and creating its news folder.
 
-    Used by the news agent (recurring-candidate flow) and by the trader
-    (when the operator wants a specific name added immediately). Idempotent
-    — re-running with the same symbol is a no-op apart from logging.
+    Used by the news agent (recurring-candidate flow + single-event flow) and
+    by the trader (when the operator wants a specific name added immediately).
+    Idempotent — re-running with the same symbol is a no-op apart from
+    logging. **Sector is required** to prevent any newly-promoted symbol
+    from silently rolling up to "uncategorized" in the sector view; the
+    legacy "skip sector and figure it out later" path is gone.
 
     Args:
         symbol: ticker (e.g. "MRVL"). Case-insensitive; stored uppercase.
+        sector: one of `news_service.ALLOWED_SECTORS` (e.g. "technology",
+            "financials", "index"). Required.
         reason: short human-readable rationale (e.g. "3+ session recurrence
             in news brief candidates section"). Recorded as a comment line.
         agent: which agent is promoting ("news", "trader", "research", or "").
@@ -1014,16 +1020,34 @@ def promote_candidate(
 
     Returns:
         {"ok": True, "promoted": True/False, "symbol": ..., "already_present": ...,
-         "extra_symbols_path": ..., "news_folder_created": ...}
+         "extra_symbols_path": ..., "news_folder_created": ...,
+         "sector": ..., "sector_recorded": True/False,
+         "symbol_sectors_path": ...}
         promoted=False means the symbol was already in extra_symbols.md.
+        sector_recorded=False means the sector entry was already present.
     """
     from pathlib import Path
     from quant_trading_system.universe import EXTRA_SYMBOLS_FILE, symbols_from_operator
-    from quant_trading_system.news_service import STOCKS_DIR
+    from quant_trading_system.news_service import (
+        STOCKS_DIR,
+        SYMBOL_SECTORS_FILE,
+        ALLOWED_SECTORS,
+        reload_sector_overrides,
+        SYMBOL_TO_SECTOR,
+    )
 
     sym = (symbol or "").strip().upper()
     if not sym or not sym.isalnum() or not (1 < len(sym) <= 5):
         return _err(f"invalid symbol: {symbol!r} (expect 2-5 uppercase alnum chars)")
+
+    sec = (sector or "").strip().lower()
+    if not sec:
+        return _err("sector is required (one of: " + ", ".join(sorted(ALLOWED_SECTORS)) + ")")
+    if sec not in ALLOWED_SECTORS:
+        return _err(
+            f"invalid sector: {sector!r} (expect one of: "
+            + ", ".join(sorted(ALLOWED_SECTORS)) + ")"
+        )
 
     already = sym in symbols_from_operator()
     extras_path = Path(EXTRA_SYMBOLS_FILE)
@@ -1042,6 +1066,33 @@ def promote_candidate(
         with extras_path.open("a", encoding="utf-8") as f:
             f.write(block)
 
+    # Record the sector. Skip if the symbol already has an identical entry
+    # (idempotent); overwrite-via-append is fine because the reader takes
+    # the *last* entry per symbol implicitly when iterating top-to-bottom
+    # and the loader resolves on dict.update().
+    sectors_path = Path(SYMBOL_SECTORS_FILE)
+    sectors_path.parent.mkdir(parents=True, exist_ok=True)
+    if not sectors_path.exists():
+        sectors_path.write_text(
+            "# Symbol → sector overrides\n#\n"
+            "# Loaded at import time by news_service.SYMBOL_TO_SECTOR.\n#\n",
+            encoding="utf-8",
+        )
+    existing_sec = SYMBOL_TO_SECTOR.get(sym)
+    sector_recorded = False
+    if existing_sec != sec:
+        today = dt.date.today().isoformat()
+        agent_tag = f"{agent}, " if agent else ""
+        sector_block = (
+            f"\n# Added {today} ({agent_tag}promote-candidate)\n{sym}: {sec}\n"
+        )
+        with sectors_path.open("a", encoding="utf-8") as f:
+            f.write(sector_block)
+        # Refresh the in-process map so a subsequent call in the same
+        # process sees the new entry.
+        reload_sector_overrides()
+        sector_recorded = True
+
     # Ensure the news folder exists so news-fetch starts tracking next run.
     folder = STOCKS_DIR / sym
     created = not folder.exists()
@@ -1053,6 +1104,9 @@ def promote_candidate(
         "already_present": already,
         "extra_symbols_path": str(extras_path),
         "news_folder_created": created,
+        "sector": sec,
+        "sector_recorded": sector_recorded,
+        "symbol_sectors_path": str(sectors_path),
         "reason": reason,
         "agent": agent,
     })
@@ -1084,7 +1138,11 @@ def execute_strategy(
     )
 
 
-def execute_active_strategy(ctx: ToolContext) -> dict[str, Any]:
+def execute_active_strategy(
+    ctx: ToolContext,
+    *,
+    allow_unclaimed: bool = False,
+) -> dict[str, Any]:
     """Run every strategy in the active set against its claimed symbols.
 
     Reads ``state/active_strategies.md`` (plural, multi-strategy) and
@@ -1098,10 +1156,40 @@ def execute_active_strategy(ctx: ToolContext) -> dict[str, Any]:
 
     Returns a multi-strategy summary including a ``unclaimed_symbols``
     list (library-gap diagnostic) — symbols the harness is tracking but
-    no active strategy claims. The trader writes those into tasks.md so
-    the Saturday research agent can fill the gap.
+    no active strategy claims.
+
+    **P0 unclaimed-gate (operator directive 2026-06-04).** By default,
+    this function REFUSES to execute if any universe symbol is unclaimed.
+    Operator policy: every symbol in the universe MUST be claimed by an
+    active strategy before any execute run. To override (e.g., a one-off
+    diagnostic), pass ``allow_unclaimed=True``. The CLI flag is
+    ``--allow-unclaimed``. The previous "log it as a library gap and
+    proceed" behaviour was explicitly deprecated by the operator after
+    multiple sessions silently ignored unclaimed symbols.
     """
     from quant_trading_system import strategy_runtime
+    from quant_trading_system.universe import compute_universe
+
+    if not allow_unclaimed:
+        try:
+            universe = compute_universe(ctx.settings, alpaca_client=ctx.alpaca_client)
+            gaps = memory.unclaimed_symbols(universe.symbols)
+        except Exception as e:
+            return _err(
+                f"unclaimed-gate precheck failed: could not compute universe ({e}). "
+                "Refusing to execute. Either fix the universe error or rerun with --allow-unclaimed."
+            )
+        if gaps:
+            return _err(
+                "UNCLAIMED_SYMBOLS_VIOLATION: refusing to execute. "
+                f"{len(gaps)} symbol(s) in the universe have no active strategy claim: "
+                f"{', '.join(gaps)}. "
+                "Operator policy (set 2026-06-04): every universe symbol MUST be claimed before execute. "
+                "Resolve by either (a) `cli add-active <strategy_id> --symbols <SYM>,... --reason \"...\"` "
+                "for each unclaimed symbol, or (b) remove the symbol from the universe "
+                "(edit state/extra_symbols.md, close the position, or remove from a strategy's frontmatter). "
+                "Escape hatch (NOT for daily runs): rerun with `--allow-unclaimed`."
+            )
 
     return _ok(strategy_runtime.run_active_strategies(
         settings=ctx.settings,

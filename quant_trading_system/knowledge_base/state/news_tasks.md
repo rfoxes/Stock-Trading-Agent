@@ -24,7 +24,11 @@ Yesterday's news agent writes this. Replace, don't append.
 
 ## To do tomorrow (next news run, Fri 2026-06-05)
 
-1. Run the standard workflow (`news_manual.md` §"Workflow"). **Specifically re-read §9 every run** and ACT on any candidate at 3+ session recurrence — do not defer as an operator question (operator confirmed Thu).
+1. Run the standard workflow (`news_manual.md` §"Workflow"). **Re-read §9 every run.** §9 now has TWO promotion tiers:
+   - **Tier A (3-session recurrence)** — uncapped; act on every qualifier.
+   - **Tier B (single-event triggers)** — capped at 2 promotions per news run; triggers: confirmed M&A target, FDA approval/rejection on binary date, earnings beat+raised guidance+stock +5% post-print, sell-side initiation cluster (3+ banks in same week), Tier-1 customer-win disclosure.
+   - **Both tiers require `--sector <sector>` on `cli promote-candidate`** (newly enforced as of Thu code change). When in doubt for chip/software/internet names, `technology` is right.
+   - If `fetch_and_write` returns a non-empty `pending_sector_assignment`, that means a symbol entered the universe without a sector entry — fix it immediately with `cli promote-candidate <SYM> --sector <sector> --agent news --reason "backfill"` (idempotent).
 2. **NFP May print review — Fri 8:30 AM ET.** This is the headline Fri event. Cover the print (consensus, beat/miss, AHE, UR, LFPR), the curve reaction (yield surge or relief), the FOMC odds shift (CME/Polymarket), any sell-side reframing of the Yardeni July-hike call. Front-load this in the brief.
 3. **AVGO Day-2 cohort follow-through.** Sell-side digestion of Thu's PT-raise wave; Day-2 cohort behavior on NVDA/MRVL/MU.
 4. **AAPL/NVDA/GOOGL Apple Siri-Blackwell Day-2.** Sell-side reactions; any cohort enterprise-win read-through; TSM-Apple-NVDA value-chain framing.

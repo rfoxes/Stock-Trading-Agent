@@ -630,6 +630,23 @@ def _build_context(
             narrowed = [s for s in claim_set if s in universe_upper]
         filtered = narrowed
 
+        # CRITICAL: also narrow `positions` to claimed symbols. Without this,
+        # a strategy that iterates ctx.positions for exits (the standard
+        # pattern in every equity strategy in this repo) will generate
+        # exit intents for positions OWNED BY OTHER STRATEGIES — which
+        # crashed the broker on 2026-06-04 when newly-activated strategies
+        # tried to liquidate trend_following's positions. Every strategy
+        # only sees positions on the symbols it claims.
+        positions = [
+            p for p in positions
+            if str(p.get("symbol", "")).upper() in claim_set
+        ]
+        # Same for open_orders, for symmetry.
+        open_orders = [
+            o for o in open_orders
+            if str(o.get("symbol", "")).upper() in claim_set
+        ]
+
     # News brief — parse state/news_brief.md
     news_brief = _load_news_brief()
 

@@ -5,6 +5,50 @@ trading harness. It changes rarely — only when the harness gains or loses
 a capability, or when accumulated experience uncovers a new operating
 rule. Today's Claude reads this and `tasks.md`, then acts.
 
+## P0 — ZERO-UNCLAIMED RULE (operator directive, 2026-06-04)
+
+**Every symbol in the composed universe MUST be claimed by an active
+strategy. No exceptions.** This rule is permanent, generalized, and
+applies to every future run regardless of which symbols are in the
+universe.
+
+**Before any `cli execute` call, the workflow MUST:**
+1. Run `cli list-active` and read `unclaimed_count`.
+2. If `unclaimed_count > 0`, the run does NOT proceed to execute. It
+   instead assigns each unclaimed symbol to a strategy via `cli add-active`
+   and re-checks until `unclaimed_count == 0`.
+3. Only then run `cli execute`.
+
+**Code enforcement.** `cli execute` (without `--allow-unclaimed`) now
+REFUSES to run when any unclaimed symbol exists. The error message lists
+the offending symbols. The `--allow-unclaimed` flag exists only for
+one-off diagnostic runs by the operator — the scheduled daily workflow
+never uses it.
+
+**Assignment guidance when claiming an unclaimed symbol.** First-pass
+assignment by character-match is allowed and expected (do NOT block
+execute waiting for a head-to-head backtest). Character-match heuristics:
+
+- Mega-cap momentum tech (META, MSFT, GOOGL-class) → `equity_momentum_macd_histogram` or `equity_trend_following_ema_cross`.
+- Volatile chip / growth names with frequent breakouts (ARM, MRVL, MU, SMCI-class) → `equity_breakout_volume_confirmation`.
+- Lower-vol large-caps with consolidation patterns (CSCO, IBM-class) → `equity_mean_reversion_bollinger`.
+- Overbought names with extreme RSI (HPE, post-rally exhausted) → `equity_rsi_divergence`.
+- Names with upcoming or recent earnings prints (MU, AVGO, CRWD around their windows) → `equity_event_driven_catalyst`.
+- AI infrastructure cohort with rotational regime (DELL, HPE) → `equity_sector_rotation_momentum`.
+- ETFs / index proxies (SPY, QQQ, IWM) → `equity_trend_following_ema_cross`.
+- Anything that does not obviously match → `equity_trend_following_ema_cross` as the safe default; the research agent can rotate it later via head-to-head.
+
+**Why this rule exists.** Multiple prior sessions silently proceeded
+with unclaimed symbols sitting in the universe, treating them as
+"library gaps to log for the research agent." That was wrong. The
+operator's policy is: if the harness is tracking a symbol, the harness
+acts on it. Logging it without acting is unacceptable. This applies to
+ANY future symbol added to the universe — operator-added,
+news-agent-promoted, position-spawned, whatever.
+
+**Never replace this section.** It is the standing policy. Add to it
+only if the operator extends or refines the rule.
+
 ## What this harness is
 
 A paper-trading orchestrator that wakes once per US trading day (post-close,
@@ -71,6 +115,16 @@ sandbox's `python3` directly — the harness has no virtualenv to activate.
    python3 -m quant_trading_system.cli log-closed <strategy_id> <symbol> <pnl_fraction>
    ```
 
+3b. **P0 UNCLAIMED-GATE CHECK (required, no exceptions).** Run
+   `cli list-active` and read `unclaimed_count`. If it is greater than 0,
+   you MUST assign each unclaimed symbol to a strategy via `cli add-active`
+   before proceeding. Use the character-match guidance in the "P0 —
+   ZERO-UNCLAIMED RULE" section at the top of this file. Re-run
+   `cli list-active` after each `add-active` to confirm progress. Only
+   when `unclaimed_count == 0` do you move to step 4. The `cli execute`
+   command itself will refuse to run otherwise — this step exists so you
+   handle it deliberately rather than waiting for the gate to fail.
+
 4. **Execute the active strategy.** This is where actual trading happens:
    ```
    python3 -m quant_trading_system.cli execute
@@ -122,10 +176,13 @@ sandbox's `python3` directly — the harness has no virtualenv to activate.
    - If the active set fires zero entries for many sessions, that is
      *not* a problem to "fix" by loosening thresholds. Curve-fitting to
      activity is forbidden.
+   - **The library-gap exception does NOT apply to unclaimed universe
+     symbols.** Those are P0 blockers per the rule at the top of this
+     file — claim them first, do not log-and-defer.
    - If news today obviously warranted action (earnings beat, sector
-     rotation, single-name catalyst) but no active strategy responded,
-     **the library is incomplete**. You do not fill the gap by trading;
-     you log it. Format the entry in `tasks.md` like:
+     rotation, single-name catalyst) on a CLAIMED symbol but the
+     responsible strategy's rules didn't fire, **the library is
+     incomplete**. You do not fill the gap by trading; you log it. Format the entry in `tasks.md` like:
      ```
      ### Library gap (logged 2026-06-02)
      Event: AVGO Wed AMC earnings, options 10.65% expected move
@@ -158,9 +215,13 @@ sandbox's `python3` directly — the harness has no virtualenv to activate.
    symbol is double-claimed.
 
    Symbols in the composed universe that no active strategy claims show
-   up in `cli list-active` as `unclaimed_symbols`. Treat each one as a
-   potential library gap and either (a) claim it with an existing
-   strategy after a head-to-head, or (b) log it for the research agent.
+   up in `cli list-active` as `unclaimed_symbols`. **Per the P0
+   ZERO-UNCLAIMED RULE at the top of this file, these are NOT optional
+   library-gap candidates — they are blockers.** Every one must be
+   assigned to a strategy via `cli add-active` (first-pass character-match
+   is allowed; head-to-head is the research agent's later validation
+   step). Logging an unclaimed symbol without claiming it is a workflow
+   violation.
 
 8. **Write `tasks.md` for tomorrow's Claude.** Replace the file with a
    short, focused to-do list (see the file itself for the shape).
