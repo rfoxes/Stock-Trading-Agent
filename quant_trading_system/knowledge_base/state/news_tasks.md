@@ -6,60 +6,57 @@ Yesterday's news agent writes this. Replace, don't append.
 
 ## Status as of the last update
 
-- **Last brief assessment:** NOTABLE (2026-06-03 Wed, post-close). Three event stacks: (1) **AVGO Q2 print BEAT top/bottom; Q3 AI guide LIGHT** ($16B vs $17.2B cons); stock -5-8% AH — direct AI-cohort read-through to held NVDA. (2) **Hot ADP 122K + ISM Services 54.5** stack → Treasury yields surge → Yardeni July-hike call. (3) **Iran missiles on Kuwait/Bahrain overnight** — infrastructure damage, ≥1 killed; oil toward $100; partial materialization of Mon's HALT-WORTHY criterion but futures gap <2%. Combined: S&P -0.74%, Nasdaq -0.89%, Dow -1.21% from Tue's record. **GOOGL raise UPSIZED to $84.75B from $80B** — fresh datapoint Day-3 dilution digestion. CRWD also beat / raised FY / 4-for-1 split / -3% intraday sell-the-news. AAPL took #2 cap rank from GOOGL on the dilution. AMZN took Fortune 500 revenue crown from WMT (13y first). VOO crossed $1T AUM (first ETF ever). VIX 15.77 (+0.45 vs Mon 15.32) — regime BENIGN-LOW unchanged. Per Tue trader handoff: TSLA exit submitted (48 sh @ market, est. +$846 on ADX 18.9 < 20); JPM ADX stayed ≥20 (no exit).
-- **Universe last covered:** 10-name watchlist (AAPL, AMZN, GOOGL, JPM, META, MSFT, NVDA, QQQ, SPY, TSLA). Alpaca News returned 97 items: NVDA 28, GOOGL 14, AAPL 12, MSFT 11, AMZN 7, META 6, QQQ 6, SPY 6, TSLA 6, JPM 1. All six category HTMLs written. Cleanup deleted 0 (cutoff 2026-03-05).
+- **Last brief assessment:** NORMAL FLOW (2026-06-04 Thu, post-close). AVGO Q2-print Day-1 cash reaction was the loudest event (-12.59% to $418.91; ~$300B mcap vaporized; Q3 AI guide $16B vs $17.2B) but analyst PT raises ran the opposite direction (Jefferies $550, Wells Fargo $545, Morningstar ~$650; "intentionally sandbagged" framing) and broad tape recovered (S&P +0.41% to 7,584.31, Health Care +3.14%, Financials +2.67%, Real Estate +1.87% led; Nasdaq -0.09% on chip-cohort drag). Material positive Thu single-name catalysts: **Apple Siri 2.0 to launch Sept 2026 with iOS 27 using NVDA Blackwell B200 GPUs in Google Cloud + Gemini** — Tier-1 enterprise win flowing AAPL/NVDA/GOOGL. **AMZN €10B European warehouse robotics + $4B Pinterest AWS commitment**. **JPM tech-to-financials rotation + Dimon personally pitching SpaceX $75B IPO to 2,500 wealthy clients**. **FCC undersea cable rules favor META/GOOGL**. Private-credit gate Day-2 (Blackstone BCRED 10% requested / 5% fulfilled, Day-2 of Cliffwater cluster). Jobless claims 225K highest since Feb but holiday-distorted. VIX 16.06 (+0.29) sub-threshold; 1-day VIX +29.3% to 11.48 = NFP pre-event hedging. Iran-Hormuz calmed (oil eased). House war-powers 215-208 symbolic. **NFP May releases Fri 6/5 at 8:30 AM ET — the week's real macro event.**
+- **Universe last covered:** 14-name (AAPL, AMZN, ARM, CSCO, GOOGL, HPE, JPM, META, MRVL, MSFT, NVDA, QQQ, SPY, TSLA). Universe grew from 10 → 14 since Wed (operator added ARM, CSCO, HPE, MRVL to extra_symbols.md). Alpaca News returned 84 items: NVDA 17, META 11, GOOGL 9, MSFT 9, AMZN 8, AAPL 7, JPM 6, QQQ 6, TSLA 6, SPY 5. **Per-symbol HTMLs NOT generated for ARM/CSCO/HPE/MRVL** because their `news/stocks/<SYM>/` subdirs did not exist at fetch time. All six category HTMLs written. Daily summary written. Cleanup deleted 0 (cutoff 2026-03-06).
 
 ## Notable carry-forwards
 
-- **AVGO post-print Day-2 read-through to NVDA.** The Q3 AI guide LIGHT ($16B vs $17.2B cons) is the bear take on the custom-silicon thesis. Tomorrow: (a) sell-side reaction notes — are NVDA AI-revenue forecasts being touched, (b) MRVL / AVGO Day-2 follow-through (sustained re-rating vs one-day pop), (c) any GOOGL TPU read-through, (d) any sell-side reframing of $73B AVGO backlog as bullish vs $17.2B/$16B guide-undershoot as bearish.
-- **GOOGL Day-4 of the now-$84.75B raise.** Look for: (a) Class A vs C divergence at issuance, (b) sell-side EPS-dilution sizing models (UBS/Goldman/MS — still no detailed dilution math 3 days in), (c) any incremental Berkshire commit, (d) Anthropic S-1 stake-mark follow-through.
-- **Iran-Kuwait/Bahrain escalation Day-2.** Critical first-thing check: (a) overnight Brent/WTI prints, (b) any closure announcement of regional ports, (c) Trump response framing, (d) any further missile activity, (e) Strait of Hormuz transit status update.
-- **ADP+ISM hot-stack Day-2 reaction.** Tomorrow's NFP (Fri AM if scheduled) becomes the trifecta. Yardeni dissenting July-hike call — any sell-side desks echo? Watch Treasury 10Y level and CME June probability shift.
-- **Trump AI EO Day-3 sell-side coverage.** NVDA / GOOGL / CSCO / MSFT / ORCL / PLTR procurement-pipeline sizing. Tue carry-forward unanswered.
-- **EU cloud procurement rules follow-on.** Any analyst sizing of EU-public-sector cloud revenue exposure for AMZN / MSFT / GOOGL? Brussels press conference detail. Tue carry-forward unanswered.
-- **Anthropic S-1 follow-on.** ~$965B valuation → AMZN $4B + GOOGL $2B stake-mark. Tue carry-forward unanswered.
-- **MRVL Day-3 of Jensen "next trillion" anointment.** NVDA $2B stake validation. Sustained re-rating signal needed.
-- **CRWD Day-2 of 4-for-1 split + raised FY guide.** Software-cohort fundamentals healthy; sell-the-news context may reverse if AVGO read-through pressure spills into software.
-- **JPM** strategy watch-item per Tue handoff. Cliffwater private credit datapoint is sentiment-only. No JPM-specific event today argues either way. ADX still ≥20 per Tue.
-- **Operational: `git-sync` queue-based mechanism is now OPERATIONAL.** **Operator ran `bash scripts/install_git_safety.sh` during the Wed news run.** The `com.harness.gitrunner` LaunchAgent is installed and will drain the 7-marker backlog within several 30s polling cycles. Tomorrow's `cli git-doctor` should show `pending_marker_count ≤ 1` (only the in-flight marker). If markers still ≥ 3 on Thu run, escalate — install may need re-validation.
+- **NFP May print Fri 6/5 8:30 AM ET.** The week's anchor macro event. ADP+ISM hot stack Wed + jobless claims 225K Thu set up the trifecta read. Watch: print vs consensus, average hourly earnings, participation rate, unemployment rate. Fed-policy implication is the through-line — any hot print revives Yardeni July-hike chatter (currently 97.8% June hold on Polymarket / 99.4% CME).
+- **AAPL WWDC June 8-12 (Mon-Fri).** Five-day event window opens Mon. Siri 2.0 architecture (Blackwell + Gemini) is the headline reveal. Morgan Stanley PT $440 framing. Trader has no event-window posture rule; news layer should flag the window every Mon-Fri next week.
+- **AVGO Day-2 (Fri 6/5).** Analyst PT-raise digestion: does the sell-side bullish framing translate to a Day-2 bid? Watch: (a) any sell-side INITIATIONS at $550+ PTs, (b) cohort follow-through on NVDA/MRVL/MU, (c) any reframing of $73B backlog as the bull signal.
+- **NVDA continuation of Apple Siri-Blackwell win.** Day-2 sell-side commentary on the Apple anchor account; any cohort read-through to TSM. Confidential-compute feature gets attention.
+- **GOOGL Day-5 of $84.75B raise + Apple Gemini anchor.** Two competing narratives: dilution overhang vs Tier-1 enterprise customer win. Watch Class A/C divergence; any Berkshire incremental commit; sell-side EPS-dilution sizing (still no detailed math 5 days in).
+- **JPM Day-2 of Dimon SpaceX pitch.** Wed's 2,500-client pitch — any pricing momentum signals; any subscription-tier disclosure; Robinhood retail-allocation framing.
+- **Blackstone BCRED + Cliffwater private-credit gate cluster.** Two names in 48h; is there a third coming? Watch Apollo, KKR, Ares private credit fund flows for confirmation.
+- **CSCO/HPE/MRVL/ARM (now in universe).** First full session as universe members. Operator/news-agent needs to ensure `news/stocks/<SYM>/` subdirs exist for fetcher to populate. Action: pre-create or let fetcher auto-create.
+- **TSMC capacity-constraint pricing-power signal.** TSMC CEO C.C. Wei: AI capacity tight "very long time" + hint at price hikes. Direct read for NVDA/AVGO/AMD margins. Day-2 sell-side: does anyone size the pricing-power impact?
+- **Iran-Hormuz stabilization.** Thu oil eased; Wed missile-shock Day-2 not materializing. Watch: any re-escalation, any Strait reopening signals, any oil gap.
 
-## To do tomorrow (next news run, Thu 2026-06-04)
+## To do tomorrow (next news run, Fri 2026-06-05)
 
 1. Run the standard workflow (`news_manual.md` §"Workflow").
-2. **AVGO Day-2 first.** Sell-side actions on Q3 AI guide light; any reframing; NVDA / MRVL / GOOGL TPU read-through. Did Wall Street take the $73B backlog as the bullish signal or the $16B Q3 AI guide as the bearish one?
-3. **GOOGL Day-4 (now-$84.75B raise).** Day-4 dilution; sell-side EPS-impact sizing; Class A/C spread; Berkshire incremental commit check.
-4. **Iran-Kuwait/Bahrain Day-2 status.** Overnight oil prints; Trump response; Strait of Hormuz transit status. Critical re-escalation check.
-5. **NVDA Thu-open behavior.** Did the AVGO AH spillover materialize? Trend-follower will respond to price action; news context tracks.
-6. **CRWD Day-2 (4-for-1 + raised FY).** Sustained re-rating or sell-the-news continuation. Software-cohort tone.
-7. **MRVL Day-3.** Jensen anointment sustained vs faded.
-8. **HPE / DELL / CSCO Day-N follow-through.** AI-server cohort momentum continuation.
-9. **Trump AI EO Day-3 sell-side coverage.** Procurement-pipeline sizing.
-10. **EU cloud procurement rules** — analyst quantification.
-11. **Macro calendar Thu:** weekly jobless claims; nothing front-page-grade expected. Fri AM may have NFP — set up the preview.
-12. **VIX Thu close** + IV rank levels.
-13. **Yardeni July-hike call** — any sell-side echoes? Watch CME / Polymarket shifts.
+2. **NFP May print review — Fri 8:30 AM ET.** This is the headline Fri event. Cover the print (consensus, beat/miss, AHE, UR, LFPR), the curve reaction (yield surge or relief), the FOMC odds shift (CME/Polymarket), any sell-side reframing of the Yardeni July-hike call. Front-load this in the brief.
+3. **AVGO Day-2 cohort follow-through.** Sell-side digestion of Thu's PT-raise wave; Day-2 cohort behavior on NVDA/MRVL/MU.
+4. **AAPL/NVDA/GOOGL Apple Siri-Blackwell Day-2.** Sell-side reactions; any cohort enterprise-win read-through; TSM-Apple-NVDA value-chain framing.
+5. **WWDC June 8-12 prep.** Set up the five-day Apple event window. Morgan Stanley $440 PT framing; what other sell-sides initiate?
+6. **JPM Dimon SpaceX pitch Day-2.** Pricing momentum; any IPO allocation news.
+7. **Private credit gate Day-3 watch.** Apollo/KKR/Ares flow signals; any third major gate?
+8. **CSCO/HPE/MRVL/ARM news coverage.** Pre-create or ensure `news/stocks/<SYM>/` subdirs so Fri fetch produces per-symbol HTMLs. Then track their first full session of news.
+9. **Iran-Hormuz status update.** Overnight oil; Strait status; any re-escalation.
+10. **Macro carry-forwards:** Beige Book "E-shaped" framing follow-on; BofA June seasonality call sell-side echo.
+11. **VIX Fri close + NFP-day vol surface behavior.**
+12. **TSMC pricing-power signal sell-side sizing.**
+13. **Outlier movers Fri** — try later-evening / next-day query framing (5-session pattern of same-day staleness is now confirmed; may need to wait until Sat afternoon or use "Friday June 5 2026 close" specifically).
 
 ## Open questions for the operator
 
-- **AVGO inclusion in `state/extra_symbols.md` post-print.** Q2 print is now in the past — the "fast-track before catalyst" framing is moot. Worth including for the next print cycle plus continuous cohort read-through. 7th consecutive session flagged.
-- **CSCO inclusion** — NEW STRONG CANDIDATE. Eleven sell-side PT raises in a week; AI-server-laggard catch-up case crystallizes. Worth adding.
-- **HPE inclusion** — 7th consecutive carry-forward; Q2 +25% / FY26 raised.
-- **MRVL inclusion** — Jensen "next trillion" anointment +33%; NVDA $2B stake.
-- **DELL inclusion** — 7th consecutive carry-forward; doubled in a month.
-- **MU inclusion** — recurring; Q3 print ~June 24.
-- **ARM inclusion** — Computex sustained; Oracle joined AGI CPU ecosystem.
-- **STM inclusion** — NEW; +190% YTD on Starlink relationship pre-SpaceX IPO.
-- **Iran-Kuwait/Bahrain escalation: operator awareness.** Mon HALT-WORTHY did not trigger Tue. Today's missile strikes materialized partially. If oil gaps >5/bbl overnight or if futures gap >2% Thu open, Thu's news brief may flip HALT-WORTHY.
-- **`bash scripts/install_git_safety.sh` COMPLETED during Wed news run.** LaunchAgent now active; backlog draining. No further operator action on the git layer.
+- **AVGO inclusion in `state/extra_symbols.md`.** 8th consecutive session flagged. Print is past; new framing is "exposure to the dip" + next-cycle prep. Worth promoting.
+- **MU inclusion** — Q3 print in 20 days (June 24); -7% Thu sympathy; STRONG candidate.
+- **DELL inclusion** — 8th consecutive carry-forward; AI-server cohort.
+- **STM inclusion** — 2nd session of STRONG-candidate framing; +190% YTD on Starlink relationship pre-SpaceX IPO.
+- **TSM inclusion (NEW)** — Thu's TSMC CEO capacity-constraint pricing-power signal makes the case fresh. Direct AI-pricing-power read for the foundry layer. Would broaden the universe beyond design houses.
+- **PINS inclusion (NEW, soft)** — material catalyst Thu (+$4B AWS commitment); single-session event so below STRONG threshold but worth a watch slot.
+- **`bash scripts/install_git_safety.sh` LaunchAgent status.** Per Wed handoff, claimed install completed but `cli git-doctor` showed pending_marker_count=8. **Operator action: verify `launchctl list | grep harness` and gitrunner logs.** Markers persist on disk; nothing is lost. Top operator priority carries forward.
+- **ARM/CSCO/HPE/MRVL subdirectory creation.** Operator added these to universe Thu (before this run) but their `news/stocks/<SYM>/` subdirs don't exist. Fri's news-fetch will likely still skip them unless subdirs are pre-created OR the fetcher logic is updated to auto-create on first encounter.
 
 ## Operational notes
 
-- `cli news-fetch` returned 97 items cleanly (no proxy errors). NVDA density 28 (Trump EO Day-2 + Jensen Computex follow-on + ARK rotation + healthcare-AI partnership cohort + AVGO read-through). Total down from Tue's 124, primarily on Alpaca News density compression around mid-week.
-- WebSearch returned useful results for: AVGO Q2 print + Q3 AI guide light + AH reaction (TradingKey / StockTitan / Trefis / EBC / Yahoo / Shacknews), CRWD Q1 print + 4-for-1 split (StockStory / Yahoo / 24/7 Wall St / Public.com), ADP 122K (CNBC / ADP), ISM Services 54.5 (TradingEconomics), Yardeni July-hike (Benzinga), VIX 15.77 (FRED), S&P -0.74% + Iran missiles (TheStreet), Iran-Hormuz status (CNBC / Wiki 2026 Strait of Hormuz crisis), FOMC June 96.9% hold (Polymarket / CME), Trump AI EO 60-day framework (Benzinga / TechPolicy.Press / aoshearman).
-- WebSearch did NOT return clean daily-movers list for Wed June 3 (**4th consecutive session of this gap — Fri / Mon / Tue / Wed**). Outlier-movers reconstructed from Alpaca News headlines. Pattern strongly suggests same-day data-freshness issue on slickcharts / Yahoo movers endpoints. Try with explicit "Wednesday June 3 2026 close" framing or wait until evening tomorrow.
-- **`git-sync` queue-based mechanism is now OPERATIONAL.** Operator ran `install_git_safety.sh` during the Wed news run. Today's marker (`20260603T224754Z_news_6-830209.json`) and the 6 prior markers from Mon/Tue trader+news runs will be processed by the LaunchAgent. A follow-up sync was queued after this acknowledgment edit. Success criterion remains `{"queued": ...}`.
+- `cli news-fetch` returned 84 items cleanly (no proxy errors). NVDA density 17 (Apple Siri Blackwell + TSMC + AVGO read-through cohort). Total down from Wed's 97 — consistent with NORMAL FLOW (less event density than Wed's three-event-stack day).
+- WebSearch returned strong results for: AVGO Day-1 + analyst PT raises (Motley Fool / Yahoo / Invezz / IBTimes), Apple Siri NVDA Blackwell + Google Cloud (MacRumors / 9to5Mac / AppleInsider / MacDailyNews), VIX 16.06 (Saxo Market Quick Take), S&P 7,584.31 + Nasdaq 26,830.96 (TheStreet), jobless claims 225K (Bloomberg / Reuters), House war powers 215-208 (CNN / NPR / Time / WaPo), Blackstone BCRED gate (SEC filings + Benzinga), FOMC June 97.8% hold (Polymarket / CME), NFP May Fri 6/5 8:30 ET (BLS schedule), Iran-Hormuz status (Wikipedia / Britannica / Bloomberg / CRS).
+- **WebSearch did NOT return clean daily-movers list for Thu 6/4 — 5th consecutive session of the gap (Fri / Mon / Tue / Wed / Thu).** Pattern is now confirmed across all weekdays. Outlier-mover reconstruction from Alpaca News + WebSearch hits worked but the same-day endpoint staleness on slickcharts/Yahoo is a persistent gap. Try Saturday with explicit prior-day framing.
+- VIX Thu close 16.06 confirmed via Saxo. 1-day VIX 11.48 (+29.3%) confirms NFP-day near-tenor hedging.
 - Previous notes:
-  - "WebSearch returns nothing useful for 'CPI release' queries; use 'CPI <month> <year>' instead" — not exercised today; leave the note.
-  - "WebSearch for 'biggest gainers/losers' + specific date returns slickcharts/Yahoo Finance summary lists reliably" — DID NOT WORK Fri, Mon, Tue, Wed (**4-session pattern now**). Pattern strongly suggests endpoint same-day staleness; try later in evening for same-day or use prior-day query framing.
-  - "When a major geopolitical event happens over the weekend, search the multi-source major outlets (NPR/Fox/NBC/CNBC) rather than just the search query alone — they cross-confirm the facts faster than a single source." — applied successfully today (TheStreet + CNBC + Wikipedia cross-confirmed Iran-Kuwait/Bahrain strikes).
-  - VIX Wed close 15.77 confirmed; Tue close still not directly confirmed but Wed level implies Tue was in 15.3-15.5 band.
+  - "WebSearch returns nothing useful for 'CPI release' queries; use 'CPI <month> <year>' instead" — not exercised today.
+  - "WebSearch for 'biggest gainers/losers' + specific date returns slickcharts/Yahoo Finance summary lists reliably" — DID NOT WORK Fri/Mon/Tue/Wed/**Thu** (5-session pattern now confirmed).
+  - "When a major geopolitical event happens over the weekend, search multi-source major outlets (NPR/Fox/NBC/CNBC) rather than just the search query alone" — applied; House war-powers cross-confirmed.
+- **News-fetch subdirectory caveat.** Operator-added universe symbols don't auto-receive news-fetch coverage unless `news/stocks/<SYM>/` subdirs exist. ARM/CSCO/HPE/MRVL were universe members Thu but no per-symbol HTML was produced. Fix is either (a) pre-create subdirs during operator-add, (b) update news-fetch to auto-create on first encounter, or (c) manual mkdir in tomorrow's run.
