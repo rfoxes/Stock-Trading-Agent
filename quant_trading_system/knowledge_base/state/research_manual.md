@@ -245,4 +245,29 @@ Your job, after running the head-to-head, is to either:
 may be too strict — most reasonable strategies cluster around 0.85-0.92
 over the IEX-only feed; consider 0.90 as a future calibration.")
 
-(empty)
+- **2026-06-06: `min_num_trades = 20` is unreachable on single-symbol
+  simulate.** Over a 2-year window the most active strategy
+  (`equity_momentum_macd_histogram`) tops out at 16 trades on the most
+  active large-cap (META). Most others sit at 0-3 trades per symbol.
+  No single-symbol candidate has passed or can pass the 20-trade floor
+  given the current backtester. Suggestions for next operator-side
+  calibration pass: (a) lower the floor to ~10 to match observed
+  per-symbol throughput; (b) extend simulate to multi-symbol and
+  aggregate; (c) extend the default backtest window to 3-5 years.
+
+- **2026-06-06: `evaluate-archive` counts `order_rejected` events as
+  lifetime trading evidence.** This produces false-positive ARCHIVE
+  verdicts on freshly-deployed strategies whose only events are broker
+  rejections (e.g. duplicate-sell errors from symbol-claim overlap).
+  Documented battery semantics say "zero lifetime journal events → KEEP";
+  current implementation treats any event, including rejected ones, as
+  evidence. Until fixed, research agent should manually inspect any
+  ARCHIVE verdict on a strategy with `< 5` lifetime events.
+
+- **2026-06-06: When `cli head-to-head` is broken, `cli simulate` on
+  each (strategy, symbol) pair is the documented fallback.** It does
+  NOT produce a canonical winner (no statistical comparison) but does
+  report per-strategy Sharpe and trade count, which is enough to flag
+  unambiguous mismatches. Do NOT make `add-active` / `remove-active`
+  changes based on simulate-substitute alone — wait for head-to-head
+  to be fixed for the canonical adjudication.
