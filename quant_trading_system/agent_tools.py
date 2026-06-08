@@ -1295,9 +1295,7 @@ def head_to_head_backtest(
     available or one strategy fails.
     """
     try:
-        from quant_trading_system.backtesting.equity_backtester import (
-            EquityBacktester,
-        )
+        from quant_trading_system.strategy_backtest import run_backtest
     except Exception as e:
         return _err(f"backtester not available: {e}")
 
@@ -1307,22 +1305,25 @@ def head_to_head_backtest(
         if sf is None:
             return _err(f"strategy not found: {sid}")
         try:
-            df = ctx.market_data.get_bars(symbol, "1Day", start=start, end=end)
-        except Exception as e:
-            return _err(f"data fetch failed for {symbol}: {e}")
-        if df.empty:
-            return _err(f"no bars for {symbol} in [{start}, {end}]")
-        try:
-            bt = EquityBacktester(strategy_frontmatter=sf.frontmatter or {})
-            r = bt.run(df, symbol=symbol)
-            results[sid] = {
-                "sharpe": float(r.get("sharpe", 0.0)),
-                "max_drawdown": float(r.get("max_drawdown", 0.0)),
-                "total_return": float(r.get("total_return", 0.0)),
-                "trades": int(r.get("trades", 0)),
-            }
+            r_obj = run_backtest(
+                strategy_id=sid,
+                symbol=symbol,
+                start=start,
+                end=end,
+                market_data=ctx.market_data,
+                regime_classifier=ctx.regime_classifier,
+            )
         except Exception as e:
             return _err(f"{sid} backtest failed on {symbol}: {e}")
+        r = r_obj.to_dict() if hasattr(r_obj, "to_dict") else r_obj
+        if r.get("error"):
+            return _err(f"{sid} backtest failed on {symbol}: {r['error']}")
+        results[sid] = {
+            "sharpe": float(r.get("sharpe", 0.0) or 0.0),
+            "max_drawdown": float(r.get("max_drawdown", 0.0) or 0.0),
+            "total_return": float(r.get("total_return", 0.0) or 0.0),
+            "trades": int(r.get("num_trades", 0) or 0),
+        }
 
     a, b = results[strategy_a], results[strategy_b]
     # Winner: higher sharpe, tiebreak on smaller (less negative) max DD.

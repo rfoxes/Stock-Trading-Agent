@@ -361,18 +361,29 @@ def evaluate_for_archive(
             "metrics": {"current_status": sf.status},
         }
 
-    # Distinguish "never traded" (no journal history at all) from "stopped".
-    # If we have NO lifetime events for this strategy, archive test does not apply.
+    # Distinguish "never traded" (no successful journal events) from "stopped".
+    # Broker rejections (`order_rejected`) are NOT trading evidence — they
+    # mean the strategy tried but the broker refused (e.g., insufficient
+    # qty from symbol-claim overlap). The archive battery requires evidence
+    # the strategy actually got off the ground; rejections don't qualify.
     lifetime_events = journal.read_events(days=365 * 5, strategy_id=strategy_id)
-    if not lifetime_events:
+    lifetime_trading_events = [
+        e for e in lifetime_events
+        if e.get("type") in ("order_submitted", "trade_closed")
+    ]
+    if not lifetime_trading_events:
         return {
             "decision": "KEEP",
             "reasons": [
-                "strategy has no lifetime journal history; archive battery requires "
-                "trading evidence to evaluate (a strategy that never traded can't "
-                "be diagnosed as having 'stopped working')",
+                "strategy has no successful lifetime trading evidence "
+                "(submitted orders or closed trades); archive battery requires "
+                "trading evidence to evaluate (a strategy that never traded "
+                "successfully can't be diagnosed as having 'stopped working')",
             ],
-            "metrics": {"lifetime_events": 0},
+            "metrics": {
+                "lifetime_events": len(lifetime_events),
+                "lifetime_trading_events": 0,
+            },
         }
 
     # Pull the strategy's journal events over the longer of the two windows
