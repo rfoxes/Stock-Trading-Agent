@@ -35,3 +35,12 @@ DELL
 
 # Added 2026-06-04 (news, promote-candidate): recurring carry-forward; Q3 print ~June 24 (in 20 days); -7% Thu sympathy on AVGO read-through; 940% rally context
 MU
+
+# Added 2026-06-09 (news, promote-candidate): 3-session recurrence: Apple picks-and-shovels foundry-anchor framing + TSM-surging Day-1 Mon refresh; cohort foundry-layer anchor across WWDC + Intel-foundry-rotation narratives
+TSM
+
+# Added 2026-06-09 (news, promote-candidate): Tier-B #5 Tier-1-customer-win: The Information / Reuters report Mon 6/8 that Google placed >3M TPU manufacturing order with Intel Foundry for 2028. Largest hyperscaler validation of Intel's contract foundry to date; INTC +13% intraday. NVDA additionally evaluating backup foundry use (speculative leg, not qualifying).
+INTC
+
+# Added 2026-06-09 (news, promote-candidate): Tier-B #4 sell-side initiation cluster: 7+ banks initiated Mon 6/8 (Needham 00, Mizuho 00, Wedbush 70, Barclays 80, UBS 00, Rosenblatt 00, Morgan Stanley 50, Craig-Hallum 25). Post-IPO-quiet-period structural attention; CBRS +17% intraday. AI-inference cohort relevance to NVDA.
+CBRS

@@ -57,3 +57,12 @@ DELL: technology
 HPE: technology
 MRVL: technology
 MU: technology
+
+# Added 2026-06-09 (news, promote-candidate)
+TSM: technology
+
+# Added 2026-06-09 (news, promote-candidate)
+INTC: technology
+
+# Added 2026-06-09 (news, promote-candidate)
+CBRS: technology

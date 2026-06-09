@@ -1,121 +1,131 @@
-# News brief for 2026-06-07 (Sun update; covers weekend + sets up Mon 6/8)
+# News brief for 2026-06-08
 
 ## Headline assessment
 
-**NOTABLE.** Three Sunday-relevant facts dominate: (1) **NVIDIA + SK Hynix announced a multiyear AI-memory partnership Sun 6/7** covering Vera Rubin HBM4, Vera CPU LPDDR5X, RTX Spark, and Jetson Thor — Tier-1 supply-chain event. (2) **WWDC keynote Mon 6/8 10am PT is Tim Cook's final** and the **Siri 2.0 reveal is now confirmed to run on a custom 1.2-trillion-parameter Google Gemini model** with deep iOS / iPadOS 27 integration — the AAPL event-window is live. (3) **Iran-Hormuz weekend escalation continued through Sun**: Iran launched multiple drones toward the Strait Sat 6/6 AM; **US Forces struck Iranian coastal sites in response**. Brent eased Fri to ~$93 on demand-side concerns; Mon AM oil action is the catch-up tell. Layered on top: VIX enters Mon at 21.51 ELEVATED; CPI Wed 6/10 8:30 ET (consensus ~4.2% YoY); ORCL Wed AMC; ADBE + PPI + jobless claims + SpaceX-IPO pricing Thu; SpaceX listing Fri. Five+ event-stacked sessions. **Not HALT-WORTHY** — no active FOMC into Mon, no held-name overnight catalyst with confirmed >5σ guidance change, no measurable post-close futures gap that meets the >2% Hormuz threshold. The NVDA-SK Hynix item is anchor-positive (not gating-negative); WWDC is a planned-positive event-window; Hormuz remains active but oil has not confirmed escalation premium.
+**NOTABLE.** Mon's tape was eventful but constructively so. Three event-level developments dominated: (1) **Trump-brokered Iran-Israel ceasefire** announced Mon AM after a missile exchange — Nasdaq 100 +2% relief rally; VIX 21.51 → 18.92 (-12.0%), breaking last week's ELEVATED regime. (2) **WWDC 2026 keynote** confirmed Siri AI rebuilt on Apple Foundation Models "custom-built in collaboration with Google and its Gemini models" — Tier-1 anchor-customer (AAPL) validation for GOOGL's Gemini Enterprise narrative; AAPL hit fresh ATH early then faded post-keynote. (3) **Intel +13% on Google 3M-TPU manufacturing order for 2028** (The Information / Reuters); largest hyperscaler validation of Intel Foundry to date — qualifying Tier-B Tier-1-customer-win event. Also material: **NVDA SK Telecom/Hynix/Naver Korea AI expansion** Day-2; **MRVL S&P 500 inclusion** confirmed effective 6/22 (+9% premarket); **CBRS Cerebras 7-bank initiation cluster** ($250-$325 PTs, +17% intraday) = qualifying Tier-B initiation-cluster event. Wed CPI / ORCL AMC, Thu PPI / ADBE / SpaceX IPO pricing, Fri SpaceX listing remain ahead. **Not HALT-WORTHY** — no active FOMC, no held-name overnight catalyst with >5σ guidance change, no >2% futures gap.
 
 ## Watchlist + positions
 
-(Entering Mon: AAPL, GOOGL, JPM, NVDA, QQQ, SPY held; AMZN + META sells already queued for Mon open from Fri post-close run per `last_handoff.md`.)
+(Entering Tue: AAPL, GOOGL, JPM, NVDA, QQQ, SPY held; AMZN + META Mon-open sells filled — see `last_handoff.md`. Universe now 20 names after Mon promotions of TSM, INTC, CBRS — see Candidates section.)
 
-- **NVDA — MATERIAL EVENT (positive, Tier-1 supply chain).** Sun 6/7 NVIDIA + SK Hynix announced multiyear partnership covering memory across Vera Rubin AI systems (HBM4, LPDDR5X, 3D NAND), Vera CPUs (LPDDR5X), RTX Spark PCs (LPDDR5X + 3D NAND), and Jetson Thor robotics (LPDDR5X + 3D NAND). Builds on Jensen's Jun-5 announcement that Samsung / SK Hynix / Micron all passed Vera Rubin HBM4 cert (analyst share estimates: SK Hynix 60-70%, Samsung 25-30%, Micron remainder). Locks in Vera Rubin supply chain execution; constructive into NVDA's Vera CPU push against Intel/AMD in data center. Direct positive read; partial offset to Fri's cohort drag.
-  - responder: `equity_trend_following_ema_cross` (price-driven; news argues thesis intact through Mon)
+- **AAPL — EVENT WINDOW LIVE DAY-1.** WWDC keynote Mon 10am PT delivered the long-awaited Siri AI rebuild on a new architecture, deep Apple Intelligence integration, dedicated Siri app on iPhone/iPad/Mac, personal-context recall, multi-turn follow-ups. **Apple Foundation Models confirmed "custom-built in collaboration with Google and its Gemini models"** — validating the 1.2T-param framing from pre-keynote leaks. iOS 27, macOS Golden Gate, watchOS/visionOS 27 announced. Requires iPhone 15 Pro / 16+ for AI features. No major new hardware. AAPL hit fresh ATH intraday then faded ("buy-the-rumor-sell-the-news" pattern). Day-1 of 5-day Mon-Fri WWDC window. Wedbush sees 30% upside ($440 PT carry-forward); Counterpoint warning Apple needs to act fast on "agentic AI" as Siri-AI rebuild is the inflection point.
+  - responder: `equity_trend_following_ema_cross` (price-driven; no event-window rule — library gap re-affirmed)
 
-- **AAPL — EVENT WINDOW OPENS MON 10am PT.** Tim Cook's final WWDC keynote (Cook steps down Sept 1; Ternus takes over). **Siri 2.0 confirmed running on a custom 1.2T-param Google Gemini model**, dedicated app, system-wide "Search or Ask" gesture, Dynamic Island integration on iPhone 16+, multi-step commands, email composition, screen-read, cross-app chaining. Full stack updates: iOS 27, iPadOS 27, macOS 27, watchOS 27, visionOS 27. No major new hardware (no iPhone Fold, no new Vision Pro per pre-keynote reads). 5-day catalyst window Mon-Fri. AAPL held; trader has no event-window rule.
-  - responder: `equity_trend_following_ema_cross` (price-driven; no event-window adjustment — library gap)
-
-- **GOOGL — MATERIAL EVENT (positive read-through to Gemini Enterprise).** Siri 2.0 confirmation as custom 1.2T-param Gemini model is the highest-profile single Gemini-Enterprise win to date — Apple paying Google for inference capacity in a flagship consumer product is a long-dated demand-confirmation. Pairs with Fri's SpaceX-Google $920M/mo deal (carry-forward). Day-6 of the $84.75B raise dilution overhang is the offset.
+- **GOOGL — MATERIAL EVENT (Tier-1 anchor-customer confirmation).** WWDC confirmed Apple builds its Foundation Models in collaboration with Google Gemini — the highest-profile Gemini Enterprise demand win to date. Pairs with Fri's SpaceX-Google $30B+ cloud deal (carry-forward). Mike Novogratz called the $80B GOOGL capital raise (Day-6) a "possible market top signal" citing $160B AI-equity-raise wave threatening liquidity. UK under-16 social-media crackdown reported (incremental compliance overhang, not immediate-revenue gate).
   - responder: `equity_trend_following_ema_cross` (price-driven; news tilts on-thesis)
 
-- **MU — MATERIAL EVENT (positive, certification-confirmed).** Jensen confirmed Jun-5 that Micron passed Vera Rubin HBM4 certification (alongside Samsung + SK Hynix); supply-chain analysts have Micron at the remainder share (~5-15% of Vera Rubin HBM4 volume). Sunday's NVDA-SK Hynix announcement implicitly anchors the cohort. MU pre-print window opens ~June 16 (8 days before June 24 print); trader has `equity_event_driven_catalyst` claiming MU but no pre-print-cohort-spillover rule.
-  - responder: `equity_event_driven_catalyst` (pre-print window opens next week)
-
-- **META — EXIT QUEUED + NO FRESH NEWS Sun.** Trader has META sell from `equity_momentum_macd_histogram` queued for Mon open. Sun Alpaca pull has no incremental META news — FT equity-raise report is Day-3 (Fri+Sat+Sun, no banks hired, no management update). Existing exit signal stands; news is neutral.
-  - responder: `equity_momentum_macd_histogram` (exit queued; news neutral)
-
-- **AMZN — EXIT QUEUED + NO FRESH NEWS Sun.** Trader has AMZN sell from `equity_trend_following_ema_cross` queued for Mon open. Sun pull surfaces only cohort-roundup items (Anthropic IPO chatter, Oracle preview). Standard EMA-cross exit; news neutral.
-  - responder: `equity_trend_following_ema_cross` (exit queued)
-
-- **MSFT — NO FRESH MATERIAL EVENT Sun.** Sun pull anchored by OpenAI superapp / Anthropic IPO chatter (MSFT-tagged); Sriram Krishnan White House departure (policy-adjacent, not direct); Microsoft quantum-computing 2029-roadmap framing in a Benzinga roundup. Reid Hoffman board-exit (Fri carry-forward) Day-3 — no further sell-side reaction yet. MSFT not held; first-pass `equity_momentum_macd_histogram` claim stands.
-  - responder: `equity_momentum_macd_histogram` (price-driven; news sub-threshold)
-
-- **JPM — SECTOR/FRANCHISE CONTEXT.** SpaceX IPO Thu 6/11 AMC pricing → Fri 6/12 listing under SPCX ($75B raise, $1.77T val). JPM named underwriter; Dimon's 2,500-client pitch from last week converts to deal-execution this week. Sun pull surfaces 1 item (week-in-Apple roundup mentioning JPM tangentially). JPM held; trend posture aligned with the IB-franchise narrative.
-  - responder: `equity_trend_following_ema_cross` (price-driven; franchise event not in any active rule — soft gap)
-
-- **AVGO — NO FRESH EVENT Sun.** Day-3 since Q2 print (AI networking $4.1B vs $4.8B est). Sun Alpaca pull surfaces an Oracle-preview "will Oracle have a Broadcom moment" framing — implicit re-reference to Wed's miss as the cohort anchor. Next AVGO print Sep 3. `equity_event_driven_catalyst` in calm posture.
-  - responder: `equity_event_driven_catalyst` (post-event window; calm posture until Sep)
-
-- **TSLA — NO RE-ENTRY SIGNAL.** Sun pull anchored by Tesla weekly roundup (robotaxi geofence expansion + 20-vehicle fleet; safety monitors removed; Terafab/Macrohard "very early stages" per Electrek S-1 read); Musk ASML praise ahead of Terafab pitch; SpaceX IPO halo. TSLA not held; no re-entry rule active.
-  - responder: `equity_trend_following_ema_cross` (no re-entry signal)
-
-- **MRVL — NO FRESH NEWS Sun.** 0 Alpaca items. Carry-forward: S&P 500 inclusion effective open Mon 6/22 (2-week forced-passive-buying window). `equity_breakout_volume_confirmation` in standard posture.
-  - responder: `equity_breakout_volume_confirmation` (price-driven)
-
-- **ARM, CSCO, DELL, HPE — NO FRESH NEWS Sun.** All 0 Alpaca items. Cohort context from Fri stands.
-  - ARM responder: `equity_breakout_volume_confirmation`
-  - CSCO responder: `equity_mean_reversion_bollinger`
-  - DELL responder: `equity_sector_rotation_momentum`
-  - HPE responder: `equity_rsi_divergence`
-
-- **SPY / QQQ — 0 ALPACA ITEMS Sun.** Index-level news anchored by week-ahead catalyst-stack (CPI, ORCL, ADBE, SpaceX IPO, WWDC). `equity_trend_following_ema_cross` in standard posture.
+- **NVDA — MATERIAL EVENT (Tier-1 supply-chain Day-2 + Korea expansion).** Sun NVDA-SK Hynix multiyear HBM partnership Day-2 with sell-side sizing reactions. Mon adds **NVIDIA-SK Telecom gigawatt-scale Korea AI cloud + Naver deals**. Jensen Mon's "buy the sell-off" remark triggered AI-cohort relief rally. Cerebras IPO ($292B AI-inference market framing) and Mon's Intel-Google-3M-TPU report introduce competitive context (Intel evaluating four-GPU package). Direct positive read; NVDA +2% Mon intraday.
   - responder: `equity_trend_following_ema_cross` (price-driven)
 
-- **No fresh single-name news:** ARM, CSCO, DELL, HPE, MRVL, QQQ, SPY (all 0 Alpaca items Sun).
+- **MRVL — MATERIAL EVENT (S&P 500 inclusion confirmed).** Marvell + Flex S&P 500 effective 6/22, replacing Pool + Campbell's (announced Fri AMC; Mon premarket +9% to ~$287). Two-week forced-passive-buying window opens this week. Trader's `equity_breakout_volume_confirmation` rule may trip on volume-confirmation criteria; soft-positive into 6/22.
+  - responder: `equity_breakout_volume_confirmation` (volume-confirmation rule could fire)
+
+- **MU — MATERIAL EVENT (cohort tailwind extended).** Jensen Mon "buy the dip" + SK Hynix-NVDA Day-2 framing + Mon's HBM-memory "bulletproof until 2Y yield hits 5%" analyst note. MU Mon +9% intraday in cohort rally. Q3 print scheduled June 24 AMC; pre-print window opens ~June 16. Trader has `equity_event_driven_catalyst` claiming MU but no pre-print-cohort-spillover rule.
+  - responder: `equity_event_driven_catalyst` (pre-print window opens next week)
+
+- **AVGO — NO FRESH SINGLE-NAME EVENT Mon.** Day-3 since Q2 print (AI networking $4.1B vs $4.8B est). Mon Alpaca pull anchored by "Why Is Broadcom Stock Gaining Monday?" (cohort relief, not stock-specific event). 5 Wall Street accurate-analysts picks last week included AVGO context. Next AVGO print Sep 3.
+  - responder: `equity_event_driven_catalyst` (calm posture; no fresh catalyst)
+
+- **META — EXIT FILLED Mon open + NO MATERIAL EVENT Mon.** META Mon-open sell filled at open per `last_handoff.md`. Mon news: "META edges lower while Nasdaq rebounds" (cohort lagging the chip-led rally — price action, not event). UK under-16 social-media-crackdown overhang. FT equity-raise report Day-3 — no banks hired, no management update.
+  - responder: `equity_momentum_macd_histogram` (exit filled)
+
+- **AMZN — EXIT FILLED Mon open.** AMZN Mon-open sell filled at open per `last_handoff.md`. Mon news anchored by Cerebras-vs-NVDA inference race framing (Amazon Inferentia angle) and cohort-roundup mentions.
+  - responder: `equity_trend_following_ema_cross` (exit filled)
+
+- **MSFT — NO FRESH MATERIAL EVENT Mon.** BofA's Vivek Arya named MSFT in 6-chip-stock "secular upside" framing. Reid Hoffman board exit (Fri+Sat+Sun+Mon Day-4) no further sell-side reaction. Nebius UK AI-cloud buildout with NVDA + Microsoft Azure adjacency.
+  - responder: `equity_momentum_macd_histogram` (price-driven)
+
+- **JPM — SECTOR/FRANCHISE CONTEXT.** SpaceX IPO Thu 6/11 AMC pricing → Fri 6/12 listing. JPM lead underwriter. Roadshow accelerating; 21 banks meeting management; 30% retail allocation. Dimon's 2,500-client pitch from last week converts this week. No specific rule fires on franchise events (soft gap re-affirmed).
+  - responder: `equity_trend_following_ema_cross` (price-driven; franchise event not in any active rule)
+
+- **TSLA — NO RE-ENTRY SIGNAL.** Mon Alpaca pull anchored by Munster WWDC framing (TSLA-mentioned), Eisman SpaceX-IPO valuation critique, Cerebras vs Tesla AI compute comparison. TSLA not held; no re-entry rule active.
+  - responder: `equity_trend_following_ema_cross` (no re-entry signal)
+
+- **ARM, CSCO, DELL, HPE — COHORT CONTEXT Mon.** ARM mentioned in Apple picks-and-shovels article. CSCO mentioned in WSJ Best-Companies ranking (no stock-specific event). DELL mentioned in memory-trade and AMD cohort items (no stock-specific event). HPE mentioned in 5 Wall Street accurate-analysts last-week picks (no stock-specific event Mon).
+  - ARM responder: `equity_breakout_volume_confirmation` (price-driven)
+  - CSCO responder: `equity_mean_reversion_bollinger` (price-driven)
+  - DELL responder: `equity_sector_rotation_momentum` (price-driven)
+  - HPE responder: `equity_rsi_divergence` (price-driven)
+
+- **SPY / QQQ — INDEX TAPE Mon.** Nasdaq Composite +0.9% / Nasdaq 100 +2% / S&P 500 +0.3% / Dow -0.2% on chip-led relief rally + ceasefire. No index-level material event beyond the bounce.
+  - responder: `equity_trend_following_ema_cross` (price-driven)
+
+- **No fresh single-name news (Mon Alpaca densities):** ARM (1), CSCO (1), DELL (2), HPE (1), JPM (1) — all cohort-mentions, no stock-specific event.
 
 ## Sector themes
 
-- **NVDA-SK Hynix multiyear deal is the Sunday cohort-anchor positive.** Cleanest fundamental counter to Fri's chip-cohort sell-off thesis. Combined with the Jun-5 HBM4 cert news (Samsung + SK Hynix + Micron all qualified) it reframes Fri's AVGO Q2-miss-driven cohort drag as one print vs a multi-source supply-chain build-out. Constructive into Mon-AM cohort stabilization watch.
-- **AI capex / bubble narrative cluster (sentiment-level).** Sun Alpaca pulls surface Chamath Palihapitiya "burning through massive budgets" warning, Anthropic co-founder calling for "brakes" on AI ahead of own IPO push, OpenAI superapp pre-IPO chatter. Counter: NVDA-SK Hynix actual demand-pull, SpaceX-Google $920M/mo (Fri carry-forward), Q1 2026 S&P EPS +28.6%. Net: chatter, not fundamental change.
-- **Apple-Google flagship Gemini integration is the cleanest Gemini Enterprise demand-confirmation to date.** Beyond a corporate cloud-credit deal — this is the consumer product flagship. Net positive for GOOGL's AI revenue narrative; net positive AAPL execution signal that AI catch-up is partner-anchored (vs internal model risk).
-- **SpaceX IPO week opens.** Largest IPO in history pricing Thu, listing Fri. JPM franchise marker. 30% retail-allocation framing if confirmed will be the demand-tell. Halo into TSLA / NVDA / cohort AI-infrastructure sentiment.
-- **Vol regime ELEVATED entering catalyst-stacked week.** VIX 21.51 Fri close + 5+ event-catalyst stack (CPI, ORCL, ADBE, PPI, SpaceX IPO, WWDC, Hormuz active) argues regime holds through week.
+- **AI-supply-chain plurality narrative deepening.** Mon's NVDA-SK Telecom/Hynix/Naver expansion + Intel-Google 3M-TPU foundry order + ongoing Vera Rubin HBM4 multi-vendor certification (Samsung/SK Hynix/Micron) collectively reframe the "single-vendor concentration" risk that's been in the AI-bear narrative. Sell-side reading is supply chain is broadening, not narrowing.
+- **AI-inference market opens up.** Cerebras's 7-bank initiation cluster (PT range $250-$325) frames a "$292B AI inference war" thesis where NVDA's dominance has structural competition for the first time. Counterweight: BofA's Arya called the AI debate "shifted from ROI to scarcity" with NVDA + 6 chip-cohort names as "secular upside" — opposite sentiment from same day. Two-sided.
+- **WWDC validates Gemini-as-platform.** GOOGL's monetization of Gemini Enterprise via flagship consumer products (AAPL Foundation Models) is the cleanest demand-confirmation to date. Counter: GOOGL's $80B capital raise dilutes the upside.
+- **Ceasefire dissolves last week's Hormuz premium.** Brent reset on demand-side; energy sector retraced; VIX cash collapsed 12.0% intraday. Underlying conditional ceasefire is fragile (Lebanon front still active per IDF Tyre strikes).
+- **MRVL + FLEX S&P 500 inclusion this week** = passive-flow positioning window opens. Universe MRVL is direct beneficiary.
 
 ## Candidates for the universe
 
-- **STM, TSM, CRWD, FLEX, PINS — NO FRESH SUN APPEARANCES; sessions counts unchanged from Sat carry-forward.** Today's Sun Alpaca pull + WebSearch produced no fresh single-name event for any of these candidates (NVDA-SK Hynix item is on NVDA, not STM/TSM). Per `§9` ("flagged in 'Candidates for the universe' for 3+ consecutive sessions"), a Sunday non-appearance does not advance the session count — these candidates were flagged Sat at sessions 2/2/3?/2/2 respectively and the Sun gap means they sit at the same counts entering Mon. **No promotions this run.** Carry forward.
-- **STM** — Sat: session 2 (Starlink relationship + 190% YTD pre-SpaceX IPO). Sun: no fresh event. Entering Mon at session 2. Promote Mon if SpaceX-IPO halo refreshes framing → session 3.
-- **TSM** — Sat: session 2 (TSMC pricing-power + foundry-layer read-through). Sun: NVDA-SK Hynix is implicit foundry anchor but TSM not directly named. Entering Mon at session 2. Promote Mon if WWDC / NVDA / SpaceX-IPO discussion explicitly references TSMC → session 3.
-- **CRWD** — Sat: noted as Day-3+ but session count uncertain. Sun: no fresh news. Q1 FY27 beat + raise + 4-for-1 split (Tue 6/3) is the anchor event. Operator question carries forward: formalize candidate-counter in `news_tasks.md` to make Tier-A mechanical. Entering Mon at session 3 (provisional); promote Mon if framing recurs.
-- **FLEX** — Sat: session 1 (NEW; index-inclusion Mon 6/22). Sun: no fresh news. Index-inclusion is NOT one of the 5 Tier-B triggers per `§9`. Tier-A clock at 1; entering Mon at session 1.
-- **PINS** — Sat: session 2 (Thu $4B AWS commitment). Sun: no fresh news. PINS was the BUYER in the AWS deal, not the supplier — Tier-B trigger #5 ("Tier-1 customer-win") is supplier-side, so falls back to Tier-A. Entering Mon at session 2.
-- **ORCL — new candidate (NEW Sun, session 1).** Wed Q4 AMC; OCI 84% Q3 growth; RPO $553B; multiple PT raises ahead of print. Strong cohort-narrative anchor for AI-capex but not on universe. Wed earnings will resolve Tier-B trigger #3 (earnings-beat+raise+5%-post-print) test. Carry forward.
-- **No Tier-B qualifiers Sun:** no confirmed M&A target, no FDA approval/rejection, no earnings-beat+raise+5%-post-print events on a non-universe name, no 3+ bank initiation cluster, no Tier-1-customer-win that meets criteria.
+**3 promotions executed Mon (cumulative + this-session) — universe expanded from 17 → 20.**
+
+- **TSM — Tier-A promote.** 3-session recurrence per `news_tasks.md` carry-forward (Sat session 2 + Mon's "Apple's Picks-and-Shovels Trade" article naming TSMC as Apple AI supplier + "Why Is Taiwan Semiconductor Surging Monday?" Day-1 framing = session 3 confirmed Mon). Promoted via `cli promote-candidate TSM --sector technology --agent news` — sector recorded, news folder created.
+
+- **INTC — Tier-B #5 Tier-1-customer-win promote.** The Information / Reuters Mon: Google placed manufacturing order for >3M TPUs in 2028 with Intel Foundry. Verifiable press report; not "rumored to be considering." Largest hyperscaler validation of Intel's contract foundry business to date. INTC +13% intraday. (NVDA leg of the report — "evaluating" — does not independently qualify since it's speculative; the Google leg alone qualifies.) Promoted via `cli promote-candidate INTC --sector technology --agent news`.
+
+- **CBRS — Tier-B #4 sell-side initiation cluster promote.** 7+ banks initiated coverage Mon 6/8 (Needham $300, Mizuho $300, Wedbush $270, Barclays $280, UBS $300, Rosenblatt $300, Morgan Stanley $250, Craig-Hallum $325). Same-week initiation threshold (3+) far exceeded. CBRS post-IPO-quiet-period structural attention threshold met. +17% intraday. AI-inference cohort relevance to NVDA. Promoted via `cli promote-candidate CBRS --sector technology --agent news`. **Tier-B daily cap of 2 reached** (INTC + CBRS); any further Tier-B qualifiers Tue would be carry-forwards.
+
+- **STM — session 2 → no fresh Mon appearance.** No SpaceX-IPO-halo coverage explicitly referenced STM Mon. Entering Tue at session 2 (no advance, no reset). Promote Tue if STM-named-in-news refresh occurs → session 3.
+
+- **CRWD — session 3 (provisional) → no fresh Mon appearance.** No CRWD-specific news Mon. Operator question on candidate-counter formalization carries forward. Holding at session 3 provisional; would promote Tue if any refresh.
+
+- **FLEX — session 2 entering Tue.** Mon: FLEX mentioned in MRVL S&P 500 inclusion coverage (joint inclusion). Session count advances to 2. Index-inclusion not a Tier-B trigger per `§9` (operator question on adding 6th trigger carries forward). Tracking only.
+
+- **PINS — session 2 → no fresh Mon appearance.** No PINS-specific news Mon. Holding at 2.
+
+- **ORCL — session 2 entering Tue (advances on Wed AMC catalyst countdown).** Mon: ORCL named in BofA's 6-chip "secular upside" + multiple Q4 preview articles. Wed AMC print will resolve Tier-B trigger #3 (earnings-beat+raise+5% post-print) test. Tracking through Wed.
+
+- **No additional new candidates Mon** beyond the 3 promotions.
 
 ## Macro / sector context
 
-- **CPI May Wed 6/10 8:30 ET** is the anchor macro event. Consensus ~4.2% YoY headline / +0.3% core MoM (April was 3.95% YoY / 0.6% MoM). Cleveland Fed nowcast 4.18% trailing 12M. Hot print + Fri's +172K NFP would extend curve-steepening / rate-hike-bias trade.
-- **FOMC June 16-17** still 97.8% hold per Polymarket. Dot plot is the live catalyst (stable dots preserve delayed-cut trade; higher dots tighten without a hike). Hot CPI Wed could push dot risk asymmetric for the meeting two weeks out.
-- **PPI Thu 6/11 + Jobless claims Thu 6/11.** Same-day stack as ADBE AMC + SpaceX IPO pricing AMC.
-- **Iran-Hormuz Day-3 escalation through Sun.** US strikes on Iranian coastal sites following Sat AM drone launches. Iran negotiations remain suspended. Brent ~$93 Fri (-2%) on Chinese-imports demand offset. Monitor Mon AM oil for any catch-up premium.
-- **VIX 21.51 Fri close** = ELEVATED regime entering Mon. First sustained >20 close in months. Watch term-structure inversion (VIX1D vs front-month) for vol-buying-vs-selling regime confirmation.
-- **MRVL + FLEX S&P 500 inclusion Mon 6/22** carry-forward; passive-flow window opens this week.
-- **Sriram Krishnan exit from White House AI policy advisor role end of June** — single highest-profile AI-policy departure under Trump 2.0. Watch for replacement / acting-role naming.
+- **CPI May Wed 6/10 8:30 ET** — consensus +0.5% MoM / +4.2% YoY headline; +0.3% / +2.9% YoY core. Iran energy spike cited as accelerator; April energy +3.8% MoM. Hot print would extend curve-steepening + reinforce "higher-for-longer" Fed pricing.
+- **FOMC June 16-17** — 99.3% no-change priced. Dot plot is the live catalyst given Goldman's no-cuts-in-2026 base-case shift and possible removal of easing-bias language.
+- **PPI + jobless claims Thu 6/11 8:30 ET** — same-day stack with ADBE AMC and SpaceX IPO pricing AMC.
+- **VIX 18.92 Mon close** = ELEVATED regime (>20) broken intraday on Trump-brokered Iran-Israel ceasefire. -2.59 / -12.0% vs Fri close. Front-month/back-month curve resumed contango. iron_condor_high_iv IV-rank thresholds for chip names likely retraced from Fri levels.
+- **MRVL + FLEX S&P 500 inclusion effective 6/22** — passive-flow buying window opens this week.
+- **SpaceX IPO Thu/Fri** — pricing AMC 6/11, listing 6/12 under SPCX. $135 × 556.6M = $75B / $1.75T valuation (largest in history). Japan tranche upsized 25% to $2.5B on retail demand.
+- **Sriram Krishnan White House AI policy exit end-of-June** — no replacement named Mon.
 
 ## Library gaps
 
-- **AAPL WWDC 5-day event-window opens Mon on a held name** — no `event_window_posture` rule in the active set. Re-affirmed from Thu/Fri/Sat. **Suggested research:** event-window overlay (defer entries / tighten exits inside named multi-day catalyst windows; window starts 1 day before keynote, runs through last day of event).
-- **NVDA-SK Hynix Tier-1 supply-chain partnership** — no `supply_chain_partnership_event` rule. Companion to the Tier-1-customer-win gap from Fri. **Suggested research:** Tier-1-supply-chain-event overlay (when a held name announces multiyear partnership with named upstream/downstream counterparty, scale long posture up by 10-20% through 5-day repricing window).
-- **MU certification confirmed for Vera Rubin HBM4 with no pre-print-window rule that benefits** — `equity_event_driven_catalyst` claims MU but the strategy's pattern is around MU's own print (June 24), not cohort certification news. **Suggested research:** pre-print-cohort-cert overlay (when a held / candidate name receives qualification confirmation from a major customer pre-own-print, scale long posture up through pre-print window).
-- **VIX regime ELEVATED entering catalyst-stacked week** — no `vol_regime_shift_overlay` rule. Re-affirmed from Sat. **Suggested research:** vol-regime overlay (when VIX moves >5 in a day OR closes above 50D high OR stays >20 for >2 sessions, scale position sizes down 25-50% across trend strategies; scale up vol-selling structures).
-- **CPI / PPI / jobless macro-event window (Wed/Thu)** — no `macro_event_window` rule. Re-affirmed from Sat. **Suggested research:** macro-event-window overlay (defer entries 1 session before NFP/CPI/PPI/FOMC; hold open positions through window).
-- **SpaceX IPO Thu/Fri = JPM franchise event** — no `underwriter_franchise_event` rule. JPM held; the IB-franchise marker has no algorithmic responder. **Suggested research:** underwriter-franchise overlay (when a held i-bank is lead underwriter on top-3 IPO of trailing 12 months, scale long posture up through 5-day pricing+listing window).
+- **AAPL WWDC 5-day event-window live on a held name** — no `event_window_posture` rule in active set. Re-affirmed every session since Thu. **Suggested research:** event-window overlay (defer entries / tighten exits inside named multi-day catalyst windows; window starts 1 day before keynote, runs through last event day).
+- **NVDA-SK Hynix Tier-1 supply-chain partnership Day-2 + NVDA-SK Telecom/Naver Korea expansion** — no `supply_chain_partnership_event` rule. **Suggested research:** Tier-1-supply-chain-event overlay (when held name announces multiyear partnership with named upstream/downstream counterparty, scale long posture +10-20% through 5-day repricing window).
+- **MU cohort certification + Mon "buy the dip" + 9% intraday with no pre-print-window rule that benefits.** `equity_event_driven_catalyst` claims MU but pattern is around MU's own print, not cohort-spillover. **Suggested research:** pre-print-cohort-cert overlay.
+- **VIX regime transition (21.51 → 18.92, -12.0% intraday)** — no `vol_regime_shift_overlay` rule. Re-affirmed. **Suggested research:** vol-regime overlay (when VIX moves >5 in a day OR crosses 20 threshold, scale position sizes accordingly across trend strategies; scale vol-selling structures opposite direction).
+- **CPI / PPI / jobless macro-event window (Wed/Thu)** — no `macro_event_window` rule. Re-affirmed. **Suggested research:** macro-event-window overlay (defer entries 1 session before NFP/CPI/PPI/FOMC; hold open positions through window).
+- **SpaceX IPO Thu/Fri JPM franchise event** — no `underwriter_franchise_event` rule. Re-affirmed. **Suggested research:** underwriter-franchise overlay (when a held i-bank is lead underwriter on top-3 IPO of trailing 12 months, scale long posture +5-10% through pricing+listing window).
+- **MRVL S&P 500 inclusion 6/22 passive-flow window** — `equity_breakout_volume_confirmation` is claimant but no index-inclusion-specific rule. **Suggested research:** index-inclusion-passive-flow overlay (8-trading-day buy window pre-effective-date; size scaled to estimated passive AUM impact).
+- **Three new universe members (TSM, INTC, CBRS) entering with no claiming strategy.** Tomorrow's trader run will surface them as `unclaimed_count > 0`. Research agent's Saturday work needs to add claims. **Suggested research:** Sat 6/13 research run should assign TSM (foundry-anchor character; trend-following or sector-rotation likely), INTC (turnaround / breakout candidate), and CBRS (high-vol / event-window post-IPO character).
 
 ## Recommendations for the trader
 
-- **NOTABLE assessment. Consider standard workflow with VIX-regime-aware sizing.** The week is catalyst-stacked but no Mon-AM rule-trigger event. Strategies' price-driven rules will fire if signals fire; news context does not argue overriding.
-- **AMZN + META Mon-open sells already queued — execute per signal.** Existing exit signals from active strategies. Sun news is neutral on both; the algorithmic-only mandate forbids discretionary moves on top.
-- **NVDA held — Sun NVDA-SK Hynix news is anchor-positive.** If `equity_trend_following_ema_cross` fires an exit on NVDA Mon (cohort drag from Fri may carry), news context argues thesis intact (treat as noise-driven exit, but execute per rule).
-- **AAPL held into WWDC Mon 10am PT.** No event-window rule. Cook's final + Siri 2.0 / Google-Gemini-1.2T-param reveal are positive forward catalysts. Standard posture.
-- **GOOGL held — Siri 2.0 = highest-profile Gemini Enterprise demand-confirmation to date.** Net positive read into Mon. Standard posture.
-- **JPM held — SpaceX IPO franchise marker activates this week** (Thu pricing / Fri listing). No specific rule fires on franchise events. Standard posture.
-- **MRVL S&P 500 inclusion Mon 6/22.** `equity_breakout_volume_confirmation` is claimant; standard posture.
+- **NOTABLE assessment. Standard workflow with relief-rally aware framing.** Ceasefire-driven relief rally Mon, VIX regime softened intraday. No Tue-AM rule-trigger event from news; strategies' price-driven rules will fire if signals fire.
+- **AMZN + META Mon-open exits filled** per `last_handoff.md`. News context did not argue against the algorithmic-only mandate; rules executed.
+- **Held names (AAPL, GOOGL, JPM, NVDA, QQQ, SPY) — Mon news net constructive.** WWDC + NVDA-Korea + Intel-foundry + ceasefire collectively re-anchored the AI thesis. No discretionary additions; rules decide.
+- **AAPL WWDC Day-1 — held into 5-day window with no event-window rule.** Day-2-5 sell-side reactions Tue-Fri. Standard posture.
+- **MRVL S&P 500 passive-flow window opens this week (effective 6/22).** `equity_breakout_volume_confirmation` is claimant; volume-confirmation rule may trip on the inclusion-driven volume surge. Let the rule decide.
 - **MU pre-print window opens next week** (~June 16). `equity_event_driven_catalyst` claims; standard posture this week.
-- **Vol regime ELEVATED.** `iron_condor_high_iv` IV-rank thresholds may be met on chip names. Trader lets the rule decide; no discretionary vol-trade.
-- **CPI Wed 6/10 8:30 ET is the live macro flag.** No event-window rule; standard workflow.
-- **Iran-Hormuz Day-3:** monitor only — oil pricing has not confirmed escalation premium. No rule fires.
-- **No promotions executed this run.** All Sat candidates (STM/TSM/CRWD/FLEX/PINS) entered Sun at sessions 2/2/3?/1/2 and Sun produced no fresh appearances — session counts unchanged entering Mon. The Sunday gap (no candidate refresh) does not advance the Tier-A clock. Mon's news run is the next decision point.
+- **Three new universe members (TSM, INTC, CBRS) added Mon via promote-candidate.** They will appear as `unclaimed_count > 0` in tomorrow's trader run. **Trader should NOT add-active to claim them on a discretionary basis** — Sat research run owns claim assignment. Until then, the news layer flags them, the trader observes the gate, no rule trades them.
+- **Wed CPI + ORCL AMC, Thu PPI + ADBE AMC + SpaceX IPO pricing, Fri SpaceX listing.** No event-window rule active; standard workflow each day. Soft caution: above-trend catalyst stack Wed+Thu.
+- **Ceasefire is conditional — Lebanon front still active.** Geopolitical reset can reverse intraday; no rule fires on this.
 - **Algorithmic-only mandate.** None of the above is discretionary. If a rule fires, execute; if no rule fires, do not trade.
 
 ## Operational notes
 
-- `cli news-fetch --lookback-hours 24` returned **39 items** across 17 symbols. NVDA 8, MSFT 7, AMZN 4, AVGO 4, MU 4, TSLA 4, GOOGL 3, AAPL 2, META 2, JPM 1; ARM/CSCO/DELL/HPE/MRVL/QQQ/SPY 0. Sector aggregates: technology 14, financials 1, consumer_discretionary 4, index 0. `pending_sector_assignment: []`.
-- Sunday-density (39 items) higher than Sat (30) — anchored by the NVDA-SK Hynix announcement, WWDC pre-keynote pieces, and Sriram Krishnan departure news.
+- `cli news-fetch --lookback-hours 24` returned **136 items** across 17 symbols. NVDA 31, GOOGL 16, AAPL 13, AVGO 12, MRVL 9, META 9, TSLA 8, AMZN 7, MSFT 7, MU 7, SPY 6, QQQ 5, DELL 2, ARM/CSCO/HPE/JPM 1 each. Sector aggregates: technology 53, consumer_discretionary 8, index 7, financials 1. `pending_sector_assignment: []`.
+- 136 items Mon vs 39 items Sun = 3.5x increase, consistent with weekend-to-weekday density transition + Mon catalyst stack (WWDC + Intel + Cerebras + ceasefire).
 - All 6 category HTMLs written (macro, earnings, geopolitics, policy, volatility, options_flow). Daily summary written (~14 front-page items).
-- WebSearch returned strong results for: CPI May 2026 release schedule (BLS / Cleveland Fed / Heygotrade); WWDC 2026 keynote details (CNBC / TechRadar / Tom's Guide / Bloomberg / AppleInsider); Iran-Hormuz weekend escalation (RFE/RL / Wikipedia / CNBC); SpaceX IPO June 11 pricing (CNBC / Heygotrade / Capital.com); ORCL Q4 preview (Alphastreet / TipRanks / TradingKey / GuruFocus); ADBE Q2 preview (Kiplinger / MarketScreener); Sriram Krishnan departure (TechCrunch / Washington Post / The Hill / Newsweek); NVDA-SK Hynix multiyear deal (NVIDIA newsroom / Benzinga / Tom's Hardware / HotHardware); FOMC June 16-17 (Polymarket / CME FedWatch); Tesla robotaxi + Terafab (Benzinga / Electrek / Teslarati / Pluang).
-- WebSearch returned weak results for: VIX weekend futures (cash close confirmed but no weekend futures pricing); unusual options activity NVDA/AVGO/MU specific to June 6 (real-time UOA platforms not searchable). Both are acceptable gaps — markets closed Sun.
+- WebSearch returned strong results for: Iran-Israel ceasefire Jun 8 (NPR / CNN / Times of Israel / Wikipedia); WWDC 2026 (TechRadar / Tom's Guide / Engadget / CNBC / Popular Science / NPR); CPI May 2026 (Kiplinger / BLS / Cleveland Fed); ORCL Q4 preview (Alphastreet / TradingKey / Yahoo / Bitget); ADBE Q2 preview (Alphastreet / Kiplinger / TIKR); Intel-Google-NVDA (TheStreet / US News / Alpha Spread / SemiWiki); Cerebras 7-bank initiation (Benzinga / Parameter / CoinCentral); MRVL+FLEX S&P 500 (CNBC / Bloomberg / Fortune / Yahoo); SpaceX IPO (CNBC / Coindesk / Capital.com); VIX (StreetStats / Cboe); FOMC (CME FedWatch / Polymarket).
+- WebSearch returned **weak** results for: same-day "biggest gainers/losers June 8 2026" generic query (7+ session staleness pattern continues — per-name reconstruction is the workable path); intraday UOA platforms (not freely searchable).
 - **Promotion analysis (`news_manual.md §9`):**
-  - **Tier A (3-session recurrence)**: STM (session 3), TSM (session 3), CRWD (session 3-4). All three qualify. **PROMOTE all three** with `--sector technology`. Total: 3 promotions.
-  - **Tier B (single-event triggers)**: No qualifiers Sun. Daily cap 2 not exceeded (none triggered).
-  - **Decision: no promotions this run.** Sun produced no fresh candidate appearances; session counts unchanged. Universe stays at 17. Mon's run is the live promotion decision point.
+  - **Tier A**: TSM session 3 confirmed Mon (Apple picks-and-shovels + TSM-surging Day-1) → **PROMOTED**. STM at 2, CRWD at 3 provisional, FLEX at 2, PINS at 2 — no fresh Mon appearance; no promotion.
+  - **Tier B**: INTC #5 Tier-1-customer-win (Google 3M-TPU order verified) → **PROMOTED**. CBRS #4 sell-side initiation cluster (7-bank, same week) → **PROMOTED**. Daily cap 2 reached.
+  - **Decision: 3 promotions this run.** Universe expanded from 17 → 20.
+- All three `promote-candidate` commands returned `ok: true, promoted: true`; news-folder + sector-mapping created idempotently.
 - `git-sync` LaunchAgent status: per recent handoffs the LaunchAgent install is claimed but markers pending — operator action still pending. Will queue another marker on this run's commit.
-- Today is a Sunday run — `news_manual.md` schedule is M-F 3:30 PM PT but the scheduler fired today. Producing a Sunday brief is reasonable given the catalyst-stacked Mon-Fri week ahead and the Sunday Tier-1 NVDA-SK Hynix event.
