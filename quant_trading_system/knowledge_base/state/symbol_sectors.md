@@ -66,3 +66,9 @@ INTC: technology
 
 # Added 2026-06-09 (news, promote-candidate)
 CBRS: technology
+
+# Added 2026-06-09 (news, promote-candidate)
+ORCL: technology
+
+# Added 2026-06-09 (news, promote-candidate)
+NUVL: healthcare

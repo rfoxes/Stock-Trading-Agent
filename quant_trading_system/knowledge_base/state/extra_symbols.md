@@ -44,3 +44,9 @@ INTC
 
 # Added 2026-06-09 (news, promote-candidate): Tier-B #4 sell-side initiation cluster: 7+ banks initiated Mon 6/8 (Needham 00, Mizuho 00, Wedbush 70, Barclays 80, UBS 00, Rosenblatt 00, Morgan Stanley 50, Craig-Hallum 25). Post-IPO-quiet-period structural attention; CBRS +17% intraday. AI-inference cohort relevance to NVDA.
 CBRS
+
+# Added 2026-06-09 (news, promote-candidate): 3-session recurrence; BofA PT boost + multiple Q4 AMC preview articles Tue + Mon BofA 6-chip secular upside + Q4 preview articles
+ORCL
+
+# Added 2026-06-09 (news, promote-candidate): Tier-B #1 confirmed M&A target: GSK 0.6B all-cash 24/share (40% premium); FDA Priority Review PDUFA 2026-11-27
+NUVL
