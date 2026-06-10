@@ -11,143 +11,102 @@ when you write the version for the next-next Claude.
 **Every symbol in the universe MUST be claimed by an active strategy.**
 See `manual.md` "P0 — ZERO-UNCLAIMED RULE" at the top. `cli execute`
 REFUSES to run if any symbol is unclaimed. Claim via direct edit of
-`state/active_strategies.md` (see Open Issue #1 below — `cli add-active`
+`state/active_strategies.md` (see Open Issue #2 below — `cli add-active`
 is buggy and replaces existing claims).
 
 ---
 
-## Status as of last update (Tue 2026-06-09, post-close)
+## Status as of last update (Wed 2026-06-10, post-close)
 
 - **Active set: 7 strategies, 22/22 universe symbols claimed (unclaimed_count == 0).**
-  CBRS/INTC/NUVL/ORCL/TSM added today per P0 heuristic. Verify with `cli list-active`.
-- **Today's execute: 2 intents submitted, both queued for Wed open as market sells.**
-  - GOOGL sell 56 from `equity_trend_following_ema_cross` (EMA12 death-cross EMA26 exit). Order id `b7232cef-2130-4a92-b858-5799a9b8673c`. Est. P&L +$1,367 (profit exit).
-  - JPM sell 64 from `equity_trend_following_ema_cross` (ADX(14)=20.0 at exit threshold; implementation treats as inclusive). Order id `311fc65b-1a94-4575-9bd2-724d311546bb`. Est. P&L -$22 (~flat).
-- **Reconciled Mon's queued orders:** NVDA sell 96 filled ~$210.68 → +0.01020 of equity. MU buy 7 filled at $982.90 avg (opening fill; no reconciliation; now -$445.83 unrealized vs $813.44 stop).
-- **Account: equity $105,122.24 (-1.02% vs Mon $106,202.11; chip-selloff drag).**
-- **Regime: bull, conf 0.77, ADX 27.41.** Unchanged from Mon. ADX now ~7 above 20.0 EMA-cross exit threshold; further cool-down would fire more EMA-cross exits.
-- **CLI bug discovered: `add-active` REPLACES the strategy's symbol claims rather than appending.** Recovered today via direct YAML edit. Workaround: edit `state/active_strategies.md` directly when adding claims.
+  No claim changes today; Tue's work still standing. Verify with `cli list-active`.
+- **Today's execute: 0 intents.** All 7 strategies returned empty. No submissions, no rejections, no errors.
+- **Reconciled Tue's queued exits (both filled Wed open):**
+  - GOOGL sell 56 ≈ $362.92 fill → realized +0.01286 of equity (P&L +$1,352).
+  - JPM sell 64 ≈ $311.78 fill → realized -0.00076 of equity (P&L -$80).
+  - Logged via `cli log-closed equity_trend_following_ema_cross GOOGL 0.01286` and `... JPM -0.00076`.
+- **Account: equity $104,506.85 (-0.59% vs Tue $105,122.24); cash $32,063.73 (positive, net-cash posture).**
+- **Positions: 4 longs — AAPL 72 (+7.73%), MU 7 (-8.44%), QQQ 28 (+7.72%), SPY 35 (+3.01%).**
+- **Regime: bull, conf 0.77, ADX 27.41.** Unchanged from Mon/Tue.
+- **NEWS BRIEF GAP: today's `news_brief.md` was not written by the news agent — file header still reads 2026-06-09.** Proceeded without news context per manual §1. Operator awareness needed.
 
-## To do Wednesday (2026-06-10)
+## To do Thursday (2026-06-11)
 
-1. **Read last_handoff.md and news_brief.md FIRST.** Wed is CPI day
-   (BLS release 8:30 ET; consensus +0.5% MoM / +4.2% YoY headline,
-   +0.3% MoM / +2.9% YoY core). ORCL Q4 FY26 prints AMC. Anticipate
-   the brief will be NOTABLE or higher.
+1. **Read last_handoff.md and news_brief.md FIRST.** Thu has a heavy catalyst stack:
+   - PPI May + initial jobless claims 8:30 ET (consensus PPI +0.3% MoM; claims ~220K).
+   - ADBE Q2 prints AMC.
+   - SpaceX IPO pricing AMC ($135 × 555.6M target, $1.75T valuation).
+   - **ORCL prints Wed AMC (tonight); Thu's tape will react.**
+   - If the news brief is again missing/stale, note it again and proceed.
 
-2. **Standard read-and-snapshot.** Run `cli list-active`. Confirm
-   `unclaimed_count == 0`. If a new universe entry appeared (Wed news
-   promotion), claim via DIRECT YAML EDIT (see Open Issue #1) — do NOT
-   trust `cli add-active`.
+2. **Standard read-and-snapshot.** Run `cli list-active`. Confirm `unclaimed_count == 0`.
+   If a new universe entry appeared (Thu news promotion — likely SPCX post-listing? but SPCX lists Fri, not Thu), claim via **direct YAML edit** (see Open Issue #2) — do NOT trust `cli add-active`.
 
-3. **Reconciliation.** Mon's GOOGL sell 56 and JPM sell 64 are queued
-   Tue post-close and will fill Wed open:
-   - **GOOGL sell 56** (was 56 long at $338.79 avg; Tue mark $364.00).
-     Expected fill near Wed open price. Use actual fill from Alpaca
-     positions delta. First-pass estimate: realized ≈
-     ($364 - $338.79) × 56 ≈ +$1,412 ≈ +0.01343 of equity. Actual fill
-     could come in different post-Tue-selloff Wed open.
-     `cli log-closed equity_trend_following_ema_cross GOOGL <pnl_fraction>`.
-   - **JPM sell 64** (was 64 long at $313.04 avg; Tue mark $312.70).
-     Estimate ~flat to slightly negative. Use actual fill.
-     `cli log-closed equity_trend_following_ema_cross JPM <pnl_fraction>`.
-
-   Compute fills via cash-delta arithmetic if needed: (cash_change +
-   GOOGL_outflow + JPM_outflow) = -(GOOGL_proceeds + JPM_proceeds).
-   No buys queued Mon overnight; cash change should be pure sells inflow.
+3. **Reconciliation.** No orders queued Wed overnight. No fill expected Thu open from yesterday's `execute`. Quick `cli positions` diff vs handoff:
+   - Confirm 4 longs unchanged (AAPL 72, MU 7, QQQ 28, SPY 35) — no surprise overnight fills.
+   - If anything changed (Alpaca margin call, surprise close, etc.), reconcile before execute.
 
 4. **Run `cli execute`.** Watch for:
-   - **MU follow-on activity.** -$445.83 unrealized at Tue close;
-     stop $813.44 still ~13% away. Watch for time-stop or stop-loss
-     trigger if Wed continues chip-cohort weakness.
-   - **ORCL pre-print posture.** event-driven-catalyst strategy now
-     claims ORCL. Prints Wed AMC. Strategy may or may not fire entry
-     pre-print (didn't fire today; the rule keys off catalyst-flag).
-     If brief flags ORCL positive pre-print, expect possible entry.
-   - **CPI reaction.** No macro-event-window rule. Strategies will fire
-     on whatever technical signal forms in the post-CPI tape.
-   - **Other names.** ADX continues to govern trend-following exits.
-     With JPM gone after Wed open, claimed-but-no-position trend-following
-     names = AAPL, NVDA (gone), QQQ, SPY, AMZN (gone), TSLA (gone),
-     CBRS, NUVL, TSM. Held among them: AAPL, QQQ, SPY. Plus MU.
+   - **ORCL post-print reaction.** `equity_event_driven_catalyst` claims ORCL. The strategy's print-response rule may fire on Thu tape depending on print outcome. If ORCL gaps materially, the strategy could attempt entry.
+   - **MU stop watch.** -8.44% unrealized Wed; $813.44 stop is ~9.6% away (current $899.92). If chip cohort weakens further Thu, stop could come into play. The event-driven strategy holds through 6/24 print barring stop trigger.
+   - **AAPL WWDC Day-4.** Penultimate WWDC reaction day. Trend-following claims AAPL; price-driven rules will fire if signal forms.
+   - **ADBE post-print Thu AMC.** ADBE not in universe; not actionable for the trader.
+   - **PPI reaction.** Same as CPI Wed — no macro-event-window rule; strategies react to price.
+   - **SpaceX IPO pricing AMC.** Listing Fri. No SPCX in universe yet (won't be tradable until Fri at earliest). JPM franchise-event tailwind continues but JPM was exited Wed — no position to defend.
 
-5. **HALT-WORTHY check.** Pre-CPI tape can be volatile. If brief flags
-   HALT-WORTHY (e.g., CPI prints >2σ off consensus), use discretion to
-   skip `cli execute`. Standard threshold: only skip if brief explicitly
-   says HALT-WORTHY EVENT, not on intraday vol alone.
+5. **HALT-WORTHY check.** Multiple catalysts. If brief flags HALT-WORTHY (e.g., PPI prints >2σ off consensus + ORCL gaps -10%+), use discretion to skip `cli execute`. Standard threshold: only skip if brief explicitly says HALT-WORTHY EVENT.
 
-6. **Library gaps — see list below.** Two soft-flag re-confirmations
-   today (GOOGL/JPM exits on event-positive days) re-affirm existing
-   gaps. No new gap categories.
+6. **Library gaps — see list below.** No new gap categories Wed (no intents fired = no new exit-on-positive-news data points).
 
-7. **Run `cli git-sync --agent trader --message "..."` as last action.**
-   Then `cli git-doctor` once if any lock-file warnings appeared.
+7. **Run `cli git-sync --agent trader --message "..."` as last action.** Then `cli git-doctor` once if any lock-file warnings appeared.
 
 ## Library gaps for the research agent (carry to research_tasks.md Sat)
 
-These are EVENT-OVERLAY gaps + the 5 new first-pass assignments. Every universe symbol is claimed.
+These are EVENT-OVERLAY gaps + the 5 still-unvalidated first-pass assignments. Every universe symbol is claimed; head-to-head validation remains the Sat research priority.
 
 - **Validate the now-5-strategy first-pass assignments via head-to-head:**
-  - `equity_momentum_macd_histogram` vs `equity_trend_following_ema_cross` on META, MSFT *(META 1-day round-trip realized -$764 unchanged data point)*
-  - `equity_breakout_volume_confirmation` vs `equity_trend_following_ema_cross` on ARM, MRVL, INTC *(INTC added 2026-06-09)*
+  - `equity_momentum_macd_histogram` vs `equity_trend_following_ema_cross` on META, MSFT
+  - `equity_breakout_volume_confirmation` vs `equity_trend_following_ema_cross` on ARM, MRVL, INTC
   - `equity_mean_reversion_bollinger` vs `equity_trend_following_ema_cross` on CSCO
   - `equity_rsi_divergence` vs `equity_trend_following_ema_cross` on HPE
-  - `equity_event_driven_catalyst` vs `equity_trend_following_ema_cross` on AVGO, MU, ORCL *(ORCL added 2026-06-09, Wed AMC print is fresh data; today's MU print prep is ongoing)*
+  - `equity_event_driven_catalyst` vs `equity_trend_following_ema_cross` on AVGO, MU, ORCL *(ORCL Wed AMC print is fresh data)*
   - `equity_sector_rotation_momentum` vs `equity_trend_following_ema_cross` on DELL
   - `equity_trend_following_ema_cross` vs ??? on CBRS, NUVL, TSM *(safe-default placeholders, especially NUVL biotech)*
-- **Tier-1 supply-chain / customer-win partnership overlay — RE-CONFIRMED Day-3 in a row.** NVDA exited Mon despite NVDA-SK Hynix Sun positive; GOOGL exited Tue despite Google-SpaceX cloud deal + BNP Gemini share-gain Tue positive. Suggested rule: when a held name announces multiyear partnership with a named upstream/downstream counterparty OR receives a named-Tier-1-customer win, defer trend-exit signals through a 5-day repricing window OR scale long posture up 10-20%.
-- **Underwriter-franchise-event overlay — extended.** OpenAI confidential S-1 Tue named JPM as lead underwriter (alongside Goldman, Morgan Stanley) on top of the SpaceX Thu/Fri pricing-listing window. JPM exit on ADX-cool fires regardless. Suggested rule: when JPM (or any underwriter) is named lead on a flagship IPO with >$500B target valuation, defer trend-exit signals through the listing window.
-- **M&A target post-announcement (biotech / cross-sector) overlay — NEW Tue.** NUVL entered universe Tue as confirmed GSK $10.6B M&A target at $124/share. Stock will pin near $124 barring break. No M&A-arb strategy exists. Suggested rule: post-announcement entry on confirmed M&A target with stop at announced deal price minus 5%; exit on deal close or termination news. This is the priority claim swap from `equity_trend_following_ema_cross` for NUVL.
-- **AAPL WWDC June 8-12 event-window posture rule. ACTIVE THROUGH FRI.** Day-2 Tue punished AAPL on monetization questions. Day-3-5 reactions Wed-Fri.
-- **NFP / CPI / FOMC macro-event-window rule. CPI WED 6/10 8:30 ET, FOMC Jun 16-17.**
-- **Peer-earnings cohort-spillover overlay** (AVGO → NVDA/MU/MRVL; ORCL → cloud cohort Wed).
-- **Geopolitical / oil-spike risk-off overlay** (Iran-Israel ceasefire fragile, oil -5% Tue).
-- **Rate-policy-shift sizing rule** (10Y yield around CPI / FOMC).
+- **Tier-1 supply-chain / customer-win partnership overlay — re-confirmed Tue (Day-3).** NVDA/GOOGL exits on event-positive days. Wed had no exits to add a data point but the gap remains. Suggested rule: when a held name announces multiyear partnership with a named upstream/downstream counterparty OR receives a named-Tier-1-customer win, defer trend-exit signals through a 5-day repricing window OR scale long posture up 10-20%.
+- **Underwriter-franchise-event overlay — open.** JPM exited Tue/Wed despite OpenAI underwriter naming + SpaceX overlap. Suggested rule: when JPM (or any underwriter) is named lead on a flagship IPO with >$500B target valuation, defer trend-exit signals through the listing window.
+- **M&A target post-announcement (biotech / cross-sector) overlay — open Tue.** NUVL pinned near $124. No M&A-arb strategy exists. Priority claim swap from `equity_trend_following_ema_cross` for NUVL.
+- **AAPL WWDC June 8-12 event-window posture rule. ACTIVE Day-3-5 Wed-Fri.**
+- **NFP / CPI / FOMC macro-event-window rule. CPI WED 6/10 8:30 ET FIRED (response unknown without brief). FOMC Jun 16-17.**
+- **Peer-earnings cohort-spillover overlay** (ORCL → cloud cohort Thu; ADBE → software cohort).
+- **Geopolitical / oil-spike risk-off overlay** (Iran-Israel ceasefire fragile).
+- **Rate-policy-shift sizing rule** (10Y yield around CPI / PPI / FOMC).
 - **Credit-stress sector overlay** (Cliffwater + Blackstone gates → JPM).
 - **TSMC capacity-constraint supply-side pricing-power overlay.**
 - **Trump AI EO policy-tailwind sizing rule.**
 - **EU cloud procurement regulatory-headwind rule.**
 - **Corporate-action handler** (CRWD 4-for-1 split style).
-- **Vol-regime overlay** (VIX intraday Tue 18.92 → 20.45 +8% — ELEVATED >20 tag back live).
-- **AI-cohort multiple-compression overlay** (Anthropic Fable 5 token-pricing AI-bubble + $3.6T IPO supply with SpaceX/OpenAI/Anthropic concentration).
-- **Cross-sector defensive rotation overlay** (Tue REIT/staples/utilities bid vs AI-cohort sold).
+- **Vol-regime overlay** (VIX > 20 = ELEVATED; Tue 20.45, Wed close unknown w/o brief).
+- **AI-cohort multiple-compression overlay** (Anthropic Fable 5 + $3.6T IPO supply with SpaceX/OpenAI/Anthropic concentration).
+- **Cross-sector defensive rotation overlay** (Tue REIT/staples/utilities bid).
 - **Pre-print cohort-cert overlay** (held/candidate receives major-customer qualification confirmation pre-own-print).
+- **News-brief-staleness handling.** If the news agent fails to update, the trader has no fallback. The current "proceed without context and note the gap" rule works for one-off misses; if it persists, the strategy library has no event-aware logic to fall back on. Soft observation, not a coded rule.
 
 ## Open questions for the operator
 
-1. **`cli add-active` REPLACES rather than APPENDS** — HIGH PRIORITY. Hit
-   today claiming 5 unclaimed symbols. Each `add-active` call wiped the
-   strategy's prior symbol list. Recovered via direct YAML edit. Until
-   fixed, the workflow for claiming a new symbol on a strategy that
-   already owns symbols MUST go through direct file edit, not the CLI.
-   Suggested fix: append by default; require `--replace` to overwrite.
+1. **News brief did not update for 2026-06-10.** Wed's brief is missing — file is still Tue's. Trader proceeded without it. Operator should check why the news agent didn't run / why the scheduled task didn't write `news_brief.md`.
 
-2. **`cli open-orders` parsing bug** — carry-forward. Untested today
-   when orders are live (Mon's 2 cleared at Tue open; Tue's 2 just
-   submitted at end-of-run).
+2. **`cli add-active` REPLACES rather than APPENDS** — HIGH PRIORITY, carry-forward from Tue. Workaround: edit `state/active_strategies.md` directly when adding claims.
 
-3. **NUVL claim placeholder via trend-following.** NUVL is a deal-pinned
-   biotech M&A target; trend-following won't generate meaningful signals.
-   Need M&A-arb strategy. Sat research agent priority.
+3. **`cli open-orders` parsing bug** — carry-forward, untested today (empty list at snapshot).
 
-4. **CBRS, TSM claim placeholders** — safe-default trend-following.
-   Validate via head-to-head Sat.
+4. **NUVL claim placeholder via trend-following.** Need M&A-arb strategy. Sat research agent priority.
 
-5. **GOOGL exit on Google-SpaceX positive — Day-3 consecutive event-positive
-   exit pattern.** NVDA Mon, GOOGL Tue. Library gap doubly confirmed.
+5. **CBRS, TSM claim placeholders** — safe-default trend-following. Validate via head-to-head Sat.
 
-6. **JPM exit at ADX=20.0 exactly + OpenAI underwriter franchise event
-   Tue.** Borderline ADX firing + no franchise-event rule = exit on a
-   franchise-tailwind day.
+6. **MU buy stop at $813.44 → -8.44% unrealized after Wed close.** Stop ~9.6% buffer. Position into Jun 24 print.
 
-7. **MU buy stop at $813.44 → -6.5% unrealized after Tue chip selloff.**
-   Stop still ~13% buffer. Position into Jun 24 print.
+7. **GOOGL/JPM Wed-open fill prices were derived from cash arithmetic, not Alpaca per-order report.** Combined sum is exact (+0.01210 of equity); per-symbol split (+0.01286 GOOGL, -0.00076 JPM) is proportional approximation.
 
-8. **CPI Wed 6/10 8:30 ET, ORCL Wed AMC, ADBE/PPI/SpaceX-IPO Thu,
-   SpaceX listing Fri.** Catalyst stack continues. No macro-event-window
-   rule active.
+8. **CPI Wed 6/10 fired (response unknown), ORCL Wed AMC, ADBE/PPI/SpaceX-IPO Thu, SpaceX listing Fri, FOMC Jun 16-17.** Catalyst stack continues. No macro-event-window rule active.
 
-9. **NUVL universe membership terminates on GSK deal close.** While the
-   deal is pending the symbol stays in the universe and the harness
-   tracks it; on close, remove from `extra_symbols.md` (operator action
-   when the time comes).
+9. **Book is net-cash for the first time in weeks.** $32K cash + $72K longs = 0% leverage. New baseline posture going into the Thu/Fri catalyst stack.
