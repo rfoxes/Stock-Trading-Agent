@@ -11,6 +11,8 @@ indicators:
 market_regime:
   - range_bound
   - mean_reverting
+gap_types:
+  - mean_reversion
 parameters:
   rsi_period: 9
   rsi_oversold: 35

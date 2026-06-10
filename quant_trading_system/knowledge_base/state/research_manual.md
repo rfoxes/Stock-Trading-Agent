@@ -192,12 +192,23 @@ operator does NOT pick by feel. The trader CANNOT pick by feel. The
 harness physically refuses to write a conflicting `active_strategies.md`
 — `cli add-active` errors on overlap.
 
-Your job, after running the head-to-head, is to either:
-- Update `state/active_strategies.md` to reflect the winner (the trader
-  will do this with `cli remove-active` / `cli add-active` on Monday based
-  on your finding), OR
-- Document the result in the weekly log if no change is warranted
-  (e.g., new strategy didn't beat incumbent on any contested symbol).
+**You apply the verdict yourself. You do NOT recommend.** As soon as
+`cli head-to-head` returns a winner, you immediately run:
+```
+cli remove-active <loser> --reason "head-to-head <today>: lost to <winner> on <symbol>, sharpe <a.aaa> vs <b.bbb>"
+cli add-active <winner> --symbols <comma-separated-already-claimed-plus-new-symbol> --reason "head-to-head <today>: won on <symbol>, sharpe <b.bbb> vs <a.aaa>"
+```
+There is no "trader applies on Monday" step. That pattern was the
+2026-06-08 → 2026-06-10 bug — last Saturday's verdicts sat in the
+weekly log, Monday's trader read them as advisory, and 3 new
+mid-week symbols got first-pass character-match claims on top of
+unvalidated claims. Research IS the source of truth for symbol
+claims. Mutate `active_strategies.md` directly via the CLI; do not
+leave verdicts as recommendations in the log.
+
+Document the action you took in the weekly log AFTER applying it.
+The weekly log is a journal of what happened, not a queue of what
+should happen next.
 
 ## Weekly workflow
 

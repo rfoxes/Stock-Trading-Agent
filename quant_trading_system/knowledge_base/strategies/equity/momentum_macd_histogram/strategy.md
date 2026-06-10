@@ -11,6 +11,8 @@ indicators:
 market_regime:
   - trending
   - momentum
+gap_types:
+  - trending
 parameters:
   macd_fast_period: 12
   macd_slow_period: 26

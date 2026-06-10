@@ -1179,15 +1179,25 @@ def execute_active_strategy(
                 f"unclaimed-gate precheck failed: could not compute universe ({e}). "
                 "Refusing to execute. Either fix the universe error or rerun with --allow-unclaimed."
             )
-        if gaps:
+        # Subtract symbols that have been triaged and flagged as
+        # true_library_gap (no library strategy clears baseline Sharpe).
+        # Those are *tolerated* unclaimed — Saturday research owns them.
+        # Symbols not yet triaged remain hard blockers; the trader must
+        # run `cli triage-symbol <SYM>` for each before execute.
+        flagged = set(memory.library_gap_symbols())
+        blocking = [g for g in gaps if g.upper() not in flagged]
+        if blocking:
             return _err(
                 "UNCLAIMED_SYMBOLS_VIOLATION: refusing to execute. "
-                f"{len(gaps)} symbol(s) in the universe have no active strategy claim: "
-                f"{', '.join(gaps)}. "
-                "Operator policy (set 2026-06-04): every universe symbol MUST be claimed before execute. "
-                "Resolve by either (a) `cli add-active <strategy_id> --symbols <SYM>,... --reason \"...\"` "
-                "for each unclaimed symbol, or (b) remove the symbol from the universe "
-                "(edit state/extra_symbols.md, close the position, or remove from a strategy's frontmatter). "
+                f"{len(blocking)} symbol(s) in the universe have no active "
+                f"strategy claim AND have not been triaged: {', '.join(blocking)}. "
+                "Operator policy: every universe symbol must be either "
+                "(a) claimed by an active strategy, or (b) algorithmically "
+                "triaged via `cli triage-symbol <SYM> [--gap-type ...]` "
+                "and flagged as a true library gap. Run triage-symbol for "
+                "each blocking symbol; the harness will either auto-claim "
+                "it (Sharpe ≥ 0.5 on a library candidate) or write a "
+                "library-gap marker that lets execute proceed. "
                 "Escape hatch (NOT for daily runs): rerun with `--allow-unclaimed`."
             )
 
@@ -1338,6 +1348,364 @@ def head_to_head_backtest(
         "b": {"strategy_id": strategy_b, **b},
         "winner": winner,
         "decision_basis": "higher Sharpe; tiebreak on smaller max drawdown",
+    })
+
+
+def triage_symbol(
+    ctx: ToolContext,
+    *,
+    symbol: str,
+    gap_type: str | None = None,
+    start: str | None = None,
+    end: str | None = None,
+    baseline_sharpe: float = 0.5,
+    auto_claim: bool = True,
+) -> dict[str, Any]:
+    """Find the best library strategy for ``symbol`` and (optionally)
+    claim it via ``add_active_strategy``.
+
+    This is the trader's pre-execute mechanism for handling unclaimed
+    symbols. It is purely algorithmic:
+
+      1. Build a candidate list. If ``gap_type`` is given, candidates =
+         ``find_strategies_for_gap(gap_type)``. Else candidates = every
+         active or testing equity strategy.
+      2. Backtest each candidate on ``symbol`` over the given window
+         (default: last 2 calendar years).
+      3. Rank by Sharpe (tiebreak: smaller max DD).
+      4. If the top candidate's Sharpe ≥ ``baseline_sharpe``, claim the
+         symbol with that strategy (replacing the strategy's existing
+         claims by union with the new symbol). Returns ``verdict:
+         claimed``.
+      5. Else returns ``verdict: true_library_gap`` — no library
+         strategy beats baseline on this symbol. Trader logs the gap;
+         Saturday research builds (or activates) a strategy that handles
+         the gap_type the news brief tagged.
+
+    No judgment, no character-match. Sharpe decides. If Sharpe is tied
+    or every strategy errors, the verdict is true_library_gap.
+    """
+    import datetime as _dt
+    from quant_trading_system.templates import find_strategies_for_gap
+    from quant_trading_system.strategy_backtest import run_backtest as _bt
+
+    sym = (symbol or "").strip().upper()
+    if not sym:
+        return _err("symbol required")
+
+    # Default window: last 2 calendar years
+    if not end:
+        end = _dt.date.today().isoformat()
+    if not start:
+        end_d = _dt.date.fromisoformat(end)
+        start = end_d.replace(year=end_d.year - 2).isoformat()
+
+    # Build candidate list.
+    if gap_type:
+        candidates = find_strategies_for_gap(gap_type)
+        if not candidates:
+            reason_text = (
+                f"no library strategy declares gap_types containing "
+                f"{gap_type!r}. Saturday research must add or "
+                "activate a template that handles this gap_type."
+            )
+            try:
+                memory.append_library_gap(
+                    sym, gap_type=gap_type, reason=reason_text,
+                    baseline_sharpe=baseline_sharpe,
+                )
+            except Exception:
+                pass
+            return _ok({
+                "symbol": sym,
+                "gap_type": gap_type,
+                "verdict": "true_library_gap",
+                "reason": reason_text,
+                "candidates": [],
+                "winner": None,
+                "scores": [],
+                "claimed": False,
+                "library_gap_flagged": True,
+            })
+    else:
+        candidates = []
+        for sf in memory.list_strategies():
+            if (sf.frontmatter or {}).get("status") == "archived":
+                continue
+            if sf.type != "equity":
+                continue
+            candidates.append(sf.id)
+        if not candidates:
+            return _err("no equity strategies available to triage")
+
+    # Score every candidate.
+    scores: list[dict[str, Any]] = []
+    for sid in sorted(candidates):
+        try:
+            r_obj = _bt(
+                strategy_id=sid,
+                symbol=sym,
+                start=start,
+                end=end,
+                market_data=ctx.market_data,
+                regime_classifier=ctx.regime_classifier,
+            )
+        except Exception as e:
+            scores.append({"strategy_id": sid, "error": f"backtest raised: {e}"})
+            continue
+        r = r_obj.to_dict() if hasattr(r_obj, "to_dict") else r_obj
+        if r.get("error"):
+            scores.append({"strategy_id": sid, "error": r["error"]})
+            continue
+        scores.append({
+            "strategy_id": sid,
+            "sharpe": float(r.get("sharpe", 0.0) or 0.0),
+            "max_drawdown": float(r.get("max_drawdown", 0.0) or 0.0),
+            "total_return": float(r.get("total_return", 0.0) or 0.0),
+            "trades": int(r.get("num_trades", 0) or 0),
+        })
+
+    # Pick the winner from scoreable rows.
+    rankable = [s for s in scores if "sharpe" in s]
+    if not rankable:
+        reason_text = "every candidate backtest errored — cannot rank"
+        try:
+            memory.append_library_gap(
+                sym, gap_type=gap_type or "unknown",
+                reason=reason_text, baseline_sharpe=baseline_sharpe,
+            )
+        except Exception:
+            pass
+        return _ok({
+            "symbol": sym,
+            "gap_type": gap_type,
+            "window": {"start": start, "end": end},
+            "verdict": "true_library_gap",
+            "reason": reason_text,
+            "candidates": list(candidates),
+            "winner": None,
+            "scores": scores,
+            "claimed": False,
+            "library_gap_flagged": True,
+        })
+    # Sort by Sharpe desc, tiebreak by smaller |max DD|.
+    rankable.sort(key=lambda s: (-s["sharpe"], s["max_drawdown"]))
+    top = rankable[0]
+
+    if top["sharpe"] < baseline_sharpe:
+        reason_text = (
+            f"top candidate {top['strategy_id']!r} has Sharpe "
+            f"{top['sharpe']:.3f} < baseline {baseline_sharpe:.3f}. "
+            "No library strategy is good enough on this symbol — "
+            "log for Saturday research to build a new template."
+        )
+        try:
+            memory.append_library_gap(
+                sym, gap_type=gap_type or "unknown",
+                reason=reason_text,
+                top_strategy=top["strategy_id"],
+                top_sharpe=top["sharpe"],
+                baseline_sharpe=baseline_sharpe,
+            )
+        except Exception:
+            pass
+        return _ok({
+            "symbol": sym,
+            "gap_type": gap_type,
+            "window": {"start": start, "end": end},
+            "verdict": "true_library_gap",
+            "reason": reason_text,
+            "candidates": list(candidates),
+            "winner_below_baseline": top,
+            "scores": rankable,
+            "claimed": False,
+            "library_gap_flagged": True,
+        })
+
+    if not auto_claim:
+        return _ok({
+            "symbol": sym,
+            "gap_type": gap_type,
+            "window": {"start": start, "end": end},
+            "verdict": "winner_found",
+            "winner": top,
+            "scores": rankable,
+            "claimed": False,
+        })
+
+    # Claim. Union with existing symbol claims for the winner.
+    winner_id = top["strategy_id"]
+    current = memory.read_active_strategies()
+    existing_syms = next(
+        (set(c.symbols) for c in current if c.strategy_id == winner_id),
+        set(),
+    )
+    union_syms = sorted(existing_syms | {sym})
+    reason = (
+        f"triage-symbol {_dt.date.today().isoformat()}: "
+        f"{winner_id} beat {len(rankable)-1} other candidate(s) on {sym} "
+        f"with Sharpe {top['sharpe']:.3f} (vs baseline {baseline_sharpe:.2f})"
+    )
+    try:
+        memory.add_active_strategy(winner_id, symbols=union_syms, reason=reason)
+    except ValueError as e:
+        return _err(
+            f"triage selected {winner_id} but add_active failed: {e}. "
+            "This usually means another strategy already claims this "
+            "symbol — re-run with --no-claim to see scores, then resolve "
+            "via cli head-to-head."
+        )
+    # If this symbol was previously flagged as a library gap, clear it.
+    cleared_gap = False
+    try:
+        cleared_gap = memory.clear_library_gap(sym)
+    except Exception:
+        pass
+    return _ok({
+        "symbol": sym,
+        "gap_type": gap_type,
+        "window": {"start": start, "end": end},
+        "verdict": "claimed",
+        "winner": top,
+        "scores": rankable,
+        "claimed": True,
+        "claim_reason": reason,
+        "cleared_prior_library_gap": cleared_gap,
+    })
+
+
+def instantiate_template(
+    ctx: ToolContext,
+    *,
+    strategy_id: str,
+    symbol: str,
+    start: str | None = None,
+    end: str | None = None,
+    reason: str,
+    sharpe_floor: float = 0.5,
+    max_dd_floor: float = -0.30,
+) -> dict[str, Any]:
+    """Run a stricter addition test for ``strategy_id`` on ``symbol``,
+    then claim if the strategy clears the floors.
+
+    The "instantiation" of a template against a new symbol is just:
+    backtest the template's rules on the symbol, check the result clears
+    a defensible Sharpe + max-DD floor, then claim. The trader uses this
+    when the news brief surfaces a candidate with a known gap_type that
+    has at most one template responder (so triage-symbol's ranking is
+    degenerate); the research agent uses it to formalize claims for
+    symbols where a single template is the obvious match.
+
+    Returns claim metadata on pass, or the failing metrics + reason on
+    reject.
+    """
+    import datetime as _dt
+    from quant_trading_system.strategy_backtest import run_backtest as _bt
+
+    sym = (symbol or "").strip().upper()
+    if not sym:
+        return _err("symbol required")
+    if not reason or not reason.strip():
+        return _err("--reason required: every claim must trace to a justification")
+
+    if not end:
+        end = _dt.date.today().isoformat()
+    if not start:
+        end_d = _dt.date.fromisoformat(end)
+        start = end_d.replace(year=end_d.year - 2).isoformat()
+
+    sf = memory.read_strategy(strategy_id)
+    if sf is None:
+        return _err(f"strategy not found: {strategy_id}")
+
+    try:
+        r_obj = _bt(
+            strategy_id=strategy_id,
+            symbol=sym,
+            start=start,
+            end=end,
+            market_data=ctx.market_data,
+            regime_classifier=ctx.regime_classifier,
+        )
+    except Exception as e:
+        return _err(f"backtest raised: {e}")
+    r = r_obj.to_dict() if hasattr(r_obj, "to_dict") else r_obj
+    if r.get("error"):
+        return _err(f"backtest error: {r['error']}")
+
+    sharpe = float(r.get("sharpe", 0.0) or 0.0)
+    max_dd = float(r.get("max_drawdown", 0.0) or 0.0)
+    failures: list[str] = []
+    if sharpe < sharpe_floor:
+        failures.append(f"Sharpe {sharpe:.3f} < floor {sharpe_floor:.2f}")
+    if max_dd < max_dd_floor:
+        failures.append(f"max_drawdown {max_dd:.3f} < floor {max_dd_floor:.2f}")
+
+    if failures:
+        return _ok({
+            "symbol": sym,
+            "strategy_id": strategy_id,
+            "window": {"start": start, "end": end},
+            "verdict": "rejected",
+            "metrics": {
+                "sharpe": sharpe, "max_drawdown": max_dd,
+                "total_return": float(r.get("total_return", 0.0) or 0.0),
+                "trades": int(r.get("num_trades", 0) or 0),
+            },
+            "failures": failures,
+            "claimed": False,
+        })
+
+    # Pass — claim by union with existing symbols.
+    current = memory.read_active_strategies()
+    existing_syms = next(
+        (set(c.symbols) for c in current if c.strategy_id == strategy_id),
+        set(),
+    )
+    union_syms = sorted(existing_syms | {sym})
+    full_reason = (
+        f"instantiate-template {_dt.date.today().isoformat()}: {reason.strip()} "
+        f"(Sharpe {sharpe:.3f}, max DD {max_dd:.3f} on [{start}, {end}])"
+    )
+    try:
+        memory.add_active_strategy(strategy_id, symbols=union_syms, reason=full_reason)
+    except ValueError as e:
+        return _err(f"add_active failed: {e}")
+    cleared_gap = False
+    try:
+        cleared_gap = memory.clear_library_gap(sym)
+    except Exception:
+        pass
+    return _ok({
+        "symbol": sym,
+        "strategy_id": strategy_id,
+        "window": {"start": start, "end": end},
+        "verdict": "instantiated",
+        "metrics": {
+            "sharpe": sharpe, "max_drawdown": max_dd,
+            "total_return": float(r.get("total_return", 0.0) or 0.0),
+            "trades": int(r.get("num_trades", 0) or 0),
+        },
+        "claimed": True,
+        "claim_reason": full_reason,
+        "cleared_prior_library_gap": cleared_gap,
+    })
+
+
+def list_gap_registry(ctx: ToolContext) -> dict[str, Any]:
+    """Show the gap_type → strategy_ids map. Coverage holes (gap_types
+    with no responder) are the canonical list of "true" library gaps
+    pending Saturday research.
+    """
+    from quant_trading_system.templates import (
+        CANONICAL_GAP_TYPES, inverted_registry,
+    )
+    reg = inverted_registry()
+    coverage_holes = sorted([gt for gt, ids in reg.items() if not ids])
+    return _ok({
+        "canonical_gap_types": list(CANONICAL_GAP_TYPES),
+        "registry": reg,
+        "coverage_holes": coverage_holes,
     })
 
 

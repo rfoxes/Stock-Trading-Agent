@@ -244,6 +244,38 @@ def cmd_head_to_head(ctx: ToolContext, args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_triage_symbol(ctx: ToolContext, args: argparse.Namespace) -> int:
+    _emit(agent_tools.triage_symbol(
+        ctx,
+        symbol=args.symbol,
+        gap_type=args.gap_type,
+        start=args.start,
+        end=args.end,
+        baseline_sharpe=args.baseline_sharpe,
+        auto_claim=not args.no_claim,
+    ))
+    return 0
+
+
+def cmd_instantiate_template(ctx: ToolContext, args: argparse.Namespace) -> int:
+    _emit(agent_tools.instantiate_template(
+        ctx,
+        strategy_id=args.strategy_id,
+        symbol=args.symbol,
+        start=args.start,
+        end=args.end,
+        reason=args.reason,
+        sharpe_floor=args.sharpe_floor,
+        max_dd_floor=args.max_dd_floor,
+    ))
+    return 0
+
+
+def cmd_gap_registry(ctx: ToolContext, args: argparse.Namespace) -> int:
+    _emit(agent_tools.list_gap_registry(ctx))
+    return 0
+
+
 def cmd_list_strategies(ctx: ToolContext, args: argparse.Namespace) -> int:
     _emit(agent_tools.list_strategies(
         ctx,
@@ -506,6 +538,72 @@ def _build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--start", required=True, help="YYYY-MM-DD")
     sp.add_argument("--end", required=True, help="YYYY-MM-DD")
     sp.set_defaults(func=cmd_head_to_head)
+
+    # triage-symbol (algorithmic claim-or-flag for a new universe entry)
+    sp = sub.add_parser(
+        "triage-symbol",
+        help=(
+            "Rank library strategies by Sharpe on a symbol, claim the "
+            "winner if it clears baseline, else report true_library_gap. "
+            "Trader's pre-execute path for unclaimed symbols."
+        ),
+    )
+    sp.add_argument("symbol")
+    sp.add_argument(
+        "--gap-type", default=None,
+        help=(
+            "Restrict candidates to strategies declaring this gap_type "
+            "(see cli gap-registry for the canonical list). Omit to score "
+            "every active+testing equity strategy."
+        ),
+    )
+    sp.add_argument(
+        "--start", default=None,
+        help="Backtest window start (YYYY-MM-DD). Default: 2 years before --end.",
+    )
+    sp.add_argument(
+        "--end", default=None,
+        help="Backtest window end (YYYY-MM-DD). Default: today.",
+    )
+    sp.add_argument(
+        "--baseline-sharpe", type=float, default=0.5,
+        help="Top candidate must clear this Sharpe to claim. Below = true_library_gap.",
+    )
+    sp.add_argument(
+        "--no-claim", action="store_true",
+        help="Score and rank but do NOT auto-claim. Useful for dry runs.",
+    )
+    sp.set_defaults(func=cmd_triage_symbol)
+
+    # instantiate-template (stricter single-strategy add for a symbol)
+    sp = sub.add_parser(
+        "instantiate-template",
+        help=(
+            "Run a stricter Sharpe+max-DD test for ONE strategy on a "
+            "symbol; claim if it passes. Use when triage-symbol has a "
+            "degenerate single-candidate list (the gap_type has only one "
+            "responder) and you want a defensible floor check before "
+            "adding."
+        ),
+    )
+    sp.add_argument("strategy_id")
+    sp.add_argument("--symbol", required=True)
+    sp.add_argument("--reason", required=True)
+    sp.add_argument("--start", default=None)
+    sp.add_argument("--end", default=None)
+    sp.add_argument("--sharpe-floor", type=float, default=0.5)
+    sp.add_argument("--max-dd-floor", type=float, default=-0.30)
+    sp.set_defaults(func=cmd_instantiate_template)
+
+    # gap-registry (coverage view of the template registry)
+    sp = sub.add_parser(
+        "gap-registry",
+        help=(
+            "Print the gap_type → strategy_ids map and the list of "
+            "gap_types with no responder (canonical 'true' library gaps)."
+        ),
+    )
+    sp.set_defaults(func=cmd_gap_registry)
 
     # list-strategies
     sp = sub.add_parser("list-strategies", help="List strategies on disk.")

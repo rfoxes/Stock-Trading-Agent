@@ -11,6 +11,9 @@ indicators:
 market_regime:
   - trending
   - breakout
+gap_types:
+  - intraday_range
+  - breakout
 parameters:
   opening_range_minutes: 15
   atr_period: 14

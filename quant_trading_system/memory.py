@@ -87,6 +87,7 @@ STATE_DIR = KB_DIR / "state"
 
 ACTIVE_STRATEGY_FILE = STATE_DIR / "active_strategy.md"            # legacy single
 ACTIVE_STRATEGIES_FILE = STATE_DIR / "active_strategies.md"        # new plural
+LIBRARY_GAPS_FILE = STATE_DIR / "library_gaps.md"                  # triage-marked unclaimed
 HANDOFF_FILE = STATE_DIR / "last_handoff.md"
 SUMMARY_FILE = STATE_DIR / "summary.md"
 
@@ -661,12 +662,167 @@ def unclaimed_symbols(universe: Iterable[str]) -> list[str]:
     Library-gap diagnostic: these are the symbols the harness is tracking
     (positions / news / extras / strategy frontmatter) but no algorithmic
     responder owns.
+
+    Symbols flagged in `state/library_gaps.md` (triaged → no responder
+    beats baseline) are also counted as unclaimed — they ARE unclaimed.
+    The library_gap registry is metadata about why, not a claim. Callers
+    deciding whether to block on unclaimed symbols should filter against
+    ``library_gap_symbols()`` separately.
     """
     universe_set = {str(s).upper() for s in universe}
     claimed: set[str] = set()
     for c in read_active_strategies():
         claimed.update(c.symbols)
     return sorted(universe_set - claimed)
+
+
+# ---------------------------------------------------------------------------
+# Library-gap registry (state/library_gaps.md)
+#
+# When `cli triage-symbol` runs and no library strategy clears baseline
+# Sharpe for the symbol, the verdict is "true_library_gap" and the
+# symbol is appended here. The unclaimed-gate in execute treats
+# library-gap symbols as "tolerated unclaimed" — execute proceeds, the
+# symbol simply isn't traded that day, and Saturday research uses this
+# file as its top-priority queue for new-template work.
+#
+# File format — `state/library_gaps.md`:
+#
+#     ---
+#     gaps:
+#       - symbol: NUVL
+#         gap_type: ma_arbitrage
+#         triaged_at: 2026-06-10
+#         reason: "no library strategy declares gap_type ma_arbitrage"
+#         top_strategy: null
+#         top_sharpe: null
+#         baseline_sharpe: 0.5
+#     ---
+#     <free-form notes>
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class LibraryGap:
+    symbol: str
+    gap_type: str
+    triaged_at: str
+    reason: str
+    top_strategy: str | None = None
+    top_sharpe: float | None = None
+    baseline_sharpe: float = 0.5
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "symbol": self.symbol,
+            "gap_type": self.gap_type,
+            "triaged_at": self.triaged_at,
+            "reason": self.reason,
+            "top_strategy": self.top_strategy,
+            "top_sharpe": self.top_sharpe,
+            "baseline_sharpe": self.baseline_sharpe,
+        }
+
+
+def read_library_gaps() -> list[LibraryGap]:
+    """Return the current list of triaged-but-unclaimed symbols."""
+    if not LIBRARY_GAPS_FILE.exists():
+        return []
+    fm, _ = _parse_frontmatter(LIBRARY_GAPS_FILE)
+    raw = fm.get("gaps", []) or []
+    out: list[LibraryGap] = []
+    for entry in raw:
+        if not isinstance(entry, dict):
+            continue
+        sym = str(entry.get("symbol", "")).strip().upper()
+        if not sym:
+            continue
+        out.append(LibraryGap(
+            symbol=sym,
+            gap_type=str(entry.get("gap_type", "") or ""),
+            triaged_at=str(entry.get("triaged_at", "") or ""),
+            reason=str(entry.get("reason", "") or ""),
+            top_strategy=(
+                str(entry["top_strategy"])
+                if entry.get("top_strategy") not in (None, "")
+                else None
+            ),
+            top_sharpe=(
+                float(entry["top_sharpe"])
+                if isinstance(entry.get("top_sharpe"), (int, float))
+                else None
+            ),
+            baseline_sharpe=float(entry.get("baseline_sharpe", 0.5)),
+        ))
+    return out
+
+
+def write_library_gaps(gaps: Iterable[LibraryGap], notes: str = "") -> Path:
+    """Replace the library-gaps file. Use append_library_gap() in normal
+    flow; this is for batch edits and Saturday research cleanup."""
+    _ensure_dirs()
+    gap_list = list(gaps)
+    fm = {"gaps": [g.to_dict() for g in gap_list]}
+    fm_yaml = yaml.safe_dump(fm, sort_keys=False, default_flow_style=False).strip()
+    body = notes.lstrip() if notes else (
+        "Symbols the harness is tracking that no library strategy can "
+        "respond to. Triage marked them as true_library_gap. Saturday "
+        "research is responsible for either adding a template that "
+        "handles the gap_type or removing the symbol from the universe.\n"
+    )
+    LIBRARY_GAPS_FILE.write_text(
+        f"---\n{fm_yaml}\n---\n\n{body}", encoding="utf-8"
+    )
+    return LIBRARY_GAPS_FILE
+
+
+def append_library_gap(
+    symbol: str,
+    *,
+    gap_type: str,
+    reason: str,
+    top_strategy: str | None = None,
+    top_sharpe: float | None = None,
+    baseline_sharpe: float = 0.5,
+) -> LibraryGap:
+    """Add (or refresh) a library-gap marker for `symbol`. If the symbol
+    is already present, the entry is updated with today's triaged_at +
+    fresh reason/top_score. Idempotent on identical re-runs.
+    """
+    sym = symbol.strip().upper()
+    today = dt.date.today().isoformat()
+    new_gap = LibraryGap(
+        symbol=sym,
+        gap_type=gap_type,
+        triaged_at=today,
+        reason=reason,
+        top_strategy=top_strategy,
+        top_sharpe=top_sharpe,
+        baseline_sharpe=baseline_sharpe,
+    )
+    current = [g for g in read_library_gaps() if g.symbol != sym]
+    current.append(new_gap)
+    current.sort(key=lambda g: (g.gap_type, g.symbol))
+    write_library_gaps(current)
+    return new_gap
+
+
+def clear_library_gap(symbol: str) -> bool:
+    """Remove a symbol from the library-gaps registry. Saturday research
+    calls this once it has added a strategy that responds and claimed
+    the symbol via add_active_strategy. Returns True if removed."""
+    sym = symbol.strip().upper()
+    current = read_library_gaps()
+    kept = [g for g in current if g.symbol != sym]
+    if len(kept) == len(current):
+        return False
+    write_library_gaps(kept)
+    return True
+
+
+def library_gap_symbols() -> list[str]:
+    """Convenience: just the symbols currently flagged as library gaps."""
+    return sorted({g.symbol for g in read_library_gaps()})
 
 
 def read_summary() -> str:

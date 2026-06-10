@@ -215,22 +215,40 @@ move on. Full-article fetching is reserved for the Saturday research agent.
    Per symbol where something actually HAPPENED (earnings, M&A, regulatory,
    product, management, partnership, lawsuit, capital allocation), one
    line describing the EVENT and its likely fundamental implication.
-   **Each event must be tagged with an algorithmic responder.** Read
-   `state/active_strategies.md` and ask: "Is there a rule in any active
-   strategy that would fire on this kind of event for this symbol?" Tag
-   with one of:
-   - `responder: <strategy_id>` — a specific strategy in the active set
-     will respond if the trigger pattern materializes.
-   - `responder: NONE — library gap` — no active strategy has a rule for
-     this kind of event. The trader will log this as a research-agent
-     priority.
+
+   **Each event must be tagged with (a) a canonical `gap_type` and
+   (b) an algorithmic responder.** Run `cli gap-registry` at the start
+   of your session to see both the canonical taxonomy and which
+   strategies declare each gap_type. Then for each event:
+
+   - Tag `gap_type: <one of the canonical types>` — `trending`,
+     `breakout`, `mean_reversion`, `earnings_window`, `event_catalyst`,
+     `gap_play`, `intraday_range`, `pairs_arbitrage`, `divergence`,
+     `sector_rotation`, `volatility_regime`. If the event doesn't fit
+     any canonical type, tag `gap_type: NEW_CATEGORY_NEEDED` — that's
+     itself a library gap (the taxonomy doesn't cover it).
+   - Tag `responder: <strategy_id>` if the registry shows at least one
+     active strategy declares this gap_type AND it's the trader's
+     plausible go-to. Tag `responder: NONE — library gap` if the
+     registry coverage hole list (`cli gap-registry` →
+     `coverage_holes`) contains this gap_type, OR if every responder
+     was already triaged below baseline on this symbol.
+
+   The trader uses your gap_type tag to call
+   `cli triage-symbol <SYM> --gap-type <gap_type>`. The cleaner your
+   tags, the more deterministic the trader's claim decisions.
 
    Example lines:
    ```
    - NVDA: HPE Q2 blowout (+40% YoY rev) signals AI-server demand.
+     gap_type: trending
      responder: equity_trend_following_ema_cross (if ADX-confirmed momentum)
    - AVGO: AMC earnings Wed, options 10.65% expected move.
-     responder: NONE — library gap (no earnings-window strategy active)
+     gap_type: earnings_window
+     responder: equity_event_driven_catalyst
+   - SPY: VIX > 30 backwardation suggests systemic vol regime.
+     gap_type: volatility_regime
+     responder: NONE — library gap (coverage hole)
    ```
 
    Symbols with no fresh news get a single line at the bottom:

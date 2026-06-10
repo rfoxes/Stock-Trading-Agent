@@ -12,6 +12,9 @@ indicators:
 market_regime:
   - breakout
   - trending
+gap_types:
+  - breakout
+  - trending
 parameters:
   consolidation_min_days: 5
   consolidation_max_days: 30

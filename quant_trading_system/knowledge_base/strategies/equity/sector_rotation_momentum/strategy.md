@@ -11,6 +11,9 @@ indicators:
 market_regime:
   - trending
   - rotational
+gap_types:
+  - sector_rotation
+  - trending
 parameters:
   momentum_lookback_months: 3
   top_n_sectors: 3

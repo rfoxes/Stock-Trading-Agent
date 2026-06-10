@@ -13,6 +13,9 @@ market_regime:
   - range_bound
   - mean_reverting
   - all_regimes
+gap_types:
+  - pairs_arbitrage
+  - mean_reversion
 parameters:
   zscore_entry_threshold: 2.0
   zscore_exit_threshold: 0.0

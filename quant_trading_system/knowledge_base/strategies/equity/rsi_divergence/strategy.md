@@ -10,6 +10,9 @@ indicators:
 market_regime:
   - range_bound
   - trend_exhaustion
+gap_types:
+  - divergence
+  - mean_reversion
 parameters:
   rsi_period: 14
   divergence_lookback: 20

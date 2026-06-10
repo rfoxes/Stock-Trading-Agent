@@ -11,6 +11,8 @@ indicators:
 market_regime:
   - high_volatility
   - momentum
+gap_types:
+  - gap_play
 parameters:
   min_gap_pct: 2.0
   max_gap_pct: 8.0

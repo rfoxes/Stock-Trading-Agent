@@ -9,6 +9,9 @@ indicators:
   - news_signal
 market_regime:
   - all_regimes
+gap_types:
+  - event_catalyst
+  - earnings_window
 parameters:
   risk_pct_per_trade: 0.01
   stop_atr_multiplier: 2.0

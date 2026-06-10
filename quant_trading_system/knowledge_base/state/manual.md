@@ -5,46 +5,78 @@ trading harness. It changes rarely — only when the harness gains or loses
 a capability, or when accumulated experience uncovers a new operating
 rule. Today's Claude reads this and `tasks.md`, then acts.
 
-## P0 — ZERO-UNCLAIMED RULE (operator directive, 2026-06-04)
+## P0 — EVERY SYMBOL ALGORITHMICALLY EVALUATED RULE (operator directive, 2026-06-04, refined 2026-06-10)
 
-**Every symbol in the composed universe MUST be claimed by an active
-strategy. No exceptions.** This rule is permanent, generalized, and
-applies to every future run regardless of which symbols are in the
+**Every symbol in the composed universe MUST be either (a) claimed by an
+active strategy via head-to-head backtest, or (b) flagged as a true
+library gap by `cli triage-symbol`. No exceptions, no character-match
+shortcuts, no operator overrides.** This rule is permanent, generalized,
+and applies to every future run regardless of which symbols are in the
 universe.
 
-**Before any `cli execute` call, the workflow MUST:**
-1. Run `cli list-active` and read `unclaimed_count`.
-2. If `unclaimed_count > 0`, the run does NOT proceed to execute. It
-   instead assigns each unclaimed symbol to a strategy via `cli add-active`
-   and re-checks until `unclaimed_count == 0`.
-3. Only then run `cli execute`.
+**The end of character-match (2026-06-10 refinement).** Earlier versions
+of this rule allowed first-pass character-match claims ("AVGO has
+earnings, give it to event_driven_catalyst") to satisfy the zero-
+unclaimed gate. That shortcut is now FORBIDDEN. Every claim must trace
+to a backtest. The trader has no discretion to pick strategies; Sharpe
+picks. The reason is the 2026-06-08 → 2026-06-10 incident: last
+Saturday's research wrote head-to-head verdicts as recommendations,
+Monday's trader ignored them and laid char-match claims on top, and
+three new mid-week symbols got assignments that never got validated.
+The fix is to remove the human-judgment step entirely.
 
-**Code enforcement.** `cli execute` (without `--allow-unclaimed`) now
-REFUSES to run when any unclaimed symbol exists. The error message lists
-the offending symbols. The `--allow-unclaimed` flag exists only for
-one-off diagnostic runs by the operator — the scheduled daily workflow
-never uses it.
+**The new pre-execute workflow.** Before any `cli execute`:
 
-**Assignment guidance when claiming an unclaimed symbol.** First-pass
-assignment by character-match is allowed and expected (do NOT block
-execute waiting for a head-to-head backtest). Character-match heuristics:
+1. Run `cli list-active`. Read `unclaimed_count`.
+2. For every symbol in `unclaimed_symbols`:
+   - If the news brief tags the symbol's catalyst with a known
+     `gap_type`, run `cli triage-symbol <SYM> --gap-type <gap_type>`.
+   - Otherwise, run `cli triage-symbol <SYM>` (scores against every
+     active+testing equity strategy).
+   - The verdict is one of:
+     - **`claimed`** — top library candidate cleared baseline Sharpe
+       (default 0.5). Symbol is now claimed by the winner.
+       Auto-recorded in `state/active_strategies.md`.
+     - **`true_library_gap`** — either the `gap_type` has no responder
+       in the library (coverage hole), or every candidate scored below
+       baseline. Symbol is auto-recorded in
+       `state/library_gaps.md`. Saturday research owns it.
+3. Re-run `cli list-active`. The new `unclaimed_count` should equal the
+   number of `library_gap_flagged` symbols. Those are tolerated by the
+   gate.
+4. Run `cli execute`. The unclaimed-gate now lets through symbols whose
+   only excuse for being unclaimed is a fresh library-gap marker.
 
-- Mega-cap momentum tech (META, MSFT, GOOGL-class) → `equity_momentum_macd_histogram` or `equity_trend_following_ema_cross`.
-- Volatile chip / growth names with frequent breakouts (ARM, MRVL, MU, SMCI-class) → `equity_breakout_volume_confirmation`.
-- Lower-vol large-caps with consolidation patterns (CSCO, IBM-class) → `equity_mean_reversion_bollinger`.
-- Overbought names with extreme RSI (HPE, post-rally exhausted) → `equity_rsi_divergence`.
-- Names with upcoming or recent earnings prints (MU, AVGO, CRWD around their windows) → `equity_event_driven_catalyst`.
-- AI infrastructure cohort with rotational regime (DELL, HPE) → `equity_sector_rotation_momentum`.
-- ETFs / index proxies (SPY, QQQ, IWM) → `equity_trend_following_ema_cross`.
-- Anything that does not obviously match → `equity_trend_following_ema_cross` as the safe default; the research agent can rotate it later via head-to-head.
+**Code enforcement.** `cli execute` (without `--allow-unclaimed`) still
+REFUSES to run when any unclaimed symbol exists AND is not in
+`state/library_gaps.md`. Symbols with a library-gap marker pass the
+gate but obviously won't be traded that day (no strategy claims them).
+The error message lists the unmarked offenders so the trader knows
+which symbols still need `cli triage-symbol`.
+
+**What this looks like at the CLI.** Concrete daily pattern:
+```
+cli list-active                                           # see unclaimed
+cli triage-symbol NUVL --gap-type event_catalyst         # claims OR flags
+cli triage-symbol HPE                                    # no gap_type → all candidates
+cli list-active                                           # confirm clearance
+cli execute                                              # P0 gate now passes
+```
+
+**What does NOT belong here.** Character-match. "Safe-default" claims.
+"Operator override per directive." "First-pass without head-to-head."
+ALL of those patterns are extinct. If you're tempted to write any of
+them in a handoff, you're skipping the triage step and the harness
+should refuse you.
 
 **Why this rule exists.** Multiple prior sessions silently proceeded
 with unclaimed symbols sitting in the universe, treating them as
-"library gaps to log for the research agent." That was wrong. The
-operator's policy is: if the harness is tracking a symbol, the harness
-acts on it. Logging it without acting is unacceptable. This applies to
-ANY future symbol added to the universe — operator-added,
-news-agent-promoted, position-spawned, whatever.
+"library gaps to log for the research agent" — and then later sessions
+laid character-match claims on top of THOSE without head-to-head, so
+the active set drifted further from what any backtest would justify.
+Algorithmic-only triage solves both: every claim is Sharpe-justified,
+every "no claim" is documented in a registry the research agent reads.
+No silent drift, no judgment, no override.
 
 **Never replace this section.** It is the standing policy. Add to it
 only if the operator extends or refines the rule.
@@ -115,15 +147,32 @@ sandbox's `python3` directly — the harness has no virtualenv to activate.
    python3 -m quant_trading_system.cli log-closed <strategy_id> <symbol> <pnl_fraction>
    ```
 
-3b. **P0 UNCLAIMED-GATE CHECK (required, no exceptions).** Run
-   `cli list-active` and read `unclaimed_count`. If it is greater than 0,
-   you MUST assign each unclaimed symbol to a strategy via `cli add-active`
-   before proceeding. Use the character-match guidance in the "P0 —
-   ZERO-UNCLAIMED RULE" section at the top of this file. Re-run
-   `cli list-active` after each `add-active` to confirm progress. Only
-   when `unclaimed_count == 0` do you move to step 4. The `cli execute`
-   command itself will refuse to run otherwise — this step exists so you
-   handle it deliberately rather than waiting for the gate to fail.
+3b. **P0 TRIAGE (required, no exceptions).** Run `cli list-active`.
+   For every entry in `unclaimed_symbols` that is NOT already in
+   `state/library_gaps.md`, run:
+   ```
+   cli triage-symbol <SYM> [--gap-type <gap_type>]
+   ```
+   - Pass `--gap-type` when the news brief tagged the symbol's catalyst
+     with one of the canonical types (`cli gap-registry` lists them).
+   - Omit `--gap-type` when there's no specific gap (e.g., a new
+     position you closed and re-bought, or an operator-added extra).
+     The harness will score every active+testing equity strategy on
+     the symbol.
+
+   Each call returns one of:
+   - `verdict: claimed` — auto-recorded in `state/active_strategies.md`.
+     Nothing else to do.
+   - `verdict: true_library_gap` — auto-recorded in
+     `state/library_gaps.md`. Nothing else to do; Saturday research
+     owns the gap.
+
+   Re-run `cli list-active` after batching the triage. The remaining
+   `unclaimed_symbols` should match the symbols you just flagged as
+   library gaps. `cli execute` (step 4) will accept those and refuse
+   any unflagged unclaimed symbols. You should NEVER use `cli add-active`
+   in this step — that's how character-match drift happened. Triage is
+   the only mechanism.
 
 4. **Execute the active strategy.** This is where actual trading happens:
    ```

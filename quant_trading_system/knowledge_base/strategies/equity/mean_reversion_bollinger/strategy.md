@@ -12,6 +12,8 @@ indicators:
 market_regime:
   - range_bound
   - low_volatility
+gap_types:
+  - mean_reversion
 parameters:
   bb_period: 20
   bb_std_dev: 2.0

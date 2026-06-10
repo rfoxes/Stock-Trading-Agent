@@ -12,6 +12,8 @@ indicators:
 market_regime:
   - trending
   - high_momentum
+gap_types:
+  - trending
 parameters:
   fast_ema_period: 12
   slow_ema_period: 26
