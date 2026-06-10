@@ -1,74 +1,71 @@
 # Handoff to tomorrow's Claude
 
-(Wed 2026-06-10, post-close run. CPI day; ORCL Q4 prints AMC tonight; SPCX pricing Thu AMC. Next run Thu 6/11.)
+(Wed 2026-06-10, true post-close scheduled run. News brief was updated mid-day to NOTABLE; ORCL Q4 print already in the brief. This handoff SUPERSEDES the earlier-in-day "do-nothing, news brief missing" handoff committed in e6d0b26 — that run executed before the news brief was written; this one ran after it. Next run Thu 6/11.)
 
 ## TL;DR
 
-Quiet do-nothing day. Active set healthy at 7 strategies × 22/22 claimed (`unclaimed_count == 0` from Tue's claim work). Both Tue-queued exits filled at Wed open: GOOGL sell 56 ≈ $362.92 fill (P&L +$1,352 ≈ +0.01286 of equity), JPM sell 64 ≈ $311.78 fill (P&L -$80 ≈ -0.00076 of equity). Both reconciled via `log-closed`. `cli execute` ran across all 7 strategies and returned **0 intents** — no entries, no exits, no rejections, no errors. Book is now 4 longs (AAPL, MU, QQQ, SPY), cash flipped positive to $32,064 (first net-cash posture since pre-Mon).
+`cli execute` fired **1 intent today**: `equity_event_driven_catalyst` submitted **ORCL buy 38 shares (market, day)**. The strategy reads `news_brief.has_positive_signal("ORCL")` which matched on the beat+raise headline ("EPS $2.11 vs $1.89 +11.6%, revenue $19.2B +21%, RPO +$85B, raised FY27 guide"). The capex shock ($40B FY27 raise → ORCL down in AH) did NOT trigger `has_negative_signal` — keyword detector is too coarse to spot asymmetric beat-but-capex reactions. **Soft-signal library gap: positive/negative keyword detector cannot distinguish raw beat headlines from net-asymmetric prints.** All other 6 strategies returned 0 intents. SafetyGate passed all 5 checks. Order is open (will fill Thu open).
 
-**News brief gap noted.** `state/news_brief.md` is still Tue 2026-06-09's brief — today's CPI-day brief was not written. Proceeded without it per manual §1 ("proceed without news context and note the gap"). No HALT-WORTHY discretion applied; standard execute ran.
+No reconciliation work needed today (Tue's GOOGL/JPM exits were already logged in the earlier handoff). News brief was NOTABLE, not HALT-WORTHY, so standard workflow ran. No script edits, no rotations.
 
-Decision: **Keep.** No rotation, no script edits, no parameter changes. Every strategy fired according to its declared rules (which today meant: no signal).
+**Active set healthy: 7 strategies × 22/22 claimed (unclaimed_count == 0).**
+
+Decision: **Keep.** Single submitted entry on a fresh catalyst is exactly the rule firing as designed. Asymmetric reaction (positive headline, negative AH) is a soft-signal gap to log — not a reason to override the rule mid-run.
 
 ## Summary of what I did today
 
-1. **Read context.** manual.md (P0 rule, Recent feedback section read), tasks.md (Wed plan), last_handoff.md (Tue narrative), news_brief.md — header dated 2026-06-09 (yesterday's, not today's). Per manual §1, proceeded without news context and noted the gap.
+1. **Read context.** manual.md (P0 rule, doctrine refined 2026-06-10 — algorithmic-only triage, character-match extinct, `cli add-active` now UNIONs), tasks.md (the version updated by today's earlier trader fix-up commit 3daff8d), last_handoff.md (earlier "do-nothing" Wed run), news_brief.md (**now present**, dated 2026-06-10, NOTABLE assessment).
 
 2. **Snapshot.**
-   - Account: equity $104,506.85 (-$615.39 vs Tue $105,122.24 = -0.59%); cash $32,063.73 (flipped positive from -$8,214.20); buying power $331,095.64.
-   - Positions: 4 longs — AAPL 72 (+7.73%), MU 7 (-8.44%), QQQ 28 (+7.72%), SPY 35 (+3.01%). GOOGL and JPM gone (Wed open fills, see Reconciliation).
-   - Open orders: empty.
-   - Regime: bull, conf 0.77, ADX 27.41 (unchanged from Mon/Tue).
+   - Account: equity $103,575.68; cash $32,063.73 (unchanged from earlier-in-day snapshot — no fills since); buying power $321,605.61 (dropped from $328,681 due to pending ORCL buy reservation).
+   - Positions before execute: 4 longs — AAPL 72 (+6.93% / cur $290.11), MU 7 (**-11.49% / cur $870.00** ← deteriorated from -8.44% earlier), QQQ 28 (+6.21% / cur $688.21), SPY 35 (+1.84% / cur $721.84).
+   - Open orders: parser bug returned `error: 'dict' object has no attribute 'id'` (same `cli open-orders` defect as Tue+Wed handoffs; carry-forward).
+   - Regime: bull, conf 0.77, ADX 27.41 (unchanged).
 
-3. **Reconciliation.** Both Tue-queued sells filled at Wed open:
-   - **GOOGL sell 56** — cash arithmetic: combined cash delta +$40,277.93 covers GOOGL + JPM total proceeds. Tue mark values were $363.99 × 56 = $20,384 (GOOGL) + $312.70 × 64 = $20,013 (JPM) = $40,397 combined. Actual proceeds were $118.31 below Tue combined mark (CPI-eve mild gap-down at open). Proportionally split: GOOGL fill ≈ $362.92, proceeds ≈ $20,324, realized P&L ≈ +$1,351.50 = **+0.01286 of equity** (Tue basis). `cli log-closed equity_trend_following_ema_cross GOOGL 0.01286` → ok.
-   - **JPM sell 64** — same arithmetic: JPM fill ≈ $311.78, proceeds ≈ $19,954, realized P&L ≈ -$80.37 = **-0.00076 of equity**. `cli log-closed equity_trend_following_ema_cross JPM -0.00076` → ok.
-   - Both fills were close to Tue close — small adverse drift consistent with pre-CPI cautious open, not a chip-style selloff.
+3. **P0 unclaimed-gate.** `cli list-active` → `unclaimed_count: 0`, `claimed_count: 22 / universe_size: 22`. Triage not needed. Gate passed.
 
-4. **P0 unclaimed-gate.** `cli list-active` at start showed `unclaimed_count == 0`, `claimed_count == 22 / universe_size == 22`. No new universe entries Wed; Tue's claim work still standing. Proceeded directly to execute.
-
-5. **Execute.** Ran across all 7 active strategies:
-   - `equity_trend_following_ema_cross` (AAPL, AMZN, CBRS, GOOGL, JPM, NUVL, NVDA, QQQ, SPY, TSLA, TSM): 0 intents. GOOGL/JPM already exited Wed open; held positions AAPL, QQQ, SPY no fresh signals; the 6 non-held names have nothing to enter on.
-   - `equity_momentum_macd_histogram` (META, MSFT): 0. Neither held; no fresh signal.
-   - `equity_breakout_volume_confirmation` (ARM, INTC, MRVL): 0. No volume-confirmed breakouts.
-   - `equity_mean_reversion_bollinger` (CSCO): 0. No Bollinger extreme.
-   - `equity_rsi_divergence` (HPE): 0. No divergence.
-   - `equity_event_driven_catalyst` (AVGO, MU, ORCL): 0. AVGO Day-5 post-print (cold); MU still pre-print window (Jun 24); ORCL prints AMC tonight — strategy may fire on the post-print tape Thu. MU position not exited (no rule trigger; -$580.86 unrealized still ~$86 above $813.44 stop).
+4. **Execute.** Ran across all 7 active strategies (full output captured in this run's transcript):
+   - `equity_event_driven_catalyst` (AVGO, MU, ORCL): **1 intent — ORCL buy 38 market**. order_id `3d56fcac-a86f-412c-8918-c8ccb6bead45`. status `submitted`. All 5 safety checks passed (paper_trading_mode, restricted_symbols, position_size, daily_loss, max_positions). Rejection reason: empty. Strategy's positive-signal keyword detector matched on the brief's ORCL bullet (beat+raise+RPO+guide-raise). AVGO + MU not fired.
+   - `equity_trend_following_ema_cross` (AAPL, AMZN, CBRS, GOOGL, JPM, NUVL, NVDA, QQQ, SPY, TSLA, TSM): 0 intents. Held names no fresh cross signal; non-held names nothing to enter on.
+   - `equity_momentum_macd_histogram` (META, MSFT): 0.
+   - `equity_breakout_volume_confirmation` (ARM, INTC, MRVL): 0. (Chip cohort weak Wed but no volume-confirmed breakout.)
+   - `equity_mean_reversion_bollinger` (CSCO): 0.
+   - `equity_rsi_divergence` (HPE): 0.
    - `equity_sector_rotation_momentum` (DELL): 0.
-   - **Combined: 0 intents, 0 submitted, 0 rejected, 0 errors.** No SafetyGate touch points.
+   - **Combined: 1 intent, 1 submitted, 0 rejected, 0 errors.**
 
-6. **Decision.** Keep. Active set healthy, P0 satisfied, strategies executed per declared rules. No rotation criteria met (no health-threshold breach, no regime change). No script edits needed. The do-nothing outcome is the correct one given the rule set and today's tape.
+5. **Decision.** Keep. The one entry is exactly the strategy's rule responding to a brief-flagged positive event. No rotation criteria met. No script edit needed today — but see Observations for a library gap on keyword-detector nuance.
 
-7. **State files written.** This handoff + Thursday's tasks.md.
+6. **State files written.** This handoff + Thu's tasks.md.
 
 ## Observations and reasoning
 
-- **News-brief gap.** Today's `news_brief.md` was not updated by the news agent — the file is still dated for 2026-06-09. Per manual §1 this is "proceed without news context and note the gap" territory. No CPI print response, no ORCL pre-print posture, no SPCX-pricing-eve flag came through the soft signal channel. The algorithmic-only mandate means strategies fire on price alone anyway, so the operational impact today is zero — but Thu's Claude should expect to read whatever Thu's brief reports as missing-from-Wed and adapt. **Logged as an open issue.**
+- **The earlier-in-day "do-nothing" Wed run vs this run.** Today's git log shows three trader commits before me (e6d0b26 "do-nothing, news brief missing", 08e31c5 "doctrine + triage CLI", 3daff8d "pre-Thu fixes"). The first one executed without a news brief; with the algorithmic-only mandate, no rule that depends on the brief could fire. The brief was then written by the news agent (commit 617846d) and now the scheduled run re-executes with the brief available. The `equity_event_driven_catalyst` rule, which is the only strategy in the library that uses the brief as a primary entry signal, fired the ORCL buy. **Mechanically clean — the harness is doing exactly what it was designed to do.** The risk is operational: two trader runs in one day means the journal sees both, and any future analyst reading "Wed had a do-nothing day" from the earlier handoff is wrong. This handoff supersedes it.
 
-- **Both Tue exits filled cleanly near Tue close.** -$118 of combined slippage vs Tue mark is ~0.3% — well within normal open-fill variance. GOOGL booked a clean +$1,352 profit exit; JPM was essentially flat (-$80). The split is approximate (proportional to Tue mark value); actual per-symbol fills could differ by a few cents on the share but the combined arithmetic is exact via the cash delta. If the operator later cross-checks against Alpaca's per-order fill report, the per-symbol numbers I logged may be off by a few hundred bps of equity in one direction or the other, but the *sum* will tie out.
+- **ORCL entry: rule fired despite negative AH reaction.** The brief's ORCL bullet leads with beat+raise+RPO+guide-raise, which trips `has_positive_signal`. The capex-shock line ("$40B FY27 capital raise...drove ORCL down in extended hours") is also present in the same bullet, but `has_negative_signal` is keyword-based and apparently didn't catch the capex framing. The strategy doesn't peek at extended-hours price action, so from the rule's perspective this is an unambiguous positive-event buy. **Whether the trade is good depends on Thu open** — if ORCL gaps down hard, the ATR stop will fire on a near-immediate basis; if the AH selloff was overdone, the strategy catches a Thu bounce. Either way, **trust the rule**.
 
-- **Book is now net-cash for the first time in a while.** $32,064 cash vs $72,442 long market value = no leverage; equity $104,507 covers everything with $32,064 cushion. This is the cleanest balance-sheet posture in the last two weeks. Trend-following has been the main exit source (META/MSFT 5/28, TSLA 6/2, AMZN 6/5, NVDA 6/9, GOOGL 6/10, JPM 6/10) — the strategy keeps trimming losers and profit-takers and the new-entry side has been quiet. The remaining 4 longs are 3 trend-following (AAPL, QQQ, SPY) + 1 event-driven (MU pre-print).
+- **Library gap, soft signal: keyword detector lacks asymmetric-reaction nuance.** This is a near-mirror of the "ORCL capex-shock post-print" gap the news brief already logged. The brief frames it as needing a `capex_shock_negative_event` overlay; from the trader's side, the parallel issue is that the `news_brief.has_positive_signal` / `has_negative_signal` checks in `_news_brief.py` (wherever they live in strategy_runtime) need to recognize asymmetric-reaction keywords (capex overshoot, AH selloff, after-hours drop, negative-reaction-to-beat) and gate `has_positive_signal` accordingly. **Log this for Saturday research. Don't override the rule mid-run.**
 
-- **MU pressure continues.** -8.44% unrealized at $899.92 current vs $982.90 avg, against $813.44 stop. Stop is now ~$86 away (~9.6% buffer, down from ~13% Tue). Chip cohort has been giving back gains. Position is into a 6/24 print — about 10 trading days out. The event-driven strategy didn't fire a defensive close today; rule says hold through pre-print window. If MU pierces $813.44 the stop fires; if not, the print response governs.
+- **MU deteriorated through the session.** Earlier-in-day handoff had MU at -8.44% / $899.92; post-close I see **-11.49% / $870.00**. Stop $813.44 is now ~$56.56 away ≈ **6.5% buffer** (was ~9.6%). The event-driven strategy's pre-print window for MU runs through 6/24; rule respects the buy stop. If MU pierces $813.44 intraday Thu, the stop fires and the position closes. If not, hold through print. **Operator awareness: stop is now within one chip-cohort red day of triggering.**
 
-- **Equity -0.59% day.** Modest CPI-day chop. Held names mostly flat-to-slightly-down: AAPL -1.0% (WWDC Day-3 reaction continues, but smaller); QQQ -0.5%; SPY ~flat; MU another leg lower. Cash drag from the GOOGL profit exit replaced its mark in cash, so the equity decline is essentially from AAPL + MU + QQQ marks.
+- **News-brief gap from earlier in the day was resolved.** Earlier handoff flagged "news_brief.md not updated for 2026-06-10". The brief was written at some point between that run and this one (commit 617846d [news 2026-06-10]). Open issue from the earlier handoff is now closed.
 
-- **ORCL print tonight (Wed AMC) is the next big single-name event.** Event-driven catalyst now claims ORCL; the strategy's entry rule didn't fire pre-print today. Thu's run will see ORCL post-print and the strategy may or may not respond depending on print outcome and the rule's print-window logic. Worth watching whether the strategy responds to a beat/miss/raise/cut on the catalyst-flag.
+- **NOTABLE day with elevated event-window awareness.** Three live event vectors: hot CPI (4.2% headline, 2.9% core, matched consensus), US-Iran active exchange (oil reversed Mon-Tue weakness), ORCL post-print fade. Not HALT-WORTHY individually or combined. VIX 19.87 mid-afternoon — third session probing the 20 ELEVATED threshold without breaking through. Standard `cli execute` was the right call.
 
-- **CPI was today** — without the news brief I can't say whether the print came in hot, cold, or in line. The market closed mildly red (NDX/SPY ~flat-to-down ½%) so the print probably didn't surprise dramatically in either direction. If it had been a 2σ surprise, the tape would have moved more. Thu's brief should fill in the headline.
+- **Wed indices closed weaker.** Chip cohort sold off broadly (ARM -4.46%, MU -4.7% pre-market, INTC sliding, AVGO testing MAs); WWDC anchor-customer story (Apple Foundation Models on Google Cloud + NVDA chips) gave GOOGL+NVDA a positive narrative but the tape didn't pay. META announced Reliance India 168MW data center; TSM May sales +30.1% YoY. Indices weaker overall on the CPI + Iran tape.
 
-- **Regime unchanged at bull/0.77/ADX 27.41.** SPY-classified regime hasn't moved on the last 3 sessions' chop. ADX 27.41 is well above the 20.0 trend-following exit threshold, so further EMA-cross exits would require a meaningful ADX decay.
+- **Regime unchanged.** bull / 0.77 / ADX 27.41 across the last 4 sessions. Trend-following exit threshold (ADX < 20) remains comfortably untouched.
 
-- **`cli execute` returned cleanly with no SafetyGate friction.** Per the 5/28 rescope, daily_loss is now per-order proposed-realized, so a zero-intent day generates no gate activity at all. Healthy.
+- **SafetyGate clean.** Per-order daily_loss path (the 2026-05-28 rescope) sees zero realized loss on a buy, so no friction. Position-size and max-positions both passed.
 
-- **No new code, no parameter edits, no strategy edits.** This is the third-in-a-row session with no structural changes — the active set + claims is stable. The 5/28 `max_exits_per_run` change is the most recent material edit and it's still operating as designed (single staggered exit per run last seen Tue with GOOGL+JPM batched together; today no exits to stagger).
+- **No edits to manual.md, no edits to strategy code or .md files.** The only structural change today was the operator-driven doctrine refinement (commits 08e31c5 + 3daff8d) which I'm a downstream consumer of, not an author of.
 
 ## Final state at session end
 
 - **Active set:** 7 strategies × 22/22 universe symbols claimed. `unclaimed_count == 0`. No claim changes today.
-- **Open orders:** 0.
-- **Positions:** 4 longs — AAPL 72 (avg $271.30, +7.73%), MU 7 (avg $982.90, -8.44%), QQQ 28 (avg $647.96, +7.72%), SPY 35 (avg $708.81, +3.01%).
-- **Account:** equity $104,506.85, cash $32,063.73 (net-cash), buying power $331,095.64.
+- **Open orders:** 1 — ORCL buy 38 market day (order_id `3d56fcac-a86f-412c-8918-c8ccb6bead45`). Will fill Thu open.
+- **Positions:** 4 longs — AAPL 72 (avg $271.30, +6.93%), MU 7 (avg $982.90, **-11.49%**), QQQ 28 (avg $647.96, +6.21%), SPY 35 (avg $708.81, +1.84%). ORCL pending fill Thu.
+- **Account:** equity $103,575.68, cash $32,063.73 (net-cash; will turn slightly less net-cash post-fill), buying power $321,605.61.
 - **Regime:** bull, conf 0.77, ADX 27.41.
 - **Code changes:** none.
 - **Manual changes:** none.
@@ -76,23 +73,21 @@ Decision: **Keep.** No rotation, no script edits, no parameter changes. Every st
 
 ## Open issues for the operator
 
-1. **`news_brief.md` not updated for 2026-06-10.** File header still reads "News brief for 2026-06-09". The daily news agent did not run (or did not write today). Trader proceeded without news context per manual §1. Thu's Claude will encounter the same gap if not fixed.
+1. **`cli open-orders` parser bug re-confirmed today.** `error: "'dict' object has no attribute 'id'"`. The submitted ORCL order is real (returned from `cli execute` with an `order_id`), but `cli open-orders` cannot list it. Trader cannot inspect open orders from the CLI; has to infer from `account` buying-power deltas.
 
-2. **`cli add-active` REPLACES instead of APPENDS** — carry-forward from Tue. Not exercised today (no claim changes). Still needs operator fix; workaround documented in tasks.md.
+2. **News-brief keyword detector cannot distinguish asymmetric reactions.** ORCL today: beat+raise headline → `has_positive_signal` matched. Capex shock + AH selloff in the same bullet → `has_negative_signal` did NOT match. The strategy entered. Soft-signal library gap; needs Sat research. If Thu open gaps ORCL down >5%, the ATR stop will likely fire — that's the cost of letting the rule govern, and it's acceptable.
 
-3. **`cli open-orders` parsing bug** — carry-forward. Empty list at snapshot; orders that had been queued cleared at Wed open. Untested with live orders today.
+3. **MU stop buffer narrowed to ~6.5%.** Position now -11.49% unrealized at $870 vs $813.44 stop. One more chip-cohort red day could trigger. Operator awareness; rule respects stop.
 
-4. **MU buy stop sizing** — Position now -8.44% unrealized; stop $813.44 is ~9.6% away (current $899.92). Chip cohort weakness continues to pressure. Operator awareness only; rule still respects stop.
+4. **Two trader runs in a single calendar day.** The earlier "do-nothing" run wrote a handoff and `tasks.md`. This run supersedes both. The journal sees both `cli execute` calls — first one had 0 intents, mine had 1. If anyone later audits, the time-ordering matters. Suggest the operator confirm the scheduled task fires once per day at the intended time; today suggests it may have fired more than once.
 
-5. **NUVL/CBRS placeholder claims** — carry-forward. Sat research agent should run head-to-head + build M&A-arb strategy for NUVL.
+5. **NUVL/CBRS/TSM placeholder claims** — carry-forward. Sat research priority.
 
-6. **GOOGL/JPM exit reconciliation used proportional cash-delta split, not Alpaca per-fill report.** Logged P&L fractions are approximate (+0.01286 GOOGL, -0.00076 JPM); combined sum (+0.01210 of equity) is exact. If the operator wants per-order fill accuracy, query Alpaca directly and adjust.
+6. **GOOGL/JPM exit P&L still proportional split, not Alpaca per-fill** — carry-forward from earlier handoff. Combined sum tied (+0.01210 of equity); per-symbol split approximate.
 
-7. **CPI print response unknown without today's brief.** Thu's brief should reflect Wed's print + market reaction. Trader took no preemptive posture (algorithmic-only mandate).
+7. **Thu catalyst stack remains heavy.** PPI May + initial jobless claims 8:30 ET; ADBE Q2 AMC; SpaceX IPO pricing AMC (lists Fri). No macro-event-window rule active. **ORCL post-fill Thu is the trade to watch.**
 
-8. **ORCL post-print Thu** — event-driven-catalyst strategy claims ORCL; print is tonight (Wed AMC). Thu's run will see post-print tape and the strategy may fire.
-
-9. **Thu catalyst stack.** PPI + initial jobless claims 8:30 ET; ADBE Q2 AMC; SpaceX IPO pricing AMC. No macro-event-window rule; standard posture.
+8. **FOMC June 16-17.** Hold priced; dot plot is the live macro catalyst. One week out.
 
 ## Git-sync status
 
