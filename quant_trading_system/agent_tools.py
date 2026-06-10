@@ -1245,14 +1245,22 @@ def add_active_strategy(
     strategy_id: str,
     symbols: list[str],
     reason: str,
+    replace: bool = False,
 ) -> dict[str, Any]:
-    """Add a strategy to the active set with an explicit symbol-claim list.
+    """Add a strategy to the active set (default: UNION new symbols with
+    existing claim).
 
-    Enforces the no-conflict rule: every symbol can be claimed by at most
-    one active strategy. If any of ``symbols`` is already claimed by
-    another strategy, returns an error with the conflicting symbol(s)
-    listed. Resolve via head-to-head backtest (cli head-to-head), not by
-    manually overriding the claim.
+    Behaviour (2026-06-10): default is UNION. Pass ``replace=True`` to
+    overwrite the whole symbol list (CLI flag: ``--replace``). The
+    no-conflict rule is enforced regardless: every symbol can be claimed
+    by at most one active strategy. If any of ``symbols`` is already
+    claimed by another strategy, returns an error with the conflicting
+    symbol(s) listed. Resolve via head-to-head backtest
+    (cli head-to-head), not by manually overriding the claim.
+
+    The triage / instantiate paths compute the union themselves and
+    pass ``replace=False`` here, so calling add_active_strategy twice
+    on the same symbol is a no-op (idempotent).
     """
     syms_upper = [s.strip().upper() for s in symbols if s.strip()]
     if not reason or not reason.strip():
@@ -1260,10 +1268,11 @@ def add_active_strategy(
     try:
         claim = memory.add_active_strategy(
             strategy_id, symbols=syms_upper, reason=reason.strip(),
+            replace=replace,
         )
     except ValueError as e:
         return _err(str(e))
-    return _ok({"added": claim.to_dict()})
+    return _ok({"added": claim.to_dict(), "mode": "replace" if replace else "union"})
 
 
 def remove_active_strategy(

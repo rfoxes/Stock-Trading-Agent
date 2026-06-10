@@ -624,22 +624,39 @@ def add_active_strategy(
     *,
     symbols: list[str],
     reason: str,
+    replace: bool = False,
 ) -> ActiveStrategyClaim:
-    """Add or replace a strategy in the active set.
+    """Add a strategy to the active set (default: UNION).
 
-    If the strategy is already active, its symbols are REPLACED with the
-    new claim list (call with the union if you want to extend). The
-    no-conflict rule is enforced against every other claim in the set.
+    Behaviour change (2026-06-10): the default now UNIONs the new
+    ``symbols`` list with whatever the strategy already claims. The
+    previous default — REPLACE — was a footgun: trader thinks they're
+    adding one symbol, strategy loses every other claim it had.
+
+    Pass ``replace=True`` for the old behaviour (when you genuinely
+    want to overwrite the entire claim list, e.g. after archiving
+    several symbols at once). The CLI exposes this as ``--replace``.
+
+    The no-conflict rule is enforced against every other claim in the
+    set regardless of mode.
     """
-    syms = [s.upper().strip() for s in symbols if s.strip()]
-    current = [c for c in read_active_strategies() if c.strategy_id != strategy_id]
+    new_syms = {s.upper().strip() for s in symbols if s.strip()}
+    current_other = [c for c in read_active_strategies() if c.strategy_id != strategy_id]
+    existing = next(
+        (set(c.symbols) for c in read_active_strategies() if c.strategy_id == strategy_id),
+        set(),
+    )
+    if replace:
+        final_syms = sorted(new_syms)
+    else:
+        final_syms = sorted(existing | new_syms)
     new_claim = ActiveStrategyClaim(
         strategy_id=strategy_id,
-        symbols=syms,
+        symbols=final_syms,
         since=dt.date.today().isoformat(),
         reason=reason,
     )
-    write_active_strategies(current + [new_claim])
+    write_active_strategies(current_other + [new_claim])
     return new_claim
 
 

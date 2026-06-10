@@ -221,6 +221,7 @@ def cmd_add_active(ctx: ToolContext, args: argparse.Namespace) -> int:
         strategy_id=args.strategy_id,
         symbols=syms,
         reason=args.reason,
+        replace=getattr(args, "replace", False),
     ))
     return 0
 
@@ -508,14 +509,27 @@ def _build_parser() -> argparse.ArgumentParser:
     # add-active (claim symbols for a strategy)
     sp = sub.add_parser(
         "add-active",
-        help="Add a strategy to the active set with explicit symbol claims. Fails on conflict — resolve via cli head-to-head.",
+        help=(
+            "Add a strategy to the active set. Default UNIONs --symbols "
+            "with the strategy's existing claim list. --replace overwrites. "
+            "Fails on conflict with another strategy — resolve via "
+            "cli head-to-head."
+        ),
     )
     sp.add_argument("strategy_id")
     sp.add_argument(
         "--symbols", required=True,
-        help="Comma-separated list of symbols this strategy owns (e.g. AAPL,NVDA,QQQ).",
+        help="Comma-separated list of symbols (e.g. AAPL,NVDA,QQQ).",
     )
     sp.add_argument("--reason", required=True, help="Why this strategy owns these symbols.")
+    sp.add_argument(
+        "--replace", action="store_true",
+        help=(
+            "Overwrite the strategy's entire symbol claim list instead "
+            "of unioning. Use sparingly; the default UNION is what you "
+            "want almost always."
+        ),
+    )
     sp.set_defaults(func=cmd_add_active)
 
     # remove-active

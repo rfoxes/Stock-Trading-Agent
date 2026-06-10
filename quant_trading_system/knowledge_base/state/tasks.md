@@ -8,11 +8,19 @@ when you write the version for the next-next Claude.
 
 ## STANDING POLICY (P0, do not ignore)
 
-**Every symbol in the universe MUST be claimed by an active strategy.**
-See `manual.md` "P0 — ZERO-UNCLAIMED RULE" at the top. `cli execute`
-REFUSES to run if any symbol is unclaimed. Claim via direct edit of
-`state/active_strategies.md` (see Open Issue #2 below — `cli add-active`
-is buggy and replaces existing claims).
+**Every symbol in the universe MUST be either (a) claimed by an active
+strategy via algorithmic triage, or (b) flagged as a true library gap.**
+See `manual.md` "P0 — EVERY SYMBOL ALGORITHMICALLY EVALUATED RULE" (the
+top of `manual.md`, refined 2026-06-10). `cli execute` REFUSES to run
+if any symbol is unclaimed AND not in `state/library_gaps.md`.
+
+**Use `cli triage-symbol <SYM> [--gap-type X]`** for every unclaimed
+universe symbol — it auto-claims if Sharpe ≥ 0.5 on a library
+candidate, else auto-records to `state/library_gaps.md`. Character-match
+shortcuts and direct YAML edits to `active_strategies.md` are NOW
+FORBIDDEN (operator directive 2026-06-10). The old "cli add-active is
+buggy" footgun is also fixed — it UNIONs by default now; pass
+`--replace` for the old overwrite behaviour.
 
 ---
 
@@ -39,8 +47,12 @@ is buggy and replaces existing claims).
    - **ORCL prints Wed AMC (tonight); Thu's tape will react.**
    - If the news brief is again missing/stale, note it again and proceed.
 
-2. **Standard read-and-snapshot.** Run `cli list-active`. Confirm `unclaimed_count == 0`.
-   If a new universe entry appeared (Thu news promotion — likely SPCX post-listing? but SPCX lists Fri, not Thu), claim via **direct YAML edit** (see Open Issue #2) — do NOT trust `cli add-active`.
+2. **Standard read-and-snapshot.** Run `cli list-active`. Note `unclaimed_count`.
+   If `unclaimed_count > 0` (Thu news promotion — likely SPCX post-listing? but SPCX lists Fri, not Thu, so probably 0), for each unclaimed symbol run:
+   ```
+   cli triage-symbol <SYM> [--gap-type <type from news brief>]
+   ```
+   This auto-claims (Sharpe ≥ 0.5 on a library candidate) OR auto-flags as `true_library_gap` in `state/library_gaps.md`. Either outcome lets `cli execute` proceed. **Do NOT use direct YAML edits or `cli add-active` for unclaimed symbols** — triage is the only sanctioned path. (`cli add-active` itself is now safe: UNIONs by default. But triage is what the doctrine requires for claim decisions.)
 
 3. **Reconciliation.** No orders queued Wed overnight. No fill expected Thu open from yesterday's `execute`. Quick `cli positions` diff vs handoff:
    - Confirm 4 longs unchanged (AAPL 72, MU 7, QQQ 28, SPY 35) — no surprise overnight fills.
