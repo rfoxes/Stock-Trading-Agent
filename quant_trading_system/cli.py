@@ -483,7 +483,7 @@ def _build_parser() -> argparse.ArgumentParser:
     sp = sub.add_parser("log-closed", help="Log a closed-position outcome.")
     sp.add_argument("strategy_id")
     sp.add_argument("symbol")
-    sp.add_argument("pnl", type=float, help="Realized return as fraction (e.g. 0.03 = +3%).")
+    sp.add_argument("pnl", type=float, help="Realized return as fraction (e.g. 0.03 = +3%%).")
     sp.add_argument("--pnl-pct", type=float, default=None)
     sp.add_argument("--notes", default="")
     sp.set_defaults(func=cmd_log_closed)

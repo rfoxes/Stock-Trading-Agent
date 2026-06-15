@@ -15,7 +15,14 @@
       "Bash(ollama --version)",
       "Bash(brew services:*)",
       "Bash(ollama pull:*)",
-      "Bash(ollama list:*)"
+      "Bash(ollama list:*)",
+      "Bash(python3 -m quant_trading_system.cli account)",
+      "Bash(python3 -m quant_trading_system.cli positions)",
+      "Bash(python3 -m quant_trading_system.cli open-orders)",
+      "Bash(python3 -m quant_trading_system.cli regime)",
+      "Bash(python3 -m quant_trading_system.cli --help)",
+      "Bash(python3 -c \"import requests\")",
+      "Bash(python3 -m pip list)"
     ]
   }
 }

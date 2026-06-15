@@ -6,93 +6,75 @@ Yesterday's news agent writes this. Replace, don't append.
 
 ## Status as of the last update
 
-- **Last brief assessment:** NOTABLE (Wed 2026-06-10). Three-axis event day: (1) **May CPI 4.2% YoY headline / 2.9% core** — hottest headline since April 2023; energy +3.9% MoM (+23.5% YoY) on Hormuz shock. Fed-hike-by-Dec re-priced to 63-96%; June 17 FOMC = hold, dot plot live. (2) **US-Iran active exchange**: US strikes Iranian air-defense / radar near Hormuz late 6/9; Iran IRGC missile + drone retaliation 6/10 on US base in Jordan + Persian Gulf; Trump threatening more strikes on Iranian infrastructure. Oil reversed Mon-Tue's -5% into a bid. Tue ceasefire framing broken. (3) **ORCL Q4 FY26 AMC double-beat with capex shock**: EPS $2.11 vs $1.89 (+11.6%), revenue $19.2B (+21%), Cloud $9.9B (+47%, IaaS +93%), RPO +$85B to $638B, raised FY27 EPS guide to $8.05 — BUT announced $40B FY27 capital raise; stock down in extended hours. **Tier-B #3 (beat+raise+5%) did not clear.** Also: META + Reliance 168MW India AI data center (Gujarat); TSM May +30.1% YoY; Apple WWDC Day-3 confirmed running on Google Cloud + NVDA chips; chip cohort selloff broad (ARM -4.46%, MU -4.7% premarket, INTC sliding, MRVL down). Not HALT-WORTHY.
-- **Universe last covered:** 22-name (unchanged from Tue exit). Wed Alpaca densities: NVDA 17, SPY 15, ORCL 15, GOOGL 13, QQQ 11, TSLA 11, AMZN 8, MSFT 6, AAPL 5, AVGO 5, META 5, TSM 5, INTC 4, MU 4, JPM 3, NUVL 2, MRVL 2, CBRS 2, ARM 1, HPE 1, CSCO 0, DELL 0. Total 135 items (vs Tue 176). All 6 category HTMLs written. Daily summary written. Cleanup deleted 0 (cutoff 2026-03-12).
-- **Trader Wed-PM context (per `last_handoff.md`):** Both Tue-queued exits filled at Wed open: GOOGL sell 56 ≈ $362.92 (+$1,352 P&L, +0.01286 of equity), JPM sell 64 ≈ $311.78 (-$80, -0.00076). `cli execute` ran across all 7 strategies and returned **0 intents**. Book: 4 longs (AAPL 72, MU 7, QQQ 28, SPY 35), cash $32,064 (net-cash). Equity $104,506.85 (-0.59% vs Tue). Regime: bull, conf 0.77, ADX 27.41. `unclaimed_count == 0` (22/22 claimed).
-- **Zero promotions Wed.** Universe stays at 22. Tier-B daily cap untouched. Tier-A clock advanced for nobody (CRWD/STM/FLEX/PINS/VSH no refresh).
-- **NEWS-BRIEF GAP NOTED IN TRADER HANDOFF.** Wed trader ran without today's brief (file header was still 2026-06-09). This brief is now written and should be visible to Thu's news + trader runs.
+- **Last brief assessment:** NOTABLE (Mon 2026-06-15). Risk-on relief day: (1) **US-Iran peace deal "complete"** — Hormuz reopened, Navy blockade removed, oil −5%, 10y yields to 1-month lows, S&P +1.9%; resolves the active exchange from the 6/10 brief. Signing Fri 6/19 in Switzerland (Israel-Lebanon strikes = durability tail risk). (2) **VIX −9% to 17.68** — first decisive break below 20 after 3 weeks of oscillation. (3) **Book rallied hard**: MU flipped −11.5%→**+9.98%** ($1,081) on a ~12% pop into its 6/24 print (PTs to $1,250, bullish UOA); ORCL (Wed buy now filled) +8.25% after rebounding 5% off last week's capex-shock low (BofA/Goldman bullish). (4) **FOMC 6/16-17 — hold ~97%, dot plot Wed is the live catalyst** (lands the session AFTER the 6/16 trader run). (5) **Anthropic forced to disable Fable 5/Mythos 5 for all foreign users** (Trump export-control order) — AI-sector national-security overhang. Not HALT-WORTHY (de-escalation, not a shock). 
+- **CATCH-UP / GAP:** This was the first brief since **Wed 2026-06-10**. Thu 6/11 and Fri 6/12 news runs did NOT update state (last_handoff/news_brief/news_tasks all still dated 6/10). Mon's brief folds in Thu-Fri events (SpaceX priced Thu/listed Fri; ADBE printed Thu; Iran deal reached over the weekend). Operator: confirm whether the scheduled news task fired Thu/Fri and silently failed.
+- **DEPLOYMENT WAS BROKEN AT START OF RUN — repaired.** The `.venv` interpreter was orphaned when Homebrew auto-upgraded `python@3.13`→`python@3.14` (venv's python3.13 symlink → `/opt/homebrew/opt/python@3.13` which no longer existed; bare `python3` is now 3.14 with NO `requests`/`alpaca`). **Fix applied: `brew install python@3.13`** restored the symlink and the venv's intact site-packages now import cleanly. **For this run all CLI calls used `.venv/bin/python3 -m quant_trading_system.cli` instead of bare `python3`.** See operator question below — the scheduled-task launcher must use the venv python, or future runs break the same way.
+- **Universe last covered:** 22-name (unchanged). Mon Alpaca densities (100 items total, vs Wed 135): TSLA 17, AMZN 13, NVDA 10, GOOGL 9, META 8, MSFT 8, AAPL 6, MU 6, QQQ 5, ORCL 4, SPY 4, INTC 3, TSM 3, AVGO 1, CBRS 1, DELL 1, MRVL 1, ARM 0, CSCO 0, HPE 0, JPM 0, NUVL 0. Heavily SpaceX/Iran/Musk-flow weighted. All 6 category HTMLs + daily summary written. Cleanup deleted 0 (cutoff 2026-03-17).
+- **Live broker snapshot (this run, not a trader handoff):** equity **$108,589** (+4.8% vs Wed $103,576), cash $25,327 (net-long). Held: AAPL 72 (+8.88%), MU 7 (+9.98%), ORCL 38 (+8.25%, Wed buy filled @ $177.28), QQQ 28 (+14.44%), SPY 35 (+6.29%). Regime: bull, conf 0.75, ADX 24.98 (cooling from 27.41). 22/22 claimed, unclaimed_count == 0.
+- **Zero promotions Mon.** Tier-B daily cap untouched. Tier-A clock advanced for nobody (gap means no consecutive-session refresh).
 
 ## Notable carry-forwards
 
-- **PPI May + initial jobless claims Thu 6/11 8:30 ET.** Compound stack with ADBE AMC + SpaceX IPO pricing AMC.
-- **ADBE Q2 FY26 Thu 6/11 AMC.** Consensus $5.81 EPS / $6.45B rev. -32% YTD on AI cannibalization concerns. Options imply ±9.45%. $25B buyback in place. Tier-B #3 audit candidate if beat + raise + +5% post-print Fri open.
-- **SpaceX (SPCX) IPO pricing Thu 6/11 AMC → Fri 6/12 listing.** Demand >4x oversubscribed (>$250B vs $75B raise). $135 × 555.55M / $1.8T valuation. Largest IPO ever. JPM in lead-underwriter group with Goldman + Morgan Stanley. JPM franchise event Day-2 live.
-- **ORCL post-print Thu carry.** Failed Tier-B #3 at Wed AMC (down in extended hours on $40B FY27 capital raise despite double beat + raised guide). `equity_event_driven_catalyst` may fire on the post-print tape Thu. No retroactive Tier-B audit added.
-- **MU Q3 FY26 6/24 AMC.** Pre-print window opens next week. Held long; -8.44% unrealized, stop $813.44 ~9.6% away.
-- **MU buy 7 position (entered Mon execute) — chip-cohort selloff Wed extended pressure.** Stop buffer was ~13% Tue, ~9.6% Wed close.
-- **FOMC June 16-17.** Hold base case unchanged; dot plot now the live catalyst; easing-bias language at risk.
-- **AAPL WWDC Day-3 = mixed cumulative reaction.** Apple Foundation Models confirmed running on Google Cloud + NVDA chips (negative for AAPL silicon narrative; positive for GOOGL/NVDA). Day-4/5 reactions Thu/Fri.
-- **GOOGL — WWDC anchor-customer confirmation + GitLab partnership.** Exited Wed open; no current position; rule will re-engage on price action.
-- **NVDA — WWDC anchor-customer confirmation + TSM May +30% YoY + SpaceX TAM tie-in.** Exited Tue; no current position. Burry short paying off; Jensen-Senate-decline + China-AI-export-control narrative continues.
-- **META + Reliance 168MW India AI data center.** First META India AI infra commit; Reliance builds, META leases. Two-year build. Extends 2020 $5.7B Jio investment. No position; META claimed by `equity_momentum_macd_histogram`.
-- **TSM May 2026 sales +30.1% YoY (NT$416.98B).** AI-chip demand confirmation. TSM new universe member; provisionally claimed by `equity_trend_following_ema_cross`.
-- **AI capex commitment cycle — ORCL $40B FY27 raise + META India + Google-SpaceX $920M/mo (Tue) + Apple-on-GoogCloud+NVDA.** Demand side keeps printing; supply side now visibly absorbing the cost. Burry NVDA/PLTR short paying off as multiple-compression in the AI cohort starts to crystallize.
-- **VIX 19.87 mid-afternoon Wed.** Third session oscillating around 20. Realized 30-day still 13.51 = VIX rich-to-realized = event-window posture.
-- **Iran-exchange escalation live.** US strikes 6/9, Iran retaliation 6/10. Oil bid. Defense names (LMT, NOC, RTX) cited but not in universe.
-- **AI data-center NIMBY / permit pushback recurring.** Mississippi suit against xAI + SpaceX over noise. Soft signal — applies same archetype to MSFT/GOOGL/META/ORCL builds.
-- **OpenAI confidential S-1 Day-2 (Wed).** No new amendments filed Wed. JPM/Goldman/MS lead-underwriter group standing. Q4 2026 listing possible Sep.
-- **Anthropic Fable 5 launch carry-forward.** Wells Fargo token-cost AI-bubble framing remains live but no fresh sell-side commentary Wed.
-- **Largest weekly short-build of year ($14.7B) Tue carry — Burry NVDA/PLTR short Wed confirms cohort divergence.**
-- **NUVL/GSK deal Day-2.** Closing timeline TBD; PDUFA 2026-11-27 binary. Pre-close, symbol trades freely. No deal-spread items Wed.
-- **CBRS Day-3 since promotion.** Mon's 7-bank initiation cluster attention persists; no fresh sell-side Wed.
-- **MRVL + FLEX S&P 500 inclusion 6/22.** Passive-flow window remains open this week and next.
-- **NIO Chinese military company designation carry.** No fresh Wed development.
-- **H-1B $100K fee struck-down carry-forward.** Appeal pending.
-- **`SYMBOL_TO_SECTOR` map in `news_service.py` incomplete.** TSM/INTC/CBRS/ORCL → uncategorized until map updated. Hygiene fix carry-forward.
+- **FOMC June 16-17 — dot plot Wed 6/17 is THE live catalyst.** Hold priced ~97%. Decision lands the session after the 6/16 trader run. A hawkish dot-plot revision is the main 48h risk to the AI-cohort multiple. Tue 6/16 news run = pre-FOMC posture; Wed 6/17 run confirms the outcome.
+- **MU Q3 FY26 = Tue 6/24 AMC.** Held long, now +9.98%. PTs to $1,250; bullish UOA into the print. Pre-print window open. Watch for IV expansion; the print is the next single-name catalyst.
+- **ORCL post-capex-shock recovery.** Wed catalyst buy (38 @ $177.28) filled, now +8.25%. The asymmetric beat+capex print resolved to the UPSIDE (+5% Mon). Validates `equity_event_driven_catalyst`. Watch sell-side follow-through on the $40B FY27 raise.
+- **US-Iran deal signing Fri 6/19 Switzerland.** Track durability — Israeli strikes in Lebanon flagged as a tail risk. Any breakdown headline = oil/vol re-rate risk into the weekend.
+- **Anthropic Fable 5 / Mythos 5 export-control ban.** Models disabled for all foreign users; controls expected to lift once safety remediated. Track: (a) when models return, (b) NVDA-China spillover, (c) Mark Zandi "massive threat to AI optimism" framing, (d) EU sovereignty response.
+- **SpaceX (SPCX) listed Fri 6/12 at ~$2T** — largest IPO ever; Mon volume > AAPL+MSFT+TSLA+META+GOOGL combined. **Options debut Tue 6/17** (first SPCX options, day before Fed). "FAB 10" reframing (Mag-7 + OpenAI/SpaceX). JPM lead underwriter = realized franchise event. **Session-1 watch as universe candidate** (does NOT meet a Tier-B trigger — IPO isn't one of the five; hyper-volatile new listing). Track recurrence.
+- **TSLA SpaceX-merger chatter** (analysts: no merger this year); Direxion 2X SPCX ETF (LOFF) launched. FSD-Europe "inflated safety claims" report = minor offset. No position.
+- **GOOGL $1.5B Alabama data-center expansion** disclosed Mon. Concrete capex; +3%+. No position (exited 6/10).
+- **Trump 100% French-wine tariff threat** over France's digital tax (AAPL/AMZN/META/GOOGL), ahead of G7. Posture not action; track G7 outcome.
+- **ADBE Q2 (Thu 6/11):** beat + raised guide but −6% (H2 ARR cut, 10th straight quarter of deceleration; Anthropic "Claude Design" disruption narrative). **Tier-B #3 audit FAILED.** Not in universe.
+- **ROKU takeover speculation** (Needham Buy + JPM "Comcast most logical buyer"). Analyst speculation, NOT a confirmed deal — does not qualify Tier-B #1. Watch for an actual named bid.
+- **Chip cohort relief:** TSM +4%, INTC +3%, AMD +4%, NVDA +2%, MU +12% — last week's AVGO/ORCL capex-scare selloff reversed. Whale-alert screen flagged MU/TSM/INTC (universe) Mon.
+- **NUVL/GSK deal** — pre-close, trades freely. No fresh development Mon (0 Alpaca items). PDUFA 2026-11-27 binary.
+- **MRVL + FLEX S&P 500 inclusion 6/22** — passive-flow window this week. No fresh Mon item.
+- **VIX below 20 (17.68).** Vol-regime shift; IV compression favors vol-selling. `iron_condor_high_iv` claims no universe symbol. Track whether the FOMC re-inflates front-end IV.
+- **S&P concentration at "railroad-era" extreme** (Bianco); non-AI names +~1% YTD. Eisman "rotating away from hyperscalers." Structural backdrop.
+- **`SYMBOL_TO_SECTOR` map in `news_service.py` incomplete** — TSM/INTC/CBRS/ORCL → uncategorized historically; the `cli news-universe` sector_map now resolves these to `technology` correctly, but verify the underlying map. Hygiene carry-forward.
 
-## To do tomorrow (next news run, Thu 2026-06-11)
+## To do tomorrow (next news run, Tue 2026-06-16)
 
-1. **Run the standard workflow** (`news_manual.md §"Workflow"`). **Re-read §9 every run.** Tier A 3-session uncapped + Tier B 5 single-event triggers (M&A target, FDA, beat+raise+5%, sell-side initiation cluster 3+ banks same week, Tier-1 customer-win), 2/day cap on Tier B. **Both tiers require `--sector <sector>` on `cli promote-candidate`.**
-2. **Universe is 22-name** (unchanged from Wed). `cli news-universe` Thu should confirm.
-3. **PPI May Thu 8:30 ET + initial jobless claims.** Post-print reaction is Thu AM driver. Hot PPI = curve-steepener continuation + AI-cohort headwind; cool = relief rally restart.
-4. **ADBE Q2 FY26 Thu AMC.** Post-print: if beat + raised guide + +5% Fri open → Tier-B #3 audit. Thu news run writes pre-print, Fri news run confirms post-print outcome.
-5. **SpaceX IPO pricing Thu AMC.** Final pricing terms vs $135 × 555.55M baseline; over-allotment / greenshoe disclosure; JPM/Goldman/MS allocation. Friday listing kickoff.
-6. **ORCL post-print Day-2 sell-side reactions.** Did Wed AH weakness extend? Sell-side commentary on the $40B FY27 capex raise specifically. Did `equity_event_driven_catalyst` rule fire on the print at Thu trader run?
-7. **Iran-exchange escalation Day-2.** Did Iran/US trade more strikes Thu? Oil direction. Trump statements.
-8. **WWDC Day-4 reactions.** AAPL post-Day-3 sell-side adjustments — net mood of "Apple on Google + NVDA" framing.
-9. **NVDA-Korea Day-5 / SK Hynix HBM / Naver sizing.** Continues from Mon-Tue.
-10. **INTC Day-4** — Google 3M-TPU verification still pending; chip-selloff Wed extended.
-11. **CBRS Day-4** — post-quiet-period sell-side initiations cluster status; no fresh Wed.
-12. **MRVL Day-4** — chart-stretched / profit-taking + 6/22 inclusion passive-flow window.
-13. **TSM Day-4** — May +30% YoY follow-on; Chris Miller "Chip War" framing.
-14. **NUVL/GSK Day-3** — deal-close timeline, deal-spread.
-15. **META Reliance Day-2.** Sell-side sizing of the 168MW data center deal. ARR uplift framing? AI-capex-deployment narrative confirmation?
-16. **Promote candidates if Thu session refreshes:**
-    - **CRWD** at provisional session 3 → if Thu refresh → confirm Tier-A promote (sector technology).
-    - **STM** at session 2 → if Thu refresh → session 3 → Tier-A promote.
-    - **FLEX** at session 2 → if Thu refresh → session 3 → Tier-A promote (index-inclusion not Tier-B; follows Tier-A clock).
-    - **PINS** at session 2 → if Thu refresh → session 3 → Tier-A promote.
-    - **VSH** at session 1 → if Thu refresh → session 2.
-    - **SMCI** new candidate session-1 watch — if Thu has a single-name catalyst → start tracking.
-17. **Outlier movers Thu close + sector breakdown.** Per-name reconstruction still the workable path; generic gainers/losers query flaky (ChartMill / Slickcharts surface partial). Wed losers were JNJ, HD, PG, KO, GLW, WSM, BLDR, PODD — defensive-rotation casualty mix.
-18. **Vol regime Thu.** Did VIX break 20 either way? Three-session oscillation continues unresolved.
-19. **OpenAI IPO Day-3.** S-1 amendments? Underwriter list updates? JPM franchise relevance.
-20. **Anthropic Fable 5 Day-3.** Token-pricing AI-bubble framing sell-side echoes.
-21. **Library gaps re-listing.** Reaffirmed: `event_window_posture` (AAPL), `capex_shock_negative_event` (NEW — ORCL post-print asymmetry), `m_a_arbitrage_event` (NUVL), `macro_event_window` (CPI), `underwriter_franchise_event` (JPM SpaceX+OpenAI), `vol_regime_shift_overlay` (VIX threshold oscillation), `cross_sector_rotation_overlay` (energy/dividend/quality bid vs AI cohort sold), `equity_multiple_compression_overlay` (Burry short + ORCL capex + Mythos-token-pricing carry). Sat research run = next opportunity.
+1. **Run the standard workflow** (`news_manual.md §"Workflow"`). **Re-read §9 every run.** Tier A (3 consecutive sessions, uncapped) + Tier B (5 single-event triggers, 2/day cap). Both tiers require `--sector` on `cli promote-candidate`.
+2. **USE `.venv/bin/python3`** for all CLI calls until the operator confirms the scheduler/PATH uses the venv. Bare `python3` = Homebrew 3.14 with no deps and WILL fail `news-fetch`/`news-universe`. (`brew install python@3.13` already applied; venv works.)
+3. **Universe is 22-name.** `cli news-universe` Tue should confirm.
+4. **PRE-FOMC posture (Tue).** Dot plot Wed 6/17. Note: hold ~97% priced; the dot plot is the catalyst. Tue news run = pre-event; Wed run = outcome + AI-cohort reaction.
+5. **MU pre-print Day-N (6/24 AMC).** Sell-side follow-through on the +12% Mon move / PT-to-$1,250 calls. UOA refresh. Held long.
+6. **ORCL post-recovery follow-through.** Did the +5% Mon rebound extend? Sell-side on the $40B FY27 raise post-relief-rally.
+7. **US-Iran deal durability.** Pre-signing (Fri 6/19) headlines; Israel-Lebanon strike risk; oil direction.
+8. **Anthropic export-control Day-N.** Did models return? NVDA-China spillover? Mark Zandi / EU sovereignty follow-ups.
+9. **SPCX options debut Tue 6/17.** Track the new listing's vol/flow; "FAB 10" recurrence; whether SPCX keeps appearing as a candidate.
+10. **GOOGL Alabama data-center sell-side sizing.** Capex-deployment narrative.
+11. **G7 summit / French digital-tax tariff thread.** Any escalation or resolution.
+12. **Chip cohort follow-through** (TSM/INTC/MU/ARM/MRVL) after the relief bounce.
+13. **MRVL + FLEX 6/22 inclusion** passive-flow window updates.
+14. **Promote candidates if Tue session refreshes (consecutive-session rule; counters did NOT advance over the 6/11-6/12 gap):**
+    - **CRWD** provisional 3 → needs a fresh Tue appearance to formalize Tier-A promote (sector technology).
+    - **STM / FLEX / PINS** at 2 → Tue refresh → session 3 → Tier-A promote.
+    - **VSH / SMCI** at 1 → Tue refresh → session 2.
+    - **SPCX** session-1 watch (not Tier-B-eligible; recurrence/operator call).
+15. **Outlier movers Tue + sector breakdown.** Mon non-universe screen: gainers AXTI +14.8%, STX +9%; losers FOX −17.8%, SSL −11.5%, BAND −11.4% (catalysts unconfirmed — generic gainers/losers query still flaky). Per-name reconstruction remains the workable path.
+16. **Vol regime Tue.** Did VIX hold below 20 or re-inflate into the FOMC? VIX9D vs VIX.
+17. **Library gaps re-listing.** Reaffirmed: `macro_event_window` (FOMC dot plot + Iran resolution), `volatility_regime` (VIX<20 break, registry coverage hole), AI-policy/export-control overlay (Anthropic ban), `underwriter_franchise_event` (JPM/SpaceX), `m_a_arbitrage_event` (NUVL), capex-shock asymmetric-reaction detector (ORCL, now upside-resolved). Sat research = next opportunity.
 
 ## Open questions for the operator
 
-- **News-brief gap discipline.** Wed trader handoff notes: "`news_brief.md` not updated for 2026-06-10. File header still reads 'News brief for 2026-06-09'." This brief is now written but it ran *after* the trader. **Operator action:** Either tighten the schedule so the 3:30 PM PT news run completes before the 4:00 PM PT trader run, or formalize the lag-tolerance in the trader's manual §1.
-- **Five-unclaimed-on-promotion-week problem resolved per Wed handoff:** trader's Wed P0 gate showed `unclaimed_count == 0`, indicating Tue's operator/research claim work landed. ORCL was claimed by `equity_event_driven_catalyst`, INTC/CBRS/TSM by `equity_trend_following_ema_cross` (provisional). NUVL by `equity_trend_following_ema_cross` (also provisional / biotech mismatch). **Carry-forward operator question on NUVL biotech-vs-tech-universe mismatch still open** — strict reading of `news_manual.md §9` Tier-B #1 was applied; rule discipline question stands.
-- **ORCL Tier-B #3 audit-trail outcome:** Wed AMC print failed +5% (down in extended hours on $40B FY27 capital raise). No retroactive Tier-B confirmation added. **Operator action:** confirm this is the correct handling — Tier-B #3 was an audit only since ORCL was already Tier-A promoted Tue; failing the +5% only means no additional Tier-B audit trail, not de-promotion. (This is the correct reading per `news_manual.md` — keeping the carry-forward question explicit.)
-- **CRWD provisional session-3 still unconfirmed (no Mon/Tue/Wed refresh).** **Operator action:** formalize candidate-counter mechanism so the 3-session rule becomes mechanical rather than judgment-call. Carry-forward.
-- **FLEX inclusion candidate (index-inclusion not among 5 Tier-B triggers).** **Operator action:** should index-inclusion become 6th Tier-B trigger? Carry-forward.
-- **Sunday news-run firing pattern carry-forward.** Mon 6/8 ran normally; Sun 6/7 ran out-of-schedule. **Operator action:** verify M-F-only schedule or formalize Sun-runs into manual.
-- **`bash scripts/install_git_safety.sh` LaunchAgent status** — install claimed but `cli git-doctor` shows pending markers per recent handoffs. **Operator action:** verify `launchctl list | grep harness` and gitrunner logs.
-- **`SYMBOL_TO_SECTOR` map in `news_service.py` incomplete** — TSM, INTC, CBRS, ORCL roll up to `uncategorized` until map updated. NUVL = `healthcare`. Carry-forward research-agent task. Not blocking but hygiene fix.
-- **Add `capex_shock_negative_event` library-gap entry** — Wed's ORCL print profile (beat+raise+raise capex announcement → -post-print) is a clean pattern that would benefit from an explicit overlay rule. Sat research opportunity.
+- **DEPLOYMENT: venv interpreter orphaned by Homebrew python upgrade.** Homebrew upgraded `python@3.13`→`python@3.14`, breaking the `.venv` (its python3.13 symlink pointed at the removed `/opt/homebrew/opt/python@3.13`). **`brew install python@3.13` restored it** and the venv's site-packages import cleanly again. **Operator action:** (a) confirm the scheduled-task launcher invokes the venv python (`.venv/bin/python3` or an activated venv), NOT bare `python3` — otherwise every future run breaks the same way; (b) consider pinning python@3.13 against brew auto-upgrade, or rebuilding the venv on 3.14 with reinstalled wheels.
+- **News-run gap Thu 6/11 + Fri 6/12.** No state updates those days (files dated 6/10). Likely the same venv-break cause (homebrew upgraded between 6/10 and 6/15). **Operator action:** check scheduled-task logs for Thu/Fri failures; the deployment break probably silently killed those runs.
+- **News-brief / trader-schedule lag (carry-forward).** Still open: ensure the 3:30 PM PT news run completes before the 4:00 PM PT trader run. This run executed at ~3:40 PM PT local; timing OK today.
+- **Candidate-counter mechanism (carry-forward).** The 3-session Tier-A rule remains judgment-call; CRWD provisional-3 still unconfirmed. Operator: formalize a mechanical counter so gaps (like 6/11-6/12) don't ambiguously reset/freeze the clock.
+- **FLEX index-inclusion not among the 5 Tier-B triggers (carry-forward).** Should index-inclusion become a 6th Tier-B trigger?
+- **`cli open-orders` parser bug (carry-forward from trader handoffs):** returns `'dict' object has no attribute 'id'`. Not a news-agent path but flagged for the operator.
+- **`bash scripts/install_git_safety.sh` LaunchAgent status.** `git-doctor` shows 1 pending marker (`marker_test.json`) — a single test marker, not a pileup; likely fine. Verify `launchctl list | grep harness` if markers accumulate.
+- **NUVL biotech-vs-tech-universe mismatch (carry-forward).** Provisionally claimed by `equity_trend_following_ema_cross`; Sat research owns proper claim + `m_a_arbitrage_event` gap.
 
 ## Operational notes
 
-- `cli news-fetch --lookback-hours 24` returned **135 items** cleanly (vs Tue 176, Mon 136, Sun 39). NVDA/ORCL/SPY/GOOGL anchored the count; CSCO + DELL had 0 items Wed.
-- WebSearch returned strong results for: May CPI 2026 (Benzinga / CNBC / Kiplinger / CBS / Morningstar / Fox Business); ORCL Q4 FY26 (Stocktitan / Oracle IR / TheStreet / Benzinga / Investing.com); Trump Iran Hormuz strikes (RFE/RL / Britannica / Wikipedia 2026 Iran war); VIX June 10 (StreetStats / CBOE / Yahoo / Macrotrends); ADBE Q2 preview (Alphastreet / TipRanks / TIKR / Tech Times); SpaceX IPO pricing oversubscription (Bloomberg / FXStreet / Yahoo / Seeking Alpha / FXStreet); Meta-Reliance India data center (TechCrunch / CNBC / Bloomberg / Meta IR / BusinessToday).
-- WebSearch returned weak results for: same-day "biggest gainers/losers" generic query still flaky (ChartMill / Slickcharts surface partial). Top losers JNJ/HD/PG/KO/GLW/WSM/BLDR/PODD discoverable via indirect; gainers list incomplete.
+- `cli news-fetch --lookback-hours 24` returned **100 items** cleanly (via `.venv/bin/python3`) — TSLA/AMZN/NVDA/GOOGL anchored; ARM/CSCO/HPE/JPM/NUVL had 0. Lower count than Wed (135) — the tape was dominated by macro (Iran deal) + SpaceX/Musk flow rather than diversified single-name catalysts.
+- WebSearch returned strong results for: US-Iran peace deal (CBS/NPR/NBC/Fox/NewsNation); FOMC June 17 expectations (Polymarket/iShares/StreetStats); VIX 6/15 (Saxo/CBOE/Yahoo — 17.68, −9%); ADBE Q2 (Adobe IR/Yahoo/Seeking Alpha/TechTimes); Anthropic export ban (Axios/Time/Fortune/Al Jazeera/Nextgov); MU options flow (Barchart/Yahoo/OptionCharts).
+- WebSearch returned weak results for: generic "biggest gainers/losers June 15" (Slickcharts/Morningstar surfaced partial screen-level names only; catalysts unconfirmed) — per-name reconstruction still the workable path (now ~11 consecutive sessions of this query being flaky).
 - **Promotion analysis (`news_manual.md §9`):**
-  - **Tier A:** CRWD provisional 3 (no Wed refresh) → hold. STM 2 (no refresh). FLEX 2 (no refresh). PINS 2 (no refresh). VSH 1 (no refresh).
-  - **Tier B:** No qualifiers Wed. ORCL Tier-B #3 audit failed (post-print +5% not met due to capex shock). META-Reliance benefits universe member, not external candidate. No #1 (M&A) / #2 (FDA) / #4 (initiation cluster) qualifiers.
-  - **Decision: 0 promotions this run.** Universe stays at 22.
-- Previous notes (still held):
-  - "WebSearch for 'biggest gainers/losers' + specific date returns reliable summary lists" — DID NOT WORK 10 consecutive sessions now; per-name reconstruction is the workable path. ChartMill indirect on top losers worked Wed.
-  - "WebSearch returns nothing useful for 'CPI release' queries; use 'CPI <month> <year>' instead" — held; "CPI May 2026 4.2%" worked excellently.
-  - "When a major M&A is announced, the target's per-name search is the cleanest path" — applied Tue for NUVL/GSK; Wed had no fresh M&A.
-- **News-brief / trader-schedule lag noted as Wed operational issue.** Today's brief is written but it runs after the trader's 4pm PT execute. Operator awareness; not blocking algorithmic operation.
+  - **Tier A:** CRWD (3), STM (2), FLEX (2), PINS (2), VSH (1), SMCI (1) — none refreshed; counters frozen at 6/10 levels by the 6/11-6/12 run gap. Held.
+  - **Tier B:** No qualifiers. ADBE failed #3 (negative post-print). ROKU = speculation, not confirmed M&A (#1). SPCX IPO is not a Tier-B trigger. No #2/#4/#5.
+  - **Decision: 0 promotions. Universe stays at 22.**
+- Previous notes (still held): "CPI <month> <year>" query format works; per-name reconstruction beats generic gainers/losers; major-M&A → target per-name search is cleanest.

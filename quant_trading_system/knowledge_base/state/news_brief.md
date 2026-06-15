@@ -1,145 +1,116 @@
-# News brief for 2026-06-10
+# News brief for 2026-06-15
 
 ## Headline assessment
 
-**NOTABLE.** Wednesday delivered a three-axis event day. (1) **May CPI hit 4.2% YoY headline / 2.9% core** (matched +4.2% consensus; hottest headline since April 2023) — energy +3.9% MoM (+23.5% YoY) driven by the Hormuz shock. Fed-hike-by-Dec odds re-priced from ~30% to **63-96%** across venues; FOMC June 17 hold base case unchanged but the dot plot is now the live catalyst and easing-bias language is at risk. (2) **The Iran ceasefire framing broke**: US strikes on Iranian air-defense / radar / surveillance sites near Hormuz late 6/9, Iran IRGC missile + drone retaliation 6/10 on US base in Jordan + Persian Gulf targets; Trump threatening additional strikes on Iranian power plants + bridges. Oil reversed Mon-Tue's -5% Iran-deal-proximity into a sharp bid. (3) **ORCL Q4 FY26 AMC double-beat** ($2.11 vs $1.89 / +11.6%; revenue $19.2B +21%; cloud $9.9B +47%; RPO +$85B to $638B) **was undermined by a $40B FY27 capital raise announcement** — capex overshoot drove ORCL down in extended hours despite the beat + raised guide. Single-name fallout: chip cohort sold off (ARM -4.46%, MU -4.7% premarket, MRVL down, INTC sliding, AVGO testing key MAs); GOOGL + NVDA got an offsetting WWDC Day-3 anchor-customer confirmation (Apple Foundation Models run on Google Cloud + NVDA chips); META announced a 168MW Reliance-built AI data center in Gujarat; TSM May sales +30.1% YoY. **Not HALT-WORTHY** — no active FOMC, no >5σ guidance shock on a held name, the Iran exchange did not move overnight futures >2% before close, and the CPI was in-line with consensus. Trader should treat the day as elevated-vol event-window posture; algorithmic-only mandate still governs.
+**NOTABLE.** Risk-on relief day. (1) **US-Iran peace deal announced** — Trump declared the deal "complete," reopened the Strait of Hormuz and removed the Navy blockade; oil −5%, 10y yields to one-month lows, S&P +1.9%. This RESOLVES the active US-Iran exchange that was live in the last brief (Wed 6/10). Signing ceremony Fri 6/19 in Switzerland (Israel-Lebanon strikes a tail risk to durability). (2) **VIX crushed ~9% to 17.68** (from ~19.87) — the first decisive break below 20 after three weeks of oscillation, as the geopolitical event premium drained. (3) **The whole book rallied**: MU flipped from −11.5% (Wed) to **+10%** at $1,081 on a ~12% pop into its June 24 print; ORCL (the Wed buy, now filled) +8% after rebounding 5% off last week's capex-shock low. (4) **FOMC June 16-17 — hold priced ~97%, but the new dot plot Wednesday is the live catalyst** and lands the session AFTER tomorrow's trader run. (5) Policy overhang: **the Trump admin forced Anthropic to disable Fable 5 / Mythos 5 for all foreign users** (export-control order) — an AI-sector national-security thread under the rally. **Not HALT-WORTHY** — the Iran move is a de-escalation (risk-on, not a shock), no active FOMC on tomorrow's session, no held-name overnight surprise. Treat as a constructive event-window day; algorithmic-only mandate governs.
+
+> **Catch-up note:** This is the first brief since Wed 2026-06-10 — the Thu 6/11 and Fri 6/12 news runs did not update state (last_handoff/news_brief/news_tasks all still dated 6/10). Items below fold in what happened Thu-Fri (SpaceX priced Thu / listed Fri; ADBE printed Thu; Iran deal reached over the weekend). Deployment was also broken at the start of this run (venv interpreter orphaned by a Homebrew python 3.13→3.14 upgrade) — repaired before fetch; see operational notes.
 
 ## Watchlist + positions
 
-(Entering Thu: held longs AAPL 72, MU 7, QQQ 28, SPY 35 per Wed trader handoff; book is net-cash $32,064. Active set: 7 strategies × 22 universe symbols claimed.)
+(Held longs per live broker snapshot: **AAPL 72 (+8.88%), MU 7 (+9.98%), ORCL 38 (+8.25%), QQQ 28 (+14.44%), SPY 35 (+6.29%)**. Equity $108,589, cash $25,327 — net-long now, up +4.8% vs Wed close. Regime: bull, conf 0.75, ADX 24.98. 7 strategies × 22/22 claimed, unclaimed_count == 0.)
 
-- **ORCL — MAJOR EVENT (Q4 FY26 print Wed AMC).** Double-beat: EPS $2.11 vs $1.89 (+11.6%), revenue $19.2B (+21% YoY), Cloud $9.9B (+47%; IaaS +93%), RPO $553B → $638B (+$85B; OpenAI / Meta AI-infra commits), raised FY27 EPS guide to $8.05 (rev reaffirmed $90B). **Capex shock:** announced $40B FY27 capital raise — exceeded consensus capex expectations and drove ORCL down in extended hours. **Tier-B #3 (beat + raise + +5% post-print) will NOT clear at Thu open absent overnight reversal.** No retroactive Tier-B audit confirmation; ORCL stays Tier-A-promoted from Tue.
-  - responder: `equity_event_driven_catalyst` (on-character post-print window; rule will fire on the strategy's print-window logic Thu)
+- **MU — EVENT (pre-print, Q3 FY26 = Tue 6/24 AMC; held long, now +9.98%).** Surged ~12% Monday; analysts lifting PTs as high as $1,250; "Broadcom-driven drop never made sense, dip buyers up 40%." Confirmed unusual options flow (calls > puts in $ terms) reads as bullish pre-print positioning. The Wed stop-risk concern (-11.5%, ~6.5% buffer) is fully resolved — position is green and the print is the next catalyst.
+  - gap_type: earnings_window
+  - responder: equity_event_driven_catalyst (claims MU; pre-print window posture)
 
-- **MU — EVENT-WINDOW (pre-print, MU Q3 FY26 = 6/24 AMC; held long).** Caught in Wed chip-cohort selloff (-4.7% premarket on broad CPI + Iran selloff); whale-alert activity confirmed Wed. Pre-print window opens next week. Position -8.44% unrealized at Wed close per trader handoff; stop $813.44 ~9.6% away. No fresh single-name catalyst Wed; "Why Is Micron Falling" framing is price action.
-  - responder: `equity_event_driven_catalyst` (pre-print window posture; rule respects stop)
+- **ORCL — EVENT (post-capex-shock recovery; Wed buy now filled, +8.25% at $191.9).** Rebounded +5% Monday after its worst weekly drop since 2002; BofA and Goldman reiterated bullish on the AI-cloud-infra thesis. The Wed `equity_event_driven_catalyst` buy (38 sh @ $177.28) filled and is now in the money — the asymmetric beat-but-capex print has resolved to the upside on the relief tape.
+  - gap_type: event_catalyst
+  - responder: equity_event_driven_catalyst (claims ORCL; on-character post-print window)
 
-- **AAPL — EVENT (WWDC Day-3 confirmed: Apple Foundation Models on NVDA chips + Google Cloud; held long).** Confirmed Wed via Benzinga: Apple's AI relies on NVDA chips + Google Cloud for heavy workloads — anchor-customer confirmation for both. Negative read for AAPL silicon-self-sufficiency narrative; sell-side reaction continues to be mixed (-1.0% Wed per handoff). Telegram returned to Apple Watch (native app) — minor product item. Inflation-above-4% ETF strategy piece flagged AAPL alongside quality/dividend tilt.
-  - responder: `equity_trend_following_ema_cross` (price-driven; no event-window rule active — library gap)
+- **GOOGL — EVENT (capex: $1.5B Alabama data-center expansion disclosed; +3%+).** Concrete AI-infra capex commitment on the risk-on tape. Also: a congressional-purchase disclosure (Rep. Taylor) and Eisman "rotating away from hyperscalers" commentary (opinion, dropped). No current position (exited 6/10).
+  - gap_type: trending
+  - responder: equity_trend_following_ema_cross (claims GOOGL; price-driven rule re-engages on a fresh EMA cross)
 
-- **GOOGL — POSITIVE EVENT (WWDC Day-3 + GitLab partnership + SpaceX context).** "Apple's AI Reveal Hands An Unexpected Win To Google, NVIDIA" — explicit anchor-customer confirmation Wed. GitLab expanded Google Cloud partnership (fully managed DevSecOps + Gemini 3.5 AI). Munster: GOOG is a "formidable rival" to SpaceX (but doesn't make rockets). SpaceX-IPO context pieces frequently mention GOOG as the AI-cloud counterweight. GOOGL was exited Wed open per trader (sell 56 ≈ $362.92; +$1,352 P&L); no current position.
-  - responder: `equity_trend_following_ema_cross` (rule fired Wed open; no current position)
+- **AAPL — POLICY TAG only (held long, +8.88%).** No single-name fundamental event. Named in the Trump French-digital-tax tariff threat (AAPL/AMZN/META/GOOGL) — a negotiating posture, not an action. Otherwise caught the broad tech bid.
+  - gap_type: trending
+  - responder: equity_trend_following_ema_cross (claims AAPL; price-driven; no event-window rule — library gap re-affirmed)
 
-- **NVDA — POSITIVE EVENT (WWDC anchor-customer confirmation + TSM May +30% YoY + SpaceX TAM).** Apple AI on NVDA chips (anchor-customer confirmation); TSM May +30.1% YoY revenue (cohort-positive). Wedbush Dan Ives: SpaceX $28.5T TAM ties to NVDA-substrate AI. ServiceNow demand-resilient piece referenced NVDA. Counter: Burry NVDA short paying off; Jensen called the pullback a "discount" buying window; Jensen declined Senate hearing. Defense-tech and DOE-fusion-timeline pieces named NVDA. NVDA was exited Tue (sell 96 from Mon trend-following ADX exit); no current position. Stock down again Wed in chip selloff.
-  - responder: `equity_trend_following_ema_cross` (rule exited Tue; no fresh entry signal)
+- **NVDA — POLICY/CHINA (no position).** +2% on the cohort bid. Negative structural thread: ByteDance reportedly evaluating domestic AI chips (Iluvatar CoreX, Baidu); Box CEO warns US restrictions accelerate the open-weight/sovereign-AI shift. Sequoia's Maguire drew an "early-NVIDIA" comparison to SpaceX. China-TAM erosion is a slow headwind, not a same-day catalyst.
+  - gap_type: trending
+  - responder: equity_trend_following_ema_cross (claims NVDA; no fresh entry signal)
 
-- **META — POSITIVE EVENT (Reliance India 168MW AI data center deal Day-1; not held).** Meta announced first India AI infra: Reliance builds 168MW data center in Jamnagar, Gujarat; Meta leases capacity, covers energy/water costs. Extends 2020 $5.7B Jio investment. Two-year build, renewable + desalinated-seawater cooled. Concrete capex commitment + India entry-point. Wed trade choppy on broader macro.
-  - responder: `equity_momentum_macd_histogram` (no current position; rule will pick up any fresh momentum signal)
+- **META — POLICY/EARNINGS-CONTEXT (no position).** +4.47% premarket on the relief rally; cohort pieces cite a projected ~$60B summer earnings print (weeks out). Named in the French digital-tax threat. No fresh single-name catalyst.
+  - gap_type: trending
+  - responder: equity_momentum_macd_histogram (claims META; price-driven)
 
-- **TSM — POSITIVE EVENT (May 2026 sales +30.1% YoY = NT$416.98B).** Material AI-chip-demand confirmation. Cited in NVDA / TSLA / AMZN / GOOGL / INTC cross-references all day. Chris Miller "Chip War" Wed framing: China has underspent on AI for 4 years — TSM-as-incumbent narrative reinforced. TSM not held; new universe member from Mon's promotion remains unclaimed character-wise per operator question (Sat research owns proper claim).
-  - responder: `equity_trend_following_ema_cross` (provisional claim; price-driven rule will fire if EMA cross)
+- **MSFT — EARNINGS-CONTEXT (no position).** +1.92% premarket; ~$87B summer print referenced (weeks out). Eisman "hesitant on MSFT" (opinion, dropped). No fresh single-name event.
+  - gap_type: trending
+  - responder: equity_momentum_macd_histogram (claims MSFT; price-driven)
 
-- **MRVL — NO FRESH SINGLE-NAME EVENT (chip-cohort drag).** "Why Is Marvell Technology Falling Wednesday" + whale-alert list flagged MRVL; nothing new on inclusion (6/22) or business fundamentals. Wed weakness is part of broader chip selloff.
-  - responder: `equity_breakout_volume_confirmation` (volume-confirmation rule may fire on inclusion-window flows; today is price action)
+- **TSM — COHORT (no position).** +4% premarket; on the IT whale-alert screen. AI-chip demand thesis intact; no fresh single-name disclosure today.
+  - gap_type: trending
+  - responder: equity_trend_following_ema_cross (provisional claim; price-driven)
 
-- **INTC — NO FRESH MATERIAL EVENT (Google-TPU narrative quiet Day-4).** "Why Is Intel Stock Sliding Wednesday" cites profit-taking + AVGO-guidance ripple + macroeconomic headwinds; no fresh Google-foundry verification disclosed Wed. Sliding with the cohort.
-  - responder: `equity_breakout_volume_confirmation` (price-driven; provisional claim)
+- **INTC — COHORT (no position).** +3% premarket on the broad chip rally; on the IT whale-alert screen. No fresh Google-foundry verification. Price action, not event.
+  - gap_type: breakout
+  - responder: equity_breakout_volume_confirmation (provisional claim; no volume-confirmed breakout)
 
-- **AVGO — NO FRESH SINGLE-NAME EVENT (Day-5 post-print).** "Why Is Broadcom Falling Wednesday" + cohort-mentions only; post-earnings profit-taking framing continues. Next AVGO print September.
-  - responder: `equity_event_driven_catalyst` (calm posture; no fresh catalyst)
+- **TSLA — FLOW/NEUTRAL (no position).** Surging on SpaceX-merger chatter (analysts: no merger this year) and the "all things Elon" trade (Direxion 2X SPCX ETF launched). Offset: a report flags "inflated" FSD-Europe safety claims. No re-entry-grade single-name fundamental event.
+  - gap_type: trending
+  - responder: equity_trend_following_ema_cross (claims TSLA; no signal)
 
-- **NUVL — NO FRESH MATERIAL EVENT Day-2 of GSK deal.** Only cited in "5 stocks on radar" cohort piece. No deal-close timeline update, no spread-narrowing flag. Pre-close, trades freely.
-  - responder: `equity_trend_following_ema_cross` (provisional claim; price-driven rule applies — library gap on M&A-arb)
+- **AVGO — COHORT (no position).** Single item: "Micron's Broadcom-driven drop never made sense" — references last week's AVGO-print-driven chip selloff, now unwinding. No fresh AVGO catalyst (next print September).
+  - gap_type: event_catalyst
+  - responder: equity_event_driven_catalyst (claims AVGO; calm posture, no fresh catalyst)
 
-- **JPM — SECTOR/FRANCHISE CONTEXT (3 cohort items; OpenAI underwriter, SpaceX underwriter window live Thu).** No JPM-specific single-name event Wed. SpaceX pricing Thu AMC = underwriter franchise event live. Inflation-above-4% ETF piece flagged JPM in quality/dividend tilt. JPM was exited Wed open per trader (sell 64 ≈ $311.78; -$80 P&L); no current position.
-  - responder: `equity_trend_following_ema_cross` (rule fired Wed open; franchise event not in any active rule — library gap re-affirmed)
+- **AMZN — POLICY TAG (no position).** Climbed on falling oil / easing tensions; named in the French digital-tax threat and the Anthropic-AI-policy pieces. No single-name fundamental event.
+  - gap_type: trending
+  - responder: equity_trend_following_ema_cross (claims AMZN; no signal)
 
-- **TSLA — NEUTRAL EVENT (Musk SpaceX-payload bombast + Dutch FSD-crash data positive).** Musk: SpaceX could put 1M tons in orbit within 5 years. Dutch FSD crash data showed 3.5x fewer crashes (positive for FSD narrative). Mentioned in Burry-short coverage. No held position; no re-entry signal.
-  - responder: `equity_trend_following_ema_cross` (no signal)
-
-- **MSFT — NO FRESH SINGLE-NAME EVENT.** "What's Going On With Microsoft Wednesday" + SpaceX cohort + Meta-Reliance cross-mention; nothing material.
-  - responder: `equity_momentum_macd_histogram` (price-driven)
-
-- **ARM — DRAG SESSION (no fresh catalyst).** "What Is Going On With Arm Wednesday" — -4.46% to $310.79 on "routine wave of broad-market profit-taking." No fresh ARM-specific event.
-  - responder: `equity_breakout_volume_confirmation` (price-driven)
-
-- **CBRS — NO FRESH MATERIAL EVENT.** Cited in "CPI Saves Market" macro piece + one other cohort mention. Mon's 7-bank initiation cluster attention persists structurally; nothing fresh Wed.
-  - responder: `equity_trend_following_ema_cross` (provisional claim)
-
-- **HPE — NO FRESH SINGLE-NAME EVENT (single cohort item + whale alert).** Whale-alert flagged HPE among 10 IT names; no fresh single-name catalyst.
-  - responder: `equity_rsi_divergence` (price-driven)
-
-- **AMZN — NO FRESH SINGLE-NAME EVENT.** Meta-Reliance + TSM May-sales + SpaceX-context cross-mentions only. No held position.
-  - responder: `equity_trend_following_ema_cross` (no signal)
-
-- **DELL, CSCO — NO FRESH NEWS Wed (0 Alpaca items each).** No single-name event.
-  - DELL responder: `equity_sector_rotation_momentum` (price-driven)
-  - CSCO responder: `equity_mean_reversion_bollinger` (price-driven)
-
-- **SPY / QQQ — INDEX TAPE Wed.** Indices fell on hot CPI + Iran exchange; "CPI Saves Market" framing flagged momo-buy-the-dip but session ended weaker. Trump-Iran posts moved markets lower mid-morning. AMD slipped on chip selloff. No index-level event beyond the macro reaction.
-  - responder: `equity_trend_following_ema_cross` (price-driven)
-
-- **No fresh single-name news (Wed Alpaca densities; 135 total items):** CSCO 0, DELL 0, ARM 1, HPE 1, CBRS 2, NUVL 2, MRVL 2, JPM 3, INTC 4, MU 4, AAPL 5, AVGO 5, META 5, TSM 5, MSFT 6, AMZN 8, TSLA 11, QQQ 11, GOOGL 13, ORCL 15, SPY 15, NVDA 17.
+- **No fresh single-name news** (caught the broad rally / screen mentions only): **ARM, AVGO, CBRS, CSCO, DELL, HPE, JPM, MRVL, NUVL.** JPM benefits indirectly as a SpaceX lead-underwriter (franchise event, see library gaps) but had no single-name disclosure. CBRS appeared once in a "5 stocks from most-accurate analysts" piece (no fresh initiation). ARM/CSCO/HPE/JPM/NUVL had 0 Alpaca items.
 
 ## Sector themes
 
-- **Macro repricing back to "higher-for-longer" via CPI energy passthrough.** May CPI 4.2% (highest since April 2023) is driven almost entirely by the Hormuz energy shock; core 2.9% (sticky but not spiraling). Wall Street consensus: "too hot to cut, not enough to hike yet — June 17 = hold, dot plot tighter." Defensives (XLE, gold, dividend/quality ETFs) outperforming AI cohort intra-day.
-- **AI capex commitment cycle continues despite multiple-compression pressure.** Wed events: ORCL announced $40B FY27 capital raise (capex overshoot), META announced 168MW India data center with Reliance, Apple confirmed running on Google Cloud + NVDA chips, TSM May +30%. Demand side keeps printing; supply side now visibly absorbing the cost. Burry NVDA/PLTR short paying off as multiple compression in the AI cohort starts to crystallize.
-- **Chip cohort selloff is broad but undifferentiated.** ARM, MU, INTC, MRVL, AVGO, NVDA all weaker — not a single-name story; the macro tape and Burry/Saylor sentiment items drove the dispersion. TSM May sales +30.1% YoY is the on-thesis positive offset that didn't catch.
-- **AI data-center NIMBY/permit pushback becomes a recurring narrative.** xAI + SpaceX sued in Mississippi over data-center noise; ORCL's $40B FY27 raise concentrates the capex story. The "infrastructure friction" theme will likely return.
-- **Defense / energy / quality tilt firms as the structural counterweight.** LMT, NOC, RTX cited in Trump-Iran piece; XLE / XOP bid; SCHD / DGRO / VIG / QUAL noted in the ETF strategy piece. The trader's universe doesn't have direct exposure to these (no XLE, no LMT) — observation only.
+- **Geopolitical de-risking drives a broad, oil-down/tech-up relief rally.** The US-Iran deal reopened Hormuz (~20% of global oil flow), oil −5%, yields to one-month lows. The energy-passthrough that drove May's 4.2% CPI is now reversing — a tailwind to the forward inflation read even though the June FOMC is already a lock for hold.
+- **AI-sector risk is increasingly policy/national-security, not just fundamental.** The Trump-admin order forcing Anthropic to disable Fable 5 / Mythos 5 for all foreign users, plus ByteDance's pivot toward domestic chips, frames an export-control overhang sitting under the cohort even on an up day. Watch for spillover into NVDA-China sentiment.
+- **"FAB 10" reframing — AI-cohort leadership broadening to include private-turned-public names.** SpaceX's ~$2T listing and the FAB-10 (Mag-7 + OpenAI/SpaceX) framing signal the market is re-rating frontier-AI/space names. Concentration remains extreme: non-AI S&P names up just ~1% YTD (Bianco).
+- **Chip cohort (financials/tech split):** TSM +4%, INTC +3%, AMD +4%, NVDA +2%, MU +12% — the chip selloff from last week's AVGO/ORCL capex scare reversed hard on the risk-on bid. Financials (JPM): the SpaceX IPO is a realized underwriter-franchise event.
+- **Vol regime shift:** VIX broke below 20 (17.68, −9%) — the multi-week event-premium-rich posture has unwound. IV compression favors vol-selling structures for high-IV-rank names; the FOMC dot plot Wed is the one near-term event the term structure hasn't fully discounted.
 
 ## Candidates for the universe
 
-**No promotions executed Wed. Universe stays at 22.**
+**0 promotions this run. Universe stays at 22.** (No Tier-A clock advanced — see note on the 5-session gap; no Tier-B trigger cleared.)
 
-- **Tier A (3-session recurrence):** CRWD (provisional 3), STM (2), FLEX (2), PINS (2), VSH (1) — none refreshed in Wed Alpaca pull or Wed WebSearches. All hold at current session counts. CRWD provisional-3 still awaits a fresh appearance to formalize; operator question on candidate-counter mechanism carries forward.
+- **Tier A (3-session recurrence):** CRWD (provisional 3), STM (2), FLEX (2), PINS (2), VSH (1), SMCI (1) — **none refreshed today.** Note: Thu 6/11 and Fri 6/12 runs did not execute, so these counters have not advanced since 6/10; recurrence is by *consecutive sessions* and today is the next session after a gap. SMCI appeared once in an Eisman cohort list (GOOGL/MSFT/ORCL/SMCI/SOXX) — not a single-name catalyst; holds at session 1.
 - **Tier B (single-event triggers, 5 categories, 2/day cap):**
-  - **#1 confirmed M&A target:** none Wed.
-  - **#2 FDA binary:** none Wed.
-  - **#3 beat + raise + +5%:** ORCL is in-universe (already promoted Tue); the Tier-B #3 audit was the Wed-AMC test, and the print failed the +5% criterion (down in extended hours on $40B capex raise). No retroactive Tier-B audit added. Externally, no S&P 500 name reported a beat+raise+5% print Wed AMC.
-  - **#4 sell-side initiation cluster (3+ banks same week):** none new Wed.
-  - **#5 Tier-1 customer-win disclosure:** META + Reliance India data-center deal is META-internal (universe member), not a candidate trigger; the partnership benefits META, not Reliance/Indian-listed names accessible to us. Apple-on-Google Cloud + NVDA-chips confirmation similarly benefits universe members. **No promotion qualifier.**
-- **SMCI** — recurring cohort mention (ORCL/AVGO/INTC selloff context) but no single-name catalyst. Carry-forward as session-1 watch but does not qualify yet.
-- **PLTR** — Burry short paying off; defense/AI-government adjacency. Not a Tier-B trigger.
-- **Net: 0 candidates promoted Wed.** Tier-B daily cap (2) untouched; Tier-A clock advances for CRWD/STM/FLEX/PINS/VSH only on fresh appearance.
+  - **#1 confirmed M&A target:** none. ROKU is the subject of takeover *speculation* (Needham Buy + PT raise; JPM names Comcast as the most logical buyer) — analyst speculation, not a confirmed/named deal. Does NOT qualify; track as a watch.
+  - **#2 FDA binary:** none.
+  - **#3 beat + raise + +5%:** **ADBE FAILS** — beat (EPS $5.96 vs $5.82, rev $6.62B vs $6.46B) and raised FY guide, but stock fell ~6% (cut H2 ARR growth on freemium pivot = 10th straight quarter of deceleration). No +5%; in fact negative. No external S&P name cleared the full triple today.
+  - **#4 sell-side initiation cluster (3+ banks same week):** none confirmed.
+  - **#5 Tier-1 customer-win:** none.
+- **SPCX (SpaceX)** — newly public (listed Fri at ~$2T, largest IPO ever, options debut Tue). Massive liquidity and AI/space-cohort relevance, repeatedly cited in "FAB 10" framing. Does NOT meet a Tier-B trigger (an IPO isn't one of the five), and it's a hyper-volatile brand-new listing. **Logging as session-1 watch** for the operator/Saturday research agent — not promoting.
+- **STX (Seagate) +9%, AXTI +14.8%** — storage/compound-semi adjacency on the risk-on tape, but no confirmed single-name catalyst from the screen-level data. Not candidates.
 
 ## Macro / sector context
 
-- **May CPI 4.2% YoY headline / 2.9% core / +0.5% MoM headline / +0.3% MoM core.** Matched +4.2% consensus. Energy +3.9% MoM (+23.5% YoY) drove the headline; Hormuz shock the proximate cause. Fed-hike-by-Dec odds 63-96% across venues. June 17 FOMC = hold base case; dot plot is the live catalyst; easing-bias language at risk.
-- **US-Iran exchange Day-1.** US strikes Iranian air-defense / radar near Hormuz (late 6/9). IRGC missile + drone strikes on US base in Jordan + Persian Gulf 6/10. Trump threatening more strikes on Iranian infrastructure (power plants + bridges). Oil reversed Mon-Tue's -5% into a bid. Tue's "ceasefire two-three days" framing is broken; the geopolitical tape is now in active-exchange posture.
-- **PPI May + initial jobless claims Thu 6/11 8:30 ET.** Compound stack with ADBE AMC + SpaceX IPO pricing AMC.
-- **ADBE Q2 FY26 Thu 6/11 AMC.** Consensus $5.81 EPS / $6.45B rev. ADBE -32% YTD on AI cannibalization concern. Options imply ±9.45%. $25B buyback in place.
-- **SpaceX (SPCX) IPO pricing Thu 6/11 AMC → Fri 6/12 listing.** Demand >4x oversubscribed (>$250B vs $75B raise). $135 × 555.55M / $1.8T valuation. Largest IPO ever. JPM in lead-underwriter group with Goldman + Morgan Stanley.
-- **VIX 19.87 mid-afternoon (open 20.10, hi 20.46, lo 20.06).** Third session probing the 20 ELEVATED threshold without a decisive break. Realized 30-day still 13.51 = VIX trading rich-to-realized = typical event-window posture.
-- **FOMC June 16-17.** Hold priced; dot plot is the catalyst.
-- **OpenAI / SpaceX / Anthropic AI-IPO supply wave continues.** No new S-1 filings Wed; SpaceX pricing Thu is the live event.
+- **US-Iran peace deal (06-15).** Trump: deal "complete"; Hormuz reopened, Navy blockade removed, "let the oil flow." Oil −5%, 10y yields to one-month lows, S&P +1.9%. Resolves the prior brief's active exchange. Signing Fri 6/19 in Switzerland; CBS flags Israeli strikes in Lebanon as a durability tail risk.
+- **FOMC June 16-17.** Hold priced ~97%+ (funds rate 3.50-3.75%, second consecutive hold). New **dot plot Wednesday is the live catalyst** vs. the March median (25bp of 2026 cuts; 7 members saw none). May CPI 4.2% keeps the consensus against cuts through 2026. A "change in Fed leadership" is referenced. **Decision lands the session after tomorrow's trader run.**
+- **Anthropic export-control order (06-12 to 06-14).** Commerce Sec. Lutnick subjected Fable 5 / Mythos 5 to export controls to all foreign persons; Anthropic disabled the models for ALL customers. Triggered by suspected China-linked access + an autonomous-weapons dispute (Pentagon blacklist). EU pushback; controls expected to lift once safety is remediated. AI-sector/national-security overhang.
+- **Trade policy:** Trump threatens 100% tariffs on French wine over France's digital tax on US tech (AAPL/AMZN/META/GOOGL), ahead of G7. Posture, not action.
+- **Labor:** a "shadow unemployment" report says sidelined workers (people who want jobs but can't find them) now exceed 2008-crisis levels (+~1.2M). Soft offset under the sticky-inflation print.
 
 ## Library gaps
 
-- **AAPL WWDC 5-day event-window Day-3 (mixed reaction)** — `event_window_posture` rule still absent. Re-affirmed Day-3. **Suggested research:** event-window overlay (defer entries / tighten exits inside named multi-day catalyst windows).
-- **ORCL capex-shock post-print (down in extended hours despite beat+raise)** — no `capex_shock_negative_event` overlay; the `equity_event_driven_catalyst` strategy's print-window rule may or may not fire on the asymmetric reaction. **Suggested research:** capex-overshoot detection overlay (when a beat+raise print is paired with above-consensus capex disclosure, defer / size down the entry).
-- **NUVL M&A-arb position** — `m_a_arbitrage_event` still absent. Re-affirmed.
-- **OpenAI + SpaceX overlapping franchise event for JPM** — `underwriter_franchise_event` still absent (Day-2 of overlap window). Re-affirmed.
-- **Hot CPI + macro repricing** — `macro_event_window` overlay still absent. Trader took no preemptive posture on CPI day (algorithmic-only) — that's correct but the soft-signal handle is missing. **Suggested research:** macro-print event-window overlay (pre-print position sizing + post-print posture re-eval).
-- **Cross-sector defensive rotation (energy / dividend / quality bid vs AI cohort)** — `cross_sector_rotation_overlay` still absent. Re-affirmed Day-2.
-- **AI-cohort multiple-compression (Burry short paying off + $40B ORCL capex raise + Anthropic token-pricing AI-bubble narrative continuation)** — `equity_multiple_compression_overlay` still absent. Re-affirmed.
-- **VIX-threshold cross / regime-shift** — `vol_regime_shift_overlay` still absent; three sessions oscillating around 20 without confirmation either way.
-- **Iran-exchange / oil-shock event overlay** — currently no rule fires on energy-shock pass-through, even though it's now visible in CPI. Soft signal only.
-- **Hormuz / China-Taiwan / defense-name framing** — no defense-sector exposure in the universe; observation only.
+- **Macro-print / geopolitical-resolution event window (Iran deal + FOMC dot plot Wed)** — no `macro_event_window` overlay active. The trader cannot pre-position for the dot plot algorithmically (correct under the mandate), but the soft-signal handle is missing. **Suggested research:** macro/event-window overlay (pre-event sizing + post-event posture re-eval) covering scheduled prints (FOMC/CPI) and binary geopolitical resolutions.
+  - gap_type: event_catalyst
+- **VIX-threshold cross / vol-regime shift (VIX broke below 20, −9% to 17.68)** — `volatility_regime` is a confirmed registry coverage hole (no responder). The IV-compression regime favors vol-selling structures, but no strategy reads the VIX-regime transition. **Suggested research:** vol-regime overlay that flips posture on a confirmed VIX threshold cross; would also give `iron_condor_high_iv` a universe symbol to claim.
+  - gap_type: volatility_regime — responder: NONE — library gap (coverage hole)
+- **AI-policy / export-control shock overlay (Anthropic Fable/Mythos ban; NVDA-China substitution)** — no rule responds to national-security/export-policy events that hit AI-cohort names. Soft signal only. **Suggested research:** policy-event sentiment overlay tagging export-control / regulatory-AI headlines as a cohort risk flag.
+  - gap_type: event_catalyst
+- **Underwriter-franchise event for JPM (SpaceX IPO listed; OpenAI Q4 listing pending)** — `underwriter_franchise_event` still absent. The franchise tailwind from a record IPO doesn't map to any active JPM rule (trend-following, price-driven only). Re-affirmed.
+  - gap_type: event_catalyst
+- **M&A-arb (NUVL/GSK)** — `m_a_arbitrage_event` still absent; NUVL pre-close, trades freely. Re-affirmed.
+  - gap_type: pairs_arbitrage
+- **Capex-shock asymmetric-reaction detector (ORCL)** — last week's beat+raise+capex-shock print is now resolving to the UPSIDE (+5% Monday), which actually *validates* the Wed `equity_event_driven_catalyst` buy. The open soft-signal gap is the inverse: the keyword detector couldn't distinguish the asymmetric print at entry. Re-affirmed for Saturday research (positive/negative-signal nuance in `news_brief.has_positive_signal`).
+  - gap_type: event_catalyst
 
 ## Recommendations for the trader
 
-- **NOTABLE assessment. Standard workflow with elevated event-window awareness.** Three live event vectors stacked: hot CPI fallout, US-Iran active exchange, ORCL post-print fade. None individually breach HALT-WORTHY; combined they argue for letting rules govern rather than overriding.
-- **ORCL post-print Thu (AVGO/MU/ORCL claimed by `equity_event_driven_catalyst`).** The print profile (beat+raise+ negative AH reaction on capex shock) is exactly the kind of asymmetric catalyst the rule should handle. **Consider: the strategy may fire an exit/avoid signal on ORCL Thu open; trust the rule.** The trader has no ORCL position to manage today.
-- **MU pre-print window opens next week (Q3 6/24 AMC).** Held position, -8.44% unrealized, stop ~9.6% away. Pre-print event-driven posture: don't override the rule; let the stop or the print response govern.
-- **AAPL held into WWDC Day-3 (negative cumulative reaction).** No event-window rule; trader is correctly relying on trend-following price action. Standard posture.
-- **JPM no longer held (exited Wed open); franchise-event window (SpaceX pricing Thu AMC + OpenAI Q4 listing) is informational only.** Library gap on `underwriter_franchise_event` re-affirmed.
-- **Fed June 17 dot plot is the live macro catalyst.** No `macro_event_window` rule; trader cannot pre-position. Soft caution: any held momentum/trend position has 1 week to FOMC; the print profile (likely hold + hawkish dot-plot lift + easing-bias language removal) skews adversely for AI-cohort multiples.
-- **VIX at the 20 ELEVATED threshold.** No `vol_regime_shift_overlay` rule. Observation only; iron-condor strategy (`iron_condor_high_iv`) would find IV rank attractive if it claimed any universe symbols, but none are claimed for it.
-- **AI-cohort multiple-compression risk is becoming concrete** (Burry short + ORCL capex overshoot + Anthropic Mythos-token-pricing carry-forward). No rule fires on multiple-compression. Observation only.
-- **`cli execute` should run as scheduled.** No HALT-WORTHY trigger. Rules govern; if no rule fires, no trade is the correct outcome.
-- **Algorithmic-only mandate.** If a rule fires, execute; if no rule fires, don't trade.
-
-## Operational notes
-
-- `cli news-fetch --lookback-hours 24` returned **135 items** across 22 symbols (vs Tue 176, Mon 136). NVDA 17, SPY 15, ORCL 15, GOOGL 13, QQQ 11, TSLA 11, AMZN 8, MSFT 6, AAPL 5, AVGO 5, META 5, TSM 5, INTC 4, MU 4, JPM 3, NUVL 2, MRVL 2, CBRS 2, ARM 1, HPE 1, CSCO 0, DELL 0. Sector aggregates: technology 53, financials 3, healthcare 2, index 16, consumer_discretionary 11. `pending_sector_assignment: []`. Zero-coverage Wed: CSCO, DELL.
-- 135 items Wed vs 176 Tue (-23%) consistent with the day's coverage being concentrated on macro (CPI / Iran) + ORCL print + chip selloff rather than diversified single-name catalysts. NVDA/ORCL/SPY/GOOGL anchor the count.
-- All 6 category HTMLs written (macro, earnings, geopolitics, policy, volatility, options_flow). Daily summary written.
-- WebSearch returned strong results for: May CPI 2026 (Benzinga / CNBC / Kiplinger / CBS / Morningstar); ORCL Q4 FY26 (Stocktitan / Oracle IR / TheStreet / Benzinga); Trump Iran Hormuz strikes (RFE/RL / Britannica / Wikipedia); VIX June 10 (StreetStats / CBOE / Yahoo / Macrotrends); ADBE Q2 preview (Alphastreet / TipRanks / TIKR); SpaceX IPO pricing oversubscription (Bloomberg / FXStreet / Yahoo / Seeking Alpha); Meta-Reliance India data center (TechCrunch / CNBC / Bloomberg / Meta IR).
-- WebSearch returned weak results for: same-day "biggest gainers/losers" S&P 500 query still flaky (top losers JNJ/HD/PG/KO/GLW/WSM/BLDR/PODD via ChartMill indirect — usable for cohort framing only); intraday UOA platforms still not freely searchable.
-- **Promotion analysis (`news_manual.md §9`):**
-  - **Tier A:** no fresh sessions added for CRWD / STM / FLEX / PINS / VSH. Holding at prior counts.
-  - **Tier B:** no qualifiers Wed. ORCL post-print failed Tier-B #3 (+5% confirmation) due to capex-shock AH selloff. META-Reliance partnership benefits an in-universe member, not a new candidate.
-  - **Decision: 0 promotions this run.** Universe stays at 22.
-- `git-sync` LaunchAgent status remains in pending-marker state per recent handoffs; operator action still pending.
+- **NOTABLE, constructive. Standard workflow with event-window awareness.** The dominant event (Iran deal) is a de-escalation — risk-on, not a shock — so the posture is "let rules ride the relief tape," not "defend." No HALT-WORTHY trigger.
+- **MU (held, +9.98%) into the 6/24 print.** Pre-print event window is now open and the position is green with bullish flow. Don't override — let `equity_event_driven_catalyst`'s window logic and the trailing stop govern. The Wed stop-risk is gone.
+- **ORCL (held, +8.25%) — the Wed catalyst buy is working.** The asymmetric capex-shock print resolved to the upside. Trust the rule's exit logic; no discretionary action.
+- **FOMC dot plot Wednesday is the live macro catalyst** (lands after tomorrow's run). No `macro_event_window` rule, so the trader cannot pre-position — that's correct. Soft awareness only: a hawkish dot-plot revision is the main risk to the AI-cohort multiple over the next 48h; rules will react to price after the fact.
+- **VIX broke below 20 (17.68).** Vol-selling structures are favored by IV rank, but no `vol_regime_shift_overlay` is active and `iron_condor_high_iv` claims no universe symbol — observation only.
+- **Anthropic export-control overhang + NVDA-China substitution** are slow structural threads, not same-day catalysts. No rule fires on policy; observation only.
+- **`cli execute` should run as scheduled.** If a rule fires (most likely MU/ORCL event-window or a fresh trend cross on the relief tape), execute; if none fires, no trade is the correct outcome. Algorithmic-only mandate governs.
