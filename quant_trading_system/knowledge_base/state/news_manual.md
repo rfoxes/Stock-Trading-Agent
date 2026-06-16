@@ -455,6 +455,20 @@ nothing useful for 'CPI release' queries; use 'CPI <month> <year>' instead.")
   <SYM> --agent news --reason "<N>-session recurrence; <catalyst>"`
   for every qualifier. Idempotent. Re-classify the symbol in the brief
   from "Candidate" → universe member with the new responder tag.
+- **2026-06-16: An explicit operator instruction to add a symbol OVERRIDES the
+  Tier-A/B promotion discipline — promote it via `promote-candidate` even if it
+  meets no automated trigger.** The news agent already HAS universe-add authority
+  (step 9); the Tier-A/B rules are the *automated* discipline for when to self-
+  initiate, not a ceiling on operator directives. On 2026-06-16 the operator
+  directed SPCX (SpaceX) into the universe; an IPO is not one of the 5 Tier-B
+  triggers, so prior runs (correctly, under the automated rules) only logged it as
+  a watch — but once the operator says "I want it in," promote it
+  (`--agent news --reason "operator-directed ..."`). Don't make the operator ask
+  twice. The news agent still CANNOT attach strategies (no set-active/add-active/
+  propose-strategy) — promotion leaves the symbol UNCLAIMED, and the trader's P0
+  triage + Saturday research own the strategy claim. (Also: confirm the symbol
+  isn't already in — e.g. Cerebras is `CBRS`, in since 2026-06-09 — before
+  re-promoting.)
 - **2026-06-04: `news_fetch` bug fix — it now uses `compute_universe`,
   not `settings.watchlist`.** Operator additions to `extra_symbols.md`
   flow through automatically. No need to pre-create subdirs.

@@ -72,3 +72,6 @@ ORCL: technology
 
 # Added 2026-06-09 (news, promote-candidate)
 NUVL: healthcare
+
+# Added 2026-06-16 (news, promote-candidate)
+SPCX: industrials

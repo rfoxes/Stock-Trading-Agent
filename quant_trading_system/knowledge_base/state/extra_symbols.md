@@ -50,3 +50,6 @@ ORCL
 
 # Added 2026-06-09 (news, promote-candidate): Tier-B #1 confirmed M&A target: GSK 0.6B all-cash 24/share (40% premium); FDA Priority Review PDUFA 2026-11-27
 NUVL
+
+# Added 2026-06-16 (news, promote-candidate): Operator-directed 2026-06-16: SpaceX largest-IPO-ever (~$2T, listed 6/12); FAB-10 frontier cohort; Nasdaq-100 fast-entry inclusion ~July1 forces QQQ rebalance + historic options debut. Operator override of Tier-A/B discipline (an IPO is not a Tier-B trigger). Sector=industrials (aerospace; Starlink leg => could be communication_services).
+SPCX

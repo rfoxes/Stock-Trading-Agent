@@ -22,7 +22,10 @@ plot; algorithmic-only mandate governs.
 ## Watchlist + positions
 
 (Held longs per the 6/16 trader handoff: **AAPL 72, AVGO 26, MU 7, ORCL 38,
-QQQ 28, SPY 35.** Active set: 7 strategies × 22/22 claimed, unclaimed_count == 0.
+QQQ 28, SPY 35.** Active set: 7 strategies. **Universe expanded to 23 — SPCX was
+operator-directed-promoted this run (see below); it is currently UNCLAIMED.** So
+22/23 claimed, unclaimed_count == 1 (SPCX). The trader should triage SPCX on its
+next run (`cli triage-symbol SPCX ...`) per the P0 zero-unclaimed rule.
 `coverage_holes` is now **empty** in `gap-registry` — the Saturday research run
 closed the `volatility_regime` hole by tagging the 4 options strategies.)
 
@@ -118,6 +121,22 @@ closed the `volatility_regime` hole by tagging the 4 options strategies.)
   - gap_type: trending
   - responder: equity_trend_following_ema_cross (claims SPY; no fresh signal)
 
+- **SPCX — NEW UNIVERSE MEMBER (operator-directed promotion this run; UNCLAIMED).**
+  SpaceX (listed 6/12, ~$2T, largest IPO ever). Today: **historic options debut**
+  (3rd-most-traded single name behind TSLA/NVDA; ~500k contracts in hour one;
+  gamma-squeeze-to-$400 talk on a 3-5% float), **exercising a $60B option to buy
+  Anysphere/Cursor**, and **pending Nasdaq-100 fast-entry inclusion ~July 1**
+  (~$22-27B forced index buying; the QQQ rebalance channel above) + Russell 6/26.
+  36 Alpaca items — the highest-density name in the universe. **No strategy claims
+  it yet** — the trader triages on its next run; Saturday research owns the proper
+  head-to-head claim. Hyper-volatile new listing; an IPO is not a Tier-B trigger,
+  so this is an operator override, not an automated promotion.
+  - gap_type: volatility_regime (new hyper-IV listing; no price/earnings history)
+  - responder: NONE — UNCLAIMED. Trader triage pending. Note: as a brand-new IPO
+    with no bars/indicator history, trend/momentum/breakout rules will have little
+    to work with for several sessions; expect triage to report a true library gap
+    or a low-confidence provisional claim.
+
 - **No fresh single-name news** (caught the tape / screen mentions only):
   **ARM, CBRS, CSCO, HPE, JPM, MRVL, NUVL, ORCL, TSM.** MRVL slipped
   post-Monday-surge (price action) with S&P 500 inclusion still pending 6/22;
@@ -153,9 +172,10 @@ closed the `volatility_regime` hole by tagging the 4 options strategies.)
 
 ## Candidates for the universe
 
-**0 promotions this run. Universe stays at 22.** No Tier-A candidate cleared a
-fresh catalyst appearance today (consecutive-session streaks did not advance);
-no Tier-B trigger fired.
+**1 promotion this run (operator-directed): SPCX → universe (now 23).** No
+*automated* promotion qualified — no Tier-A candidate cleared a fresh catalyst
+(streaks did not advance) and no Tier-B trigger fired — but the operator directed
+SPCX in explicitly, overriding the rule-based discipline.
 
 - **Tier A (3-session recurrence):** Carry-forwards CRWD (was provisional 3),
   STM/FLEX/PINS (2), VSH/SMCI (1) — **none appeared with a fresh catalyst today.**
@@ -173,13 +193,15 @@ no Tier-B trigger fired.
   - **#4 sell-side initiation cluster (3+ banks same week):** none confirmed.
   - **#5 Tier-1 customer-win:** none confirmed. (QCOM's rumored $10B Tenstorrent
     deal is unconfirmed rumor — does not qualify.)
-- **Watches for the operator / Saturday research:** **SMCI, WDC** (memory/AI-server
-  adjacency, recurring on whale screens with MU/DELL), **QCOM** (40+ AI-device
-  reveal + rumored $10B Tenstorrent deal, +4%), **RIVN** (R2 launch + humanoid
-  robots), **SPCX** (historic options debut + pending Nasdaq-100 fast-entry
-  inclusion ~July 1; session-2 watch; an IPO is not a Tier-B trigger, 3-5% float,
-  hyper-volatile). None promoted. SPCX's universe relevance is *indirect* — via the
-  QQQ index-rebalance flow (see Watchlist + positions), not as an addable name.
+- **SPCX (SpaceX) — PROMOTED THIS RUN (operator-directed).** No longer a watch:
+  added to the universe (sector `industrials`; aerospace) per explicit operator
+  instruction, overriding the Tier-A/B discipline (an IPO is not a Tier-B trigger).
+  Now a universe member, UNCLAIMED — see Watchlist + positions. Cerebras (CBRS) was
+  already promoted 2026-06-09 (Tier-B #4 initiation cluster) and remains in.
+- **Watches for the operator / Saturday research (NOT promoted):** **SMCI, WDC**
+  (memory/AI-server adjacency, recurring on whale screens with MU/DELL), **QCOM**
+  (40+ AI-device reveal + rumored $10B Tenstorrent deal, +4%), **RIVN** (R2 launch +
+  humanoid robots).
 
 ## Macro / sector context
 

@@ -28,7 +28,15 @@ Yesterday's news agent writes this. Replace, don't append.
   run used `.venv/bin/python3 -m quant_trading_system.cli`. Operator action still
   required (see open questions). NOTE: cwd drifts if you `cd` into a news subdir
   mid-run — use absolute paths or `cd /Users/rfoxes/Stock-Trading-Agent &&` for CLI.
-- **Universe:** 22-name (unchanged). Tue Alpaca densities (98 items total, vs Mon
+- **Universe: now 23-name.** SPCX (SpaceX) promoted this run via operator directive
+  (sector `industrials`), overriding the Tier-A/B discipline (an IPO is not a Tier-B
+  trigger). **SPCX is UNCLAIMED** — the trader must triage it on its next run
+  (`cli triage-symbol SPCX --gap-type volatility_regime`); as a brand-new IPO with
+  no bar/indicator history it will likely report a true library gap or a
+  low-confidence provisional claim. Saturday research owns the proper head-to-head.
+  (Re-run `news-fetch` picked up 36 SPCX items — the densest name in the universe.)
+  NOTE: Cerebras (CBRS) is ALREADY in the universe (promoted 2026-06-09, Tier-B #4).
+- **Universe (pre-SPCX):** was 22-name. Tue Alpaca densities (98 items total, vs Mon
   100): TSLA 16, AMZN 13, MSFT 11, GOOGL 10, NVDA 10, META 7, AAPL 6, MU 6, QQQ 4,
   SPY 4, DELL 3, MRVL 3, INTC 2, AVGO 1, ORCL 1, TSM 1; ARM/CBRS/CSCO/HPE/JPM/NUVL 0.
   Heavily SpaceX/Elon/AI-debt weighted. All 6 category HTMLs + daily summary
@@ -41,7 +49,8 @@ Yesterday's news agent writes this. Replace, don't append.
   (NEW_CATEGORY_NEEDED), not registry holes. Tag accordingly going forward.
 - **Held set (per 6/16 trader handoff):** AAPL 72, AVGO 26, MU 7, ORCL 38, QQQ 28,
   SPY 35. Active set 7 strategies × 22/22 claimed, unclaimed_count == 0.
-- **Zero promotions Tue.** Tier-B daily cap untouched. No Tier-A catalyst refresh.
+- **1 promotion Tue (operator-directed): SPCX.** No *automated* promotion qualified
+  (Tier-B cap untouched, no Tier-A refresh); SPCX added by explicit operator override.
 
 ## Notable carry-forwards
 
@@ -101,7 +110,9 @@ Yesterday's news agent writes this. Replace, don't append.
    Both require `--sector` on `cli promote-candidate`.
 2. **USE `.venv/bin/python3`** for all CLI calls. Bare `python3` = Homebrew 3.14,
    no deps, WILL fail. Use absolute paths / `cd /Users/rfoxes/Stock-Trading-Agent &&`.
-3. **Universe is 22-name.** `cli news-universe` Wed should confirm.
+3. **Universe is now 23-name** (SPCX added Tue, operator-directed). `cli news-universe`
+   Wed should confirm 23. **Cover SPCX** (per-symbol fetch + a brief line). Check
+   whether the trader claimed SPCX on its 6/16 post-close run or left it a library gap.
 4. **FOMC OUTCOME run (Wed is THE day).** Report the actual dot-plot revision
    (median 2026 dots; cut vs. hike camp), Warsh's debut presser tone, and the
    AI-cohort reaction. This is the highest-priority item for Wed. Decision drops
