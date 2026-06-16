@@ -11,6 +11,9 @@ indicators:
   - implied_move
 market_regime:
   - any
+gap_types:
+  - earnings_window
+  - volatility_regime
 parameters:
   entry_days_before_earnings: [5, 10]
   strike_selection: atm

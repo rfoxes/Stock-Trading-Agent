@@ -282,3 +282,33 @@ over the IEX-only feed; consider 0.90 as a future calibration.")
   unambiguous mismatches. Do NOT make `add-active` / `remove-active`
   changes based on simulate-substitute alone — wait for head-to-head
   to be fixed for the canonical adjudication.
+
+- **2026-06-16: head-to-head VALIDATION of uniquely-held first-pass
+  claims is systematically degenerate — do not churn on it.** When you
+  run `head-to-head <claimant> equity_trend_following_ema_cross` to
+  "validate" a character-match claim, `trend_following` does **0 trades**
+  on most single symbols over a 2-yr window, so it "wins" on the
+  Sharpe=0 ≥ negative-Sharpe / smaller-drawdown tiebreak — i.e. it wins
+  by *inaction*. Applying that verdict swaps an active responder for a
+  silent one (strictly worse for coverage). Likewise a 1-trade
+  "challenger Sharpe" is not a real Sharpe and must not unseat a claimant
+  with 10+ trades. Rule of thumb: **only apply a head-to-head reassignment
+  when BOTH strategies have ≥ ~5 trades in the window.** Otherwise record
+  the verdict and hold. (This is distinct from genuine symbol-claim
+  CONFLICT resolution for a newly-proposed strategy, where you still apply
+  verbatim.) Note also that `equity_event_driven_catalyst` is
+  un-backtestable (enters on a non-replayable `news_brief` signal → 0
+  trades in every sim), so head-to-heads on its symbols are pure noise.
+
+- **2026-06-16: the harness interpreter moved to a venv.** Homebrew
+  upgraded bare `python3` to 3.14.5 (no harness deps) on 6/11; run all
+  CLI via `.venv/bin/python3` (3.13.13) until the operator repoints the
+  scheduled tasks. The prompt's "no virtualenv" line is stale.
+
+- **2026-06-16: `gap-registry` coverage holes can be tagging artifacts.**
+  The registry only sees strategies that declare `gap_types:` frontmatter.
+  Options strategies shipped without it, so `volatility_regime` showed as
+  a hole despite `iron_condor_high_iv` et al. being textbook responders.
+  Before treating a coverage_hole as a real capability gap, check whether
+  an existing (esp. options) strategy just needs a `gap_types:` tag.
+  Tagging options is safe — `triage_symbol` filters to `type==equity`.

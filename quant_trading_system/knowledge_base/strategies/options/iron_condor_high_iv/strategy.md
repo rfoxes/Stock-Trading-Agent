@@ -12,6 +12,8 @@ indicators:
 market_regime:
   - sideways
   - high_volatility
+gap_types:
+  - volatility_regime
 parameters:
   short_strike_delta: 0.16
   long_wing_width: 5

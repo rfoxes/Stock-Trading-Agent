@@ -11,6 +11,8 @@ indicators:
 market_regime:
   - neutral
   - slightly_bullish
+gap_types:
+  - volatility_regime
 parameters:
   short_put_delta: 0.25
   short_call_delta: 0.20

@@ -11,6 +11,8 @@ indicators:
 market_regime:
   - neutral
   - low_volatility
+gap_types:
+  - volatility_regime
 parameters:
   front_month_dte: [25, 35]
   back_month_dte: [55, 70]
