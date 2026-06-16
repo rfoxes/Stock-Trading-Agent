@@ -101,8 +101,25 @@ closed the `volatility_regime` hole by tagging the 4 options strategies.)
   - gap_type: trending
   - responder: equity_trend_following_ema_cross (claims TSLA; no signal)
 
+- **QQQ — EVENT (pending index-rebalance flow; held long).** SpaceX (SPCX) is on
+  track for **Nasdaq-100 inclusion under the new fast-entry rule (~15 trading days
+  post the 6/12 listing → window closes ~July 1)**. Analysts estimate **$22-27B of
+  forced index buying** into a 3-5% float — which means QQQ trackers must reweight
+  *existing* constituents (the held mega-caps) to fund the SPCX add. A mechanical,
+  scheduled flow event on a held position, not price action.
+  - gap_type: event_catalyst
+  - responder: NONE — library gap. QQQ is claimed by equity_trend_following_ema_cross
+    (price-driven); no active rule reads a scheduled index-rebalance/forced-flow event.
+
+- **SPY — NON-EVENT clarification (held long).** SpaceX inclusion does **NOT** touch
+  SPY: S&P Global reaffirmed its four-quarters-of-GAAP-profitability rule and SpaceX
+  posted a ~$4.28B quarterly loss, so S&P 500 entry is off the table until mid-2027
+  at the earliest. SPY is insulated from the SPCX rebalance flow that hits QQQ.
+  - gap_type: trending
+  - responder: equity_trend_following_ema_cross (claims SPY; no fresh signal)
+
 - **No fresh single-name news** (caught the tape / screen mentions only):
-  **ARM, CBRS, CSCO, HPE, JPM, MRVL, NUVL, ORCL, QQQ, SPY, TSM.** MRVL slipped
+  **ARM, CBRS, CSCO, HPE, JPM, MRVL, NUVL, ORCL, TSM.** MRVL slipped
   post-Monday-surge (price action) with S&P 500 inclusion still pending 6/22;
   ORCL had only a Musk-wealth blurb (no fresh catalyst); TSM appeared only in an
   ARK-sells-flow item. ARM/CBRS/CSCO/HPE/JPM/NUVL had 0 Alpaca items.
@@ -113,6 +130,13 @@ closed the `volatility_regime` hole by tagging the 4 options strategies.)
   infra race as a "$4.1 trillion debt story" (NVDA/AMZN/AVGO/GOOGL/MSFT +
   DLR/EQIX); NVDA's own ~$20-25B debt raise is the on-cohort example. The market
   is funding capex with leverage — a new structural risk lens under the rally.
+- **SpaceX index-rebalance flow (scheduled, mechanical).** SPCX is set for
+  Nasdaq-100 fast-entry inclusion (~15 trading days post the 6/12 listing → ~July 1)
+  and Russell 1000 / Top 200 entry effective 6/26, with an estimated $22-27B of
+  forced index buying into a 3-5% float. The Nasdaq-100 add forces QQQ trackers to
+  reweight existing constituents — a flow headwind on the held QQQ's underlying
+  mega-caps over the next ~2 weeks. S&P 500 (SPY) is excluded (GAAP-profitability
+  rule; SpaceX is loss-making) until mid-2027+.
 - **AI data-center permitting backlash (real regulatory event).** ~$130B of US
   data-center projects blocked/delayed in Q1 2026 (75+ projects, record); 833
   opposition groups across 49 states; moratorium bills in 14 states; Maine within
@@ -152,8 +176,10 @@ no Tier-B trigger fired.
 - **Watches for the operator / Saturday research:** **SMCI, WDC** (memory/AI-server
   adjacency, recurring on whale screens with MU/DELL), **QCOM** (40+ AI-device
   reveal + rumored $10B Tenstorrent deal, +4%), **RIVN** (R2 launch + humanoid
-  robots), **SPCX** (historic options debut, session-2 watch; an IPO is not a
-  Tier-B trigger). None promoted.
+  robots), **SPCX** (historic options debut + pending Nasdaq-100 fast-entry
+  inclusion ~July 1; session-2 watch; an IPO is not a Tier-B trigger, 3-5% float,
+  hyper-volatile). None promoted. SPCX's universe relevance is *indirect* — via the
+  QQQ index-rebalance flow (see Watchlist + positions), not as an addable name.
 
 ## Macro / sector context
 
@@ -227,6 +253,13 @@ canonical type fits).
   rule maps the record-IPO underwriting tailwind to JPM (claimed by trend-
   following, price-driven only). Re-affirmed. gap_type: NEW_CATEGORY_NEEDED —
   responder: NONE.
+- **Scheduled index-rebalance / forced-flow window (SPCX → Nasdaq-100 ~July 1,
+  Russell 6/26).** QQQ (held) faces a mechanical reweight as SPCX is added under
+  the Nasdaq fast-entry rule ($22-27B forced buying into a 3-5% float), but no
+  active rule reads a known index-rebalance schedule as a flow event. **Suggested
+  research:** an index-rebalance/forced-flow overlay (anticipated add/drop dates +
+  estimated flow) as a soft posture signal on affected ETF holdings.
+  gap_type: event_catalyst — responder: NONE.
 
 ## Recommendations for the trader
 
@@ -235,6 +268,12 @@ canonical type fits).
   session), Iran is de-escalation, no held name carries a confirmed negative
   overnight catalyst. Let rules ride; don't pre-position for the dot plot
   (correct — no macro_event_window rule exists).
+- **QQQ (held) — SPCX Nasdaq-100 rebalance window (~July 1).** Soft awareness
+  only: the ~$22-27B forced SPCX buy reweights existing QQQ constituents over the
+  next ~2 weeks. No active rule reads index-rebalance flow (correct under the
+  mandate); rules react to price after the fact. SPY is insulated (S&P excluded
+  SpaceX). Not a same-day action item — flagged so it's not mistaken for
+  fundamental weakness if the held mega-caps see rebalance-driven pressure.
 - **MU (held) into the 6/24 print.** Pre-print event window is open with bullish
   flow and PT raises. Let equity_event_driven_catalyst's window logic + the
   trailing stop govern; no discretionary action.

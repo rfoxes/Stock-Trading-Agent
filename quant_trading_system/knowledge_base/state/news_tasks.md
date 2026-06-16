@@ -74,10 +74,15 @@ Yesterday's news agent writes this. Replace, don't append.
 - **DELL AI-server +757% + Goldman $1.24T TAM raise.** Demand datapoint; on IT
   whale screen. Track sell-side follow-through.
 - **INTC / Mobileye robotaxi 2027.** Stake read-through; track MBLY follow-up.
-- **SPCX (SpaceX).** Historic options debut 6/16 (3rd-most-traded single name
-  behind TSLA/NVDA; gamma-squeeze talk). Also exercising $60B option to buy
-  Anysphere (Cursor). NOT a Tier-B trigger (IPO). Session-2 watch; track recurrence
-  + read-through to TSLA/NVDA vol surface.
+- **SPCX (SpaceX) — index-rebalance flow touches held QQQ (the real universe
+  read-through).** Set for **Nasdaq-100 fast-entry inclusion ~July 1** (~15 trading
+  days post the 6/12 listing) + **Russell 1000/Top 200 effective 6/26**; ~$22-27B
+  forced index buying into a 3-5% float → QQQ trackers must reweight existing
+  constituents over ~2 weeks. **SPY EXCLUDED** (S&P GAAP-profitability rule; SpaceX
+  loss-making ~$4.28B/qtr) until mid-2027+. Also: historic options debut 6/16
+  (3rd-most-traded behind TSLA/NVDA; gamma-squeeze talk) + exercising a $60B option
+  to buy Anysphere (Cursor). NOT a Tier-B trigger (IPO); session-2 watch. **Track
+  the Nasdaq-100 add date + estimated flow into QQQ daily through ~July 1.**
 - **MRVL + FLEX S&P 500 inclusion 6/22** — passive-flow window THIS week. No fresh
   6/16 catalyst (MRVL slipped post-Monday-surge = price action). Track into 6/22.
 - **VIX sub-20 (16.41).** IV compression; `volatility_regime` now has library
@@ -110,6 +115,10 @@ Yesterday's news agent writes this. Replace, don't append.
 10. **Anthropic export-ban Day-N.** Did models return (July-1 prediction-market
     date)? NVDA-China spillover? EU sovereign-AI follow-up.
 11. **MRVL + FLEX 6/22 inclusion** passive-flow window — track all week.
+11b. **SPCX → QQQ Nasdaq-100 inclusion (~July 1) + Russell (6/26).** Track the
+    confirmed add date + estimated forced flow ($22-27B) reweighting held QQQ's
+    constituents. SPY unaffected (S&P excluded SpaceX). The genuine universe
+    read-through of the SpaceX IPO — don't bury it under the Musk-flow noise.
 12. **Vol regime Wed.** Did the dot plot re-inflate VIX, or did sub-20 hold? VIX9D
     vs VIX. Activation gap on volatility_regime (responders exist, none active).
 13. **Promote candidates if Wed session refreshes (consecutive-session rule):**
