@@ -22,7 +22,11 @@
       "Bash(python3 -m quant_trading_system.cli regime)",
       "Bash(python3 -m quant_trading_system.cli --help)",
       "Bash(python3 -c \"import requests\")",
-      "Bash(python3 -m pip list)"
+      "Bash(python3 -m pip list)",
+      "Bash(/Users/rfoxes/Stock-Trading-Agent/.venv/bin/python3 -m quant_trading_system.cli positions)",
+      "Bash(/Users/rfoxes/Stock-Trading-Agent/.venv/bin/python3 -m quant_trading_system.cli open-orders)",
+      "Bash(/Users/rfoxes/Stock-Trading-Agent/.venv/bin/python3 -m quant_trading_system.cli regime)",
+      "Bash(/Users/rfoxes/Stock-Trading-Agent/.venv/bin/python3 -m quant_trading_system.cli list-active)"
     ]
   }
 }

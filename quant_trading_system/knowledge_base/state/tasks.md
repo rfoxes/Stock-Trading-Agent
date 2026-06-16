@@ -10,115 +10,139 @@ when you write the version for the next-next Claude.
 
 **Every symbol in the universe MUST be either (a) claimed by an active
 strategy via algorithmic triage, or (b) flagged as a true library gap.**
-See `manual.md` "P0 — EVERY SYMBOL ALGORITHMICALLY EVALUATED RULE" (top
-of `manual.md`, refined 2026-06-10). `cli execute` REFUSES to run if any
-symbol is unclaimed AND not in `state/library_gaps.md`.
-
-**Use `cli triage-symbol <SYM> [--gap-type X]`** for every unclaimed
-universe symbol — auto-claims if Sharpe ≥ 0.5 on a library candidate,
-else auto-records to `state/library_gaps.md`. Character-match shortcuts
-and direct YAML edits to `active_strategies.md` are FORBIDDEN. The
-`cli add-active` UNION fix landed today (commit 3daff8d); pass
-`--replace` for the old overwrite behaviour.
+See `manual.md` "P0 — EVERY SYMBOL ALGORITHMICALLY EVALUATED RULE".
+`cli execute` REFUSES to run if any symbol is unclaimed AND not in
+`state/library_gaps.md`. Use `cli triage-symbol <SYM> [--gap-type X]` for
+every unclaimed symbol — auto-claims if Sharpe ≥ 0.5, else auto-records a
+library gap. Character-match shortcuts and direct YAML edits to
+`active_strategies.md` are FORBIDDEN.
 
 ---
 
-## Status as of last update (Wed 2026-06-10, true post-close)
+## ⚠️ READ FIRST: THE HARNESS INTERPRETER IS BROKEN FOR BARE `python3`
 
-- **Active set: 7 strategies, 22/22 universe symbols claimed (unclaimed_count == 0).**
-  No claim changes today.
-- **Today's execute: 1 intent submitted.** `equity_event_driven_catalyst`
-  → **ORCL buy 38 shares market day** (order_id `3d56fcac-a86f-412c-8918-c8ccb6bead45`).
-  All 5 SafetyGate checks passed. Will fill Thu open.
-- **6 other strategies: 0 intents each.**
-- **No reconciliation needed today** (Tue's GOOGL/JPM exits already logged in earlier-in-day handoff via commit e6d0b26).
-- **Account: equity $103,575.68 (down from earlier $104,506.85 snapshot — intraday mark drift); cash $32,063.73 (unchanged, ORCL not yet filled); buying power $321,605.61 (down from $328,681 due to ORCL reservation).**
-- **Positions: 4 longs unchanged from earlier-in-day handoff but marks moved — AAPL 72 (+6.93%), MU 7 (**-11.49%** ← from -8.44%), QQQ 28 (+6.21%), SPY 35 (+1.84%). ORCL 38 pending fill.**
-- **Regime: bull, conf 0.77, ADX 27.41.** Unchanged.
-- **News brief: PRESENT today (NOTABLE).** Earlier-in-day handoff's "missing brief" issue resolved by commit 617846d.
+**Homebrew upgraded `/opt/homebrew/bin/python3` to 3.14.5, which is missing
+the harness deps (requests/alpaca-py/dotenv).** `python3 -m quant_trading_system.cli ...`
+fails with `No module named 'requests'`. **RUN EVERYTHING VIA THE VENV:**
 
-## To do Thursday (2026-06-11)
+```
+/Users/rfoxes/Stock-Trading-Agent/.venv/bin/python3 -m quant_trading_system.cli <cmd>
+```
 
-1. **Read last_handoff.md and news_brief.md FIRST.** Heavy Thu stack continues:
-   - PPI May + initial jobless claims 8:30 ET (consensus PPI +0.3% MoM; claims ~220K).
-   - ADBE Q2 prints AMC.
-   - SpaceX IPO pricing AMC (lists Fri).
-   - **ORCL fill expected at Thu open** — see step 3.
+The `.venv` (Python 3.13.13) has all deps and reaches the broker cleanly.
+If the operator has repointed the scheduled task or reinstalled deps into
+3.14, bare `python3` may work again — test `python3 -m quant_trading_system.cli account`
+once; if it errors with ModuleNotFoundError, fall back to the venv path
+above. (A separate argparse `%`-escape crash in `cli.py:486` was FIXED on
+6/16 — `%`→`%%` — so the parser itself builds fine now.)
 
-2. **Snapshot + P0 triage.** Standard `cli list-active`. If `unclaimed_count > 0`, run `cli triage-symbol <SYM> [--gap-type <type>]` per symbol — auto-claim or auto-flag as library gap. **Do NOT use `cli add-active` for unclaimed symbols** (triage is the only sanctioned path).
+## Status as of last update (Tue 2026-06-16, post-close)
 
-3. **RECONCILE THE ORCL FILL (priority).** ORCL buy 38 should fill at Thu open. Check `cli positions`:
-   - If ORCL appears as a long position: note avg fill price, market value, unrealized P&L. The strategy's ATR stop was set at submit time; verify it's still in place. NO `log-closed` call (this is an entry, not exit).
-   - If ORCL did NOT fill (broker rejection, halt, etc.): document in handoff and flag for operator. The `cli open-orders` parser is currently broken (`'dict' object has no attribute 'id'`), so you may need to infer from `account` cash + buying-power deltas.
-   - Compare ORCL Thu open to Wed AH close. AH was down on capex shock; if gap-down is severe (>5%), the ATR stop may fire same-day. **Trust the rule** — algorithmic-only mandate. Do not override.
+- **First run since Wed 6/10** — Thu 6/11 / Fri 6/12 / Mon 6/15 did NOT execute
+  (harness was down on the interpreter drift). Repaired and ran today.
+- **Active set: 7 strategies, 22/22 claimed (unclaimed_count == 0).** No changes.
+- **Today's execute: 1 intent submitted+filled.** `equity_event_driven_catalyst`
+  → **AVGO buy 26 @ market** (order_id `77017d1b-ccfe-4f40-97da-5e3f74af47ce`).
+  All 5 SafetyGate checks passed. **This was a keyword-detector FALSE POSITIVE**
+  (brief said AVGO had no fresh catalyst) — rule governed, not overridden;
+  reinforced library gap below.
+- **6 other strategies: 0 intents.**
+- **No reconciliation** — nothing closed since 6/10; ORCL (Wed buy) filled at
+  $177.28 and is now a held long.
+- **Account: equity ~$108,250; cash ~$15,518 (net-long now post-AVGO);
+  buying power ~$321,720.**
+- **Positions (6 longs, all green): AAPL 72 (+10.07%), MU 7 (+7.03%), ORCL 38
+  (+7.25%), QQQ 28 (+13.53%), SPY 35 (+6.30%), AVGO 26 (new today).**
+- **Regime: bull, conf 0.75, ADX 24.98.**
+- **News brief: PRESENT (dated 6/15, NOTABLE — Iran peace deal relief rally,
+  VIX below 20).**
 
-4. **Other position watch:**
-   - **MU stop buffer ~6.5%.** Position -11.49% Wed close; $813.44 stop is ~$56 below $870 current. If chip cohort continues lower Thu, stop may trigger. Pre-print window through 6/24.
-   - **AAPL WWDC Day-4.** Penultimate WWDC reaction day. Trend-following claims AAPL; rule respects price action.
-   - **ADBE post-print Thu AMC.** ADBE not in universe; not actionable.
-   - **PPI reaction.** No macro-event-window rule; price action only.
-   - **SpaceX pricing AMC.** Listing Fri. JPM exited Tue/Wed so no franchise event to defend.
+## To do Wednesday (2026-06-17)
 
-5. **Run `cli execute`.** Watch for:
-   - **Possible ORCL exit** if the ATR stop fires intraday on a hard gap-down.
-   - **MU stop trigger** if MU breaks $813.44.
-   - **Trend-following entries** on any of the 6 non-held universe names if Wed price action set up signals.
+1. **Read last_handoff.md and news_brief.md FIRST.** Use the venv interpreter
+   (see warning above).
 
-6. **HALT-WORTHY check.** Multiple catalysts. Default standard execute unless brief explicitly says HALT-WORTHY EVENT.
+2. **FOMC dot plot is TODAY (Wed 6/17).** Hold is ~97% priced; the dot plot is
+   the live catalyst and the main 48h risk to AI-cohort multiples. No
+   `macro_event_window` rule exists — you CANNOT pre-position (correct under the
+   mandate). Depending on run timing the decision may land before/during/after
+   your run; rules react to price after the fact. Default standard execute unless
+   the brief flags HALT-WORTHY EVENT.
 
-7. **Library gaps — see list below.** Wed added ONE new soft-signal gap (news-brief keyword detector cannot distinguish asymmetric reactions).
+3. **Snapshot + P0 triage.** `cli list-active`. If `unclaimed_count > 0`, run
+   `cli triage-symbol <SYM> [--gap-type <type>]` per symbol. Do NOT use
+   `cli add-active` for unclaimed symbols.
 
-8. **Run `cli git-sync --agent trader --message "..."` as last action.**
+4. **Reconcile.** Confirm the 6 longs (incl. AVGO) are still held. If AVGO/ORCL/MU
+   exited via the event-driven strategy's logic, `log-closed equity_event_driven_catalyst
+   <SYM> <pnl_fraction>`. No action if all still held (entries don't get log-closed).
+
+5. **Position watch:**
+   - **MU pre-print window — Q3 FY26 = Tue 6/24 AMC.** Held +7%, surging into the
+     print. `equity_event_driven_catalyst` window logic + trailing stop govern.
+   - **AVGO (new, weak-quality entry).** Watch behavior; no fresh catalyst, next
+     print September. Trust the rule's exit logic.
+   - **ORCL +7%** — Wed catalyst buy working; trust exit logic.
+   - **AAPL/QQQ/SPY** — broad-rally beneficiaries, trend-following claims AAPL/QQQ/SPY.
+
+6. **Run `cli execute` (via venv).** Watch for any dot-plot-driven price reactions
+   that trip trend/momentum rules.
+
+7. **Library gaps — see list below.**
+
+8. **Run `cli git-sync --agent trader --message "..."` (via venv) as last action.**
 
 ## Library gaps for the research agent (carry to research_tasks.md Sat)
 
-These are EVENT-OVERLAY gaps + the 5 still-unvalidated first-pass assignments. Every universe symbol is claimed; head-to-head validation remains the Sat research priority.
-
-- **NEW (Wed 2026-06-10): news-brief keyword detector cannot distinguish asymmetric reactions.** The `event_driven_catalyst` strategy uses `news_brief.has_positive_signal(sym)` and `has_negative_signal(sym)` as keyword-match gates. Wed's ORCL bullet contained BOTH a beat+raise positive headline AND a capex-shock + AH-selloff negative framing — but `has_negative_signal` did not match the asymmetric-reaction keywords (capex, AH selloff, after-hours drop, negative reaction to beat). The strategy entered ORCL on positive-only signal. **Suggested research:** extend `_news_brief.py` keyword sets with asymmetric-reaction terms, OR add a `has_asymmetric_signal()` shortcut that returns true when positive AND negative both match — strategies can then choose to skip entry. This is the mirror of the brief's `capex_shock_negative_event` overlay request.
-- **Validate the now-5-strategy first-pass assignments via head-to-head:**
+- **REINFORCED (6/16): `news_brief.has_positive_signal`/`has_negative_signal`
+  keyword detector is too coarse in BOTH directions.** 6/10 ORCL = false NEGATIVE
+  (missed capex-shock framing). 6/16 AVGO = false POSITIVE (matched a no-catalyst
+  cohort mention → bought 26 shares the news agent itself said had no fresh
+  catalyst). **Suggested research:** rework the keyword sets / add a confidence
+  or freshness gate; consider `has_asymmetric_signal()`; possibly require a
+  catalyst-strength threshold before `event_driven_catalyst` enters on a brief
+  signal alone.
+- **NEW (6/16): `_load_news_brief()` has no staleness guard.** It parses
+  `date_in_file` but never compares to today, so a stale brief is fed to
+  strategies as live signal. Latent liquidation/entry risk if the news agent
+  ever misses a day (it missed 6/11-6/15 this week). **Suggested research:**
+  reject or down-weight a brief whose `date_in_file` != today.
+- **Validate the 5 first-pass + 3 provisional assignments via head-to-head:**
   - `equity_momentum_macd_histogram` vs `equity_trend_following_ema_cross` on META, MSFT
   - `equity_breakout_volume_confirmation` vs `equity_trend_following_ema_cross` on ARM, MRVL, INTC
   - `equity_mean_reversion_bollinger` vs `equity_trend_following_ema_cross` on CSCO
   - `equity_rsi_divergence` vs `equity_trend_following_ema_cross` on HPE
-  - `equity_event_driven_catalyst` vs `equity_trend_following_ema_cross` on AVGO, MU, ORCL *(ORCL now has a real entry to validate against)*
+  - `equity_event_driven_catalyst` vs `equity_trend_following_ema_cross` on AVGO, MU, ORCL
   - `equity_sector_rotation_momentum` vs `equity_trend_following_ema_cross` on DELL
   - `equity_trend_following_ema_cross` vs ??? on CBRS, NUVL, TSM
-- **Tier-1 supply-chain / customer-win partnership overlay.** NVDA/GOOGL anchor-customer confirmation Wed (Apple Foundation Models on Google Cloud + NVDA chips) didn't trigger any defer-exit logic. Suggested rule unchanged.
-- **Underwriter-franchise-event overlay — open Day-2.** JPM exited Tue/Wed despite OpenAI underwriter naming + SpaceX overlap.
-- **M&A target post-announcement (biotech / cross-sector) overlay — open.** NUVL pinned. No M&A-arb strategy exists.
-- **AAPL WWDC June 8-12 event-window posture rule. ACTIVE Day-3-5 Wed-Fri.**
-- **NFP / CPI / FOMC macro-event-window rule. CPI fired Wed in-line; FOMC Jun 16-17.**
-- **Peer-earnings cohort-spillover overlay** (ADBE → software cohort Thu).
-- **`capex_shock_negative_event` overlay** (ORCL Wed AMC: beat+raise but $40B FY27 capital raise drove down in AH).
-- **Geopolitical / oil-spike risk-off overlay** (Iran-Israel active exchange Day-1; oil reversed Mon-Tue weakness).
-- **Rate-policy-shift sizing rule** (10Y yield around CPI / PPI / FOMC).
-- **Credit-stress sector overlay** (Cliffwater + Blackstone gates → JPM).
-- **TSMC capacity-constraint supply-side pricing-power overlay** (TSM May +30% YoY).
-- **Trump AI EO policy-tailwind sizing rule.**
-- **EU cloud procurement regulatory-headwind rule.**
-- **Corporate-action handler** (CRWD 4-for-1 split style).
-- **Vol-regime overlay** (VIX 19.87 Wed mid-afternoon; third probe at 20 ELEVATED threshold).
-- **AI-cohort multiple-compression overlay** (Burry short paying off + ORCL capex overshoot + Anthropic token-pricing).
-- **Cross-sector defensive rotation overlay** (energy / dividend / quality bid vs AI cohort).
-- **Pre-print cohort-cert overlay.**
-- **News-brief-staleness handling.** Earlier-in-day Wed brief was missing for the first trader run; resolved later in the day. If staleness persists across runs the strategy library has no event-aware fallback.
+- **`macro_event_window` overlay** (FOMC dot plot Wed 6/17; Iran-deal resolution) — absent.
+- **`vol_regime_shift_overlay`** (VIX broke below 20 to 17.68) — confirmed registry
+  coverage hole; would also give `iron_condor_high_iv` a symbol to claim.
+- **AI-policy / export-control shock overlay** (Anthropic Fable/Mythos foreign-user
+  ban; NVDA-China substitution) — no rule responds to national-security/export events.
+- **`underwriter_franchise_event` for JPM** (SpaceX listed; OpenAI Q4 listing pending) — absent.
+- **`m_a_arbitrage_event` (NUVL/GSK)** — absent; NUVL pre-close.
+- **AAPL WWDC / named-multi-day event-window posture** (`event_window_posture`) — absent.
+- **AI-cohort multiple-compression overlay** — absent.
+- **Cross-sector defensive rotation overlay** — absent (less urgent on the relief tape).
 
 ## Open questions for the operator
 
-1. **Two trader runs on Wed 6/10.** The earlier-in-day "do-nothing" run (commit e6d0b26) executed before the news brief was written. The scheduled task then fired again later in the day (this run), and the brief-using `event_driven_catalyst` rule fired the ORCL entry. Is the scheduled task firing more than once per day intentional? If not, the trigger setup may need review.
-
-2. **`cli open-orders` parser bug remains.** `'dict' object has no attribute 'id'`. Now actively blocking — Wed has a live submitted order (ORCL) that can't be inspected from the CLI. HIGH PRIORITY operator fix.
-
-3. **News-brief keyword detector lacks asymmetric-reaction nuance.** Sat research gap above; operator should also be aware that the gate is keyword-based and coarse.
-
-4. **MU buy stop at $813.44 → -11.49% unrealized after Wed close.** Stop buffer ~6.5%. One chip-cohort red day away from triggering. Pre-print window through 6/24.
-
-5. **NUVL/CBRS/TSM claim placeholders** — Sat research priority. NUVL especially (biotech M&A target with no M&A-arb strategy).
-
-6. **GOOGL/JPM Wed-open fill prices were proportional cash-arithmetic, not Alpaca per-fill report.** Combined sum exact (+0.01210 of equity); per-symbol approximate. Carry-forward.
-
-7. **CPI Wed in-line (4.2% headline matched consensus); PPI Thu; ADBE Thu AMC; SpaceX IPO pricing Thu AMC → list Fri.** Catalyst stack continues. No macro-event-window rule.
-
-8. **Book is net-cash $32K cash vs $72K longs (0% leverage) — will become slightly less net-cash post-ORCL-fill Thu.** ORCL ~38 × $215 = ~$8,170 = ~8% of equity at entry.
-
-9. **FOMC June 16-17.** Hold base case; dot plot is the catalyst. One week out.
+1. **[HIGH] Repair the scheduled-task interpreter.** Bare `python3` → Homebrew
+   3.14.5 (no harness deps). Repoint the Cowork task / daily_prompt to
+   `.venv/bin/python3`, or reinstall deps into 3.14, or recreate the venv.
+   Until then every automated run fails at context-build unless Claude falls
+   back to the venv manually (as I did today). See last_handoff.md Open issue #1.
+2. **argparse `%` crash FIXED (`cli.py:486`, `%`→`%%`).** No action; informational.
+3. **`cli open-orders` parser bug appears RESOLVED** under the venv (3.13) — the
+   `'dict' object has no attribute 'id'` error did not reproduce. Confirm next
+   time there's a live open order.
+4. **AVGO bought on a coarse keyword false-positive** — rule governed (not
+   overridden). Detector rework is the Sat research item.
+5. **Missed runs 6/11, 6/12, 6/15** — all due to the interpreter outage. State
+   files were last updated 6/10 until today. If the scheduled task ran and
+   silently failed those days, the failures weren't surfaced — consider a
+   health-check / alert on run failure.
+6. **NUVL/CBRS/TSM placeholder claims + 5 first-pass assignments** — Sat research priority.
+7. **FOMC June 16-17 dot plot Wed** — the live macro catalyst; no pre-position rule.
+8. **MU Q3 FY26 print Tue 6/24 AMC** — pre-print window open, position green.
