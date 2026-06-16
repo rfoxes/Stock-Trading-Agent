@@ -19,94 +19,92 @@ library gap. Character-match shortcuts and direct YAML edits to
 
 ---
 
-## ⚠️ READ FIRST: THE HARNESS INTERPRETER IS BROKEN FOR BARE `python3`
+## ⚠️ READ FIRST: BARE `python3` IS STILL BROKEN — USE THE VENV
 
-**Homebrew upgraded `/opt/homebrew/bin/python3` to 3.14.5, which is missing
-the harness deps (requests/alpaca-py/dotenv).** `python3 -m quant_trading_system.cli ...`
-fails with `No module named 'requests'`. **RUN EVERYTHING VIA THE VENV:**
+**Homebrew `/opt/homebrew/bin/python3` is 3.14.5 and lacks the harness deps
+(requests/alpaca-py/dotenv).** `python3 -m quant_trading_system.cli ...` fails
+with `No module named 'requests'`. Confirmed still broken today (6/16).
+**RUN EVERYTHING VIA THE VENV:**
 
 ```
 /Users/rfoxes/Stock-Trading-Agent/.venv/bin/python3 -m quant_trading_system.cli <cmd>
 ```
 
 The `.venv` (Python 3.13.13) has all deps and reaches the broker cleanly.
-If the operator has repointed the scheduled task or reinstalled deps into
-3.14, bare `python3` may work again — test `python3 -m quant_trading_system.cli account`
-once; if it errors with ModuleNotFoundError, fall back to the venv path
-above. (A separate argparse `%`-escape crash in `cli.py:486` was FIXED on
-6/16 — `%`→`%%` — so the parser itself builds fine now.)
+Test `python3 -m quant_trading_system.cli account` once; if it ModuleNotFounds,
+use the venv path. (The argparse `%`-escape crash in `cli.py:486` was fixed
+6/16 — parser builds fine now.) This is a known-good interpreter reaching the
+LIVE broker — it is NOT a "stop on ModuleNotFoundError" situation; complete
+the run via the venv and document the drift.
 
-## Status as of last update (Tue 2026-06-16, post-close)
+## Status as of last update (2026-06-16, follow-on run)
 
-- **First run since Wed 6/10** — Thu 6/11 / Fri 6/12 / Mon 6/15 did NOT execute
-  (harness was down on the interpreter drift). Repaired and ran today.
+- **Clean do-nothing day. `cli execute` → 0 intents** across all 7 strategies
+  (0 submitted / 0 rejected / 0 errors). **Decision: Keep.** No rotations, no
+  `.py`/`.md` edits, no manual changes.
 - **Active set: 7 strategies, 22/22 claimed (unclaimed_count == 0).** No changes.
-- **Today's execute: 1 intent submitted+filled.** `equity_event_driven_catalyst`
-  → **AVGO buy 26 @ market** (order_id `77017d1b-ccfe-4f40-97da-5e3f74af47ce`).
-  All 5 SafetyGate checks passed. **This was a keyword-detector FALSE POSITIVE**
-  (brief said AVGO had no fresh catalyst) — rule governed, not overridden;
-  reinforced library gap below.
-- **6 other strategies: 0 intents.**
-- **No reconciliation** — nothing closed since 6/10; ORCL (Wed buy) filled at
-  $177.28 and is now a held long.
-- **Account: equity ~$108,250; cash ~$15,518 (net-long now post-AVGO);
-  buying power ~$321,720.**
-- **Positions (6 longs, all green): AAPL 72 (+10.07%), MU 7 (+7.03%), ORCL 38
-  (+7.25%), QQQ 28 (+13.53%), SPY 35 (+6.30%), AVGO 26 (new today).**
-- **Regime: bull, conf 0.75, ADX 24.98.**
-- **News brief: PRESENT (dated 6/15, NOTABLE — Iran peace deal relief rally,
-  VIX below 20).**
+- **AVGO did NOT re-fire** despite the same stale 6/15 brief — it's now held,
+  so the entry guard skips it. Confirms yesterday's keyword false-positive is a
+  **one-shot entry, not a compounding buy loop**.
+- **No reconciliation** — all 6 longs still held since the 6/16 run.
+- **Account: equity $108,403.81; cash $15,518.16; buying power $322,152.46.**
+- **Positions (6 longs, all green):** AAPL 72 (+10.23%), AVGO 26 (+0.54%),
+  MU 7 (+6.87%), ORCL 38 (+6.91%), QQQ 28 (+13.40%), SPY 35 (+6.24%).
+- **Regime: bull, conf 0.75, ADX 24.98** (unchanged).
+- **News brief: STALE — dated 6/15, broker clock 6/16. No fresh brief for
+  today.** Treated as soft/absent context; verified no held name has a negative
+  signal (no stale-news exit risk).
 
-## To do Wednesday (2026-06-17)
+## To do next run
 
 1. **Read last_handoff.md and news_brief.md FIRST.** Use the venv interpreter
-   (see warning above).
+   (see warning above). **Check the brief's date matches today** — it was stale
+   today and no fresh brief was produced.
 
-2. **FOMC dot plot is TODAY (Wed 6/17).** Hold is ~97% priced; the dot plot is
-   the live catalyst and the main 48h risk to AI-cohort multiples. No
-   `macro_event_window` rule exists — you CANNOT pre-position (correct under the
-   mandate). Depending on run timing the decision may land before/during/after
-   your run; rules react to price after the fact. Default standard execute unless
-   the brief flags HALT-WORTHY EVENT.
+2. **FOMC dot plot (June 16–17).** The live macro catalyst. Hold ~97% priced;
+   the dot plot is the surprise vector and the main 48h risk to AI-cohort
+   multiples. No `macro_event_window` rule exists — you CANNOT pre-position
+   (correct under the mandate). Default standard execute unless the brief flags
+   HALT-WORTHY EVENT. Watch for dot-plot-driven price reactions that trip
+   trend/momentum rules.
 
 3. **Snapshot + P0 triage.** `cli list-active`. If `unclaimed_count > 0`, run
    `cli triage-symbol <SYM> [--gap-type <type>]` per symbol. Do NOT use
    `cli add-active` for unclaimed symbols.
 
-4. **Reconcile.** Confirm the 6 longs (incl. AVGO) are still held. If AVGO/ORCL/MU
-   exited via the event-driven strategy's logic, `log-closed equity_event_driven_catalyst
-   <SYM> <pnl_fraction>`. No action if all still held (entries don't get log-closed).
+4. **Reconcile.** Confirm the 6 longs (AAPL/AVGO/MU/ORCL/QQQ/SPY) are still
+   held. If any exited via a strategy's logic, `log-closed <strategy_id> <SYM>
+   <pnl_fraction>`. No action if all still held (entries don't get log-closed).
 
 5. **Position watch:**
-   - **MU pre-print window — Q3 FY26 = Tue 6/24 AMC.** Held +7%, surging into the
-     print. `equity_event_driven_catalyst` window logic + trailing stop govern.
-   - **AVGO (new, weak-quality entry).** Watch behavior; no fresh catalyst, next
-     print September. Trust the rule's exit logic.
-   - **ORCL +7%** — Wed catalyst buy working; trust exit logic.
-   - **AAPL/QQQ/SPY** — broad-rally beneficiaries, trend-following claims AAPL/QQQ/SPY.
+   - **MU pre-print window — Q3 FY26 = Tue 6/24 AMC.** Held +6.87%.
+     `equity_event_driven_catalyst` window logic + trailing stop govern.
+   - **AVGO (weak-quality entry, +0.54%).** No fresh catalyst, next print Sept.
+     Trust the rule's exit logic; it has not re-fired.
+   - **ORCL +6.91%, AAPL/QQQ/SPY** — relief-rally beneficiaries; trust rules.
 
-6. **Run `cli execute` (via venv).** Watch for any dot-plot-driven price reactions
-   that trip trend/momentum rules.
+6. **Run `cli execute` (via venv).**
 
-7. **Library gaps — see list below.**
+7. **Library gaps — see list below (unchanged; Saturday research owns them).**
 
 8. **Run `cli git-sync --agent trader --message "..."` (via venv) as last action.**
 
 ## Library gaps for the research agent (carry to research_tasks.md Sat)
 
-- **REINFORCED (6/16): `news_brief.has_positive_signal`/`has_negative_signal`
-  keyword detector is too coarse in BOTH directions.** 6/10 ORCL = false NEGATIVE
-  (missed capex-shock framing). 6/16 AVGO = false POSITIVE (matched a no-catalyst
-  cohort mention → bought 26 shares the news agent itself said had no fresh
-  catalyst). **Suggested research:** rework the keyword sets / add a confidence
-  or freshness gate; consider `has_asymmetric_signal()`; possibly require a
+- **`_load_news_brief()` has no staleness guard.** It parses `date_in_file` but
+  never compares to today, so a stale brief is fed to strategies as live signal.
+  **This is now the TOP soft-signal item** — the news pipeline missed 6/11–6/15
+  AND produced no fresh 6/16 brief, so stale-brief feeds are happening in
+  practice. **Suggested research:** reject or down-weight a brief whose
+  `date_in_file` != today.
+- **`news_brief.has_positive_signal`/`has_negative_signal` keyword detector is
+  too coarse in BOTH directions.** 6/10 ORCL = false NEGATIVE (missed capex-shock
+  framing). 6/16 AVGO = false POSITIVE (matched a no-catalyst cohort mention →
+  bought 26 sh). NOTE: confirmed 6/16 the false-positive is ONE-SHOT (held names
+  skip entry), not compounding. **Suggested research:** rework keyword sets /
+  add confidence or freshness gate; consider `has_asymmetric_signal()` and a
   catalyst-strength threshold before `event_driven_catalyst` enters on a brief
   signal alone.
-- **NEW (6/16): `_load_news_brief()` has no staleness guard.** It parses
-  `date_in_file` but never compares to today, so a stale brief is fed to
-  strategies as live signal. Latent liquidation/entry risk if the news agent
-  ever misses a day (it missed 6/11-6/15 this week). **Suggested research:**
-  reject or down-weight a brief whose `date_in_file` != today.
 - **Validate the 5 first-pass + 3 provisional assignments via head-to-head:**
   - `equity_momentum_macd_histogram` vs `equity_trend_following_ema_cross` on META, MSFT
   - `equity_breakout_volume_confirmation` vs `equity_trend_following_ema_cross` on ARM, MRVL, INTC
@@ -115,7 +113,7 @@ above. (A separate argparse `%`-escape crash in `cli.py:486` was FIXED on
   - `equity_event_driven_catalyst` vs `equity_trend_following_ema_cross` on AVGO, MU, ORCL
   - `equity_sector_rotation_momentum` vs `equity_trend_following_ema_cross` on DELL
   - `equity_trend_following_ema_cross` vs ??? on CBRS, NUVL, TSM
-- **`macro_event_window` overlay** (FOMC dot plot Wed 6/17; Iran-deal resolution) — absent.
+- **`macro_event_window` overlay** (FOMC dot plot June 16–17; Iran-deal resolution) — absent.
 - **`vol_regime_shift_overlay`** (VIX broke below 20 to 17.68) — confirmed registry
   coverage hole; would also give `iron_condor_high_iv` a symbol to claim.
 - **AI-policy / export-control shock overlay** (Anthropic Fable/Mythos foreign-user
@@ -124,25 +122,20 @@ above. (A separate argparse `%`-escape crash in `cli.py:486` was FIXED on
 - **`m_a_arbitrage_event` (NUVL/GSK)** — absent; NUVL pre-close.
 - **AAPL WWDC / named-multi-day event-window posture** (`event_window_posture`) — absent.
 - **AI-cohort multiple-compression overlay** — absent.
-- **Cross-sector defensive rotation overlay** — absent (less urgent on the relief tape).
 
 ## Open questions for the operator
 
 1. **[HIGH] Repair the scheduled-task interpreter.** Bare `python3` → Homebrew
    3.14.5 (no harness deps). Repoint the Cowork task / daily_prompt to
    `.venv/bin/python3`, or reinstall deps into 3.14, or recreate the venv.
-   Until then every automated run fails at context-build unless Claude falls
-   back to the venv manually (as I did today). See last_handoff.md Open issue #1.
-2. **argparse `%` crash FIXED (`cli.py:486`, `%`→`%%`).** No action; informational.
-3. **`cli open-orders` parser bug appears RESOLVED** under the venv (3.13) — the
-   `'dict' object has no attribute 'id'` error did not reproduce. Confirm next
-   time there's a live open order.
-4. **AVGO bought on a coarse keyword false-positive** — rule governed (not
-   overridden). Detector rework is the Sat research item.
-5. **Missed runs 6/11, 6/12, 6/15** — all due to the interpreter outage. State
-   files were last updated 6/10 until today. If the scheduled task ran and
-   silently failed those days, the failures weren't surfaced — consider a
-   health-check / alert on run failure.
-6. **NUVL/CBRS/TSM placeholder claims + 5 first-pass assignments** — Sat research priority.
-7. **FOMC June 16-17 dot plot Wed** — the live macro catalyst; no pre-position rule.
-8. **MU Q3 FY26 print Tue 6/24 AMC** — pre-print window open, position green.
+   Persisting across runs (6/16 and today). See last_handoff.md Open issue #1.
+2. **News pipeline reliability.** No fresh brief was produced for today (6/16);
+   the brief is dated 6/15. The news agent missed 6/11–6/15 too. Likely the same
+   interpreter outage. Consider a health-check / alert on run failure.
+3. **`cli open-orders` parser bug** appears RESOLVED under the venv (3.13).
+   Confirm next time there's a live open order.
+4. **AVGO keyword false-positive is one-shot, not compounding** — confirmed
+   6/16 it did not re-fire (held → entry guard skips). Detector rework is the
+   Sat research item.
+5. **NUVL/CBRS/TSM placeholder claims + 5 first-pass assignments** — Sat research priority.
+6. **MU Q3 FY26 print Tue 6/24 AMC** — pre-print window open, position green.
