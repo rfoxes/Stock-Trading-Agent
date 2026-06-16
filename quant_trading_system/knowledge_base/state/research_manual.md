@@ -158,6 +158,35 @@ Before spending time implementing a candidate:
 3. If it's structurally different (different entry signal, different
    exit logic, different asset class), it's an **addition candidate**.
 
+## Provisional claims are PRIORITY ZERO (revalidate or escalate)
+
+Under the **mandatory-attach doctrine (2026-06-16)**, every universe symbol
+always has a strategy attached. When the trader's triage found nothing
+clearing baseline Sharpe (or a symbol had no price history, e.g. a fresh
+IPO), it attached a **provisional, execution-quarantined** claim, recorded
+in `state/provisional_claims.md` with a `revalidate_by` deadline. A
+quarantined symbol is attached but NOT trading — acceptable only briefly.
+
+**Before anything else each Saturday, work `state/provisional_claims.md`:**
+1. Re-triage each entry: `cli triage-symbol <SYM> [--gap-type <type>]`
+   (or run the addition battery for a bespoke template). A brand-new IPO
+   may now have enough bars to backtest.
+2. **Clears baseline now** → it becomes a VALIDATED claim and leaves
+   quarantine automatically (the provisional marker is cleared on a
+   successful claim; re-running `cli triage-symbol <SYM>` is the canonical
+   path). It will start trading on the next weekday run.
+3. **Still below baseline AND `revalidate_by` has passed** → ESCALATE to
+   the operator under "Open questions" in `research_tasks.md` (build a
+   bespoke template for its gap_type, or remove the symbol — operator's
+   call; never auto-remove, never let it trade unvalidated). Keep it
+   provisional until the operator decides.
+
+This is the safety valve for mandatory-attach: 100% coverage is only safe
+because provisional = "attached, not yet trusted, not trading," and YOU
+are the agent who converts each one to validated or escalates it. Never
+leave one drifting — that drift is exactly what the 2026-06-10 refinement
+and this doctrine exist to prevent.
+
 ## Library gaps are TOP PRIORITY
 
 The trader and news agent flag **library gaps** every weekday — events

@@ -1228,6 +1228,7 @@ def list_active_strategies(ctx: ToolContext) -> dict[str, Any]:
     else:
         ctx_universe_error = ""
     gaps = memory.unclaimed_symbols(universe_syms) if universe_syms else []
+    provisional = memory.read_provisional_claims()
     return _ok({
         "active_strategies": [c.to_dict() for c in claims],
         "active_count": len(claims),
@@ -1235,6 +1236,10 @@ def list_active_strategies(ctx: ToolContext) -> dict[str, Any]:
         "claimed_count": sum(len(c.symbols) for c in claims),
         "unclaimed_symbols": gaps,
         "unclaimed_count": len(gaps),
+        # Option 3: claims that are attached for coverage but quarantined
+        # from execution until research validates them.
+        "provisional_claims": [p.to_dict() for p in provisional],
+        "provisional_count": len(provisional),
         "universe_error": ctx_universe_error or None,
     })
 
@@ -1369,9 +1374,23 @@ def triage_symbol(
     end: str | None = None,
     baseline_sharpe: float = 0.5,
     auto_claim: bool = True,
+    provisional: bool = True,
 ) -> dict[str, Any]:
     """Find the best library strategy for ``symbol`` and (optionally)
     claim it via ``add_active_strategy``.
+
+    **Mandatory-attach doctrine (Option 3, operator directive 2026-06-16).**
+    When ``provisional`` is True (the default), triage NEVER leaves a symbol
+    strategy-less. If no candidate clears ``baseline_sharpe`` (or there is no
+    rankable backtest at all — e.g. a brand-new IPO with no price history),
+    it attaches the best-available strategy as a PROVISIONAL (unvalidated)
+    claim: the symbol is added to active_strategies (coverage = 100%) AND
+    recorded in ``state/provisional_claims.md`` with a ``revalidate_by``
+    deadline. Provisional claims are QUARANTINED FROM EXECUTION
+    (run_active_strategies skips them) until Saturday research re-triages and
+    either promotes (clears baseline) or escalates them. Pass
+    ``provisional=False`` to restore the legacy ``true_library_gap`` verdict
+    (diagnostic / research use).
 
     This is the trader's pre-execute mechanism for handling unclaimed
     symbols. It is purely algorithmic:
@@ -1409,6 +1428,52 @@ def triage_symbol(
         end_d = _dt.date.fromisoformat(end)
         start = end_d.replace(year=end_d.year - 2).isoformat()
 
+    def _provisional_attach(strategy_id, sharpe, why, scores_payload, candidates_payload):
+        """Mandatory-attach fallback (Option 3): attach best-available
+        strategy as a provisional, execution-gated claim instead of leaving
+        a true_library_gap. The symbol becomes claimed (coverage) but is
+        quarantined from execution until research validates it."""
+        current = memory.read_active_strategies()
+        existing = next(
+            (set(c.symbols) for c in current if c.strategy_id == strategy_id),
+            set(),
+        )
+        union_syms = sorted(existing | {sym})
+        reason = (
+            f"PROVISIONAL/UNVALIDATED triage {_dt.date.today().isoformat()}: {why} "
+            f"Attached best-available {strategy_id} for coverage; QUARANTINED from "
+            f"execution until Saturday research validates (clears baseline "
+            f"{baseline_sharpe:.2f}) or escalates."
+        )
+        try:
+            memory.add_active_strategy(strategy_id, symbols=union_syms, reason=reason)
+        except ValueError as e:
+            return _err(
+                f"provisional triage selected {strategy_id} but add_active failed: {e}. "
+                f"Symbol {sym} may already be claimed — resolve via cli head-to-head."
+            )
+        pc = memory.append_provisional_claim(
+            sym, strategy_id=strategy_id, gap_type=gap_type or "unknown",
+            reason=why, sharpe=sharpe, baseline_sharpe=baseline_sharpe,
+        )
+        # A provisional attach supersedes any prior library-gap marker.
+        try:
+            memory.clear_library_gap(sym)
+        except Exception:
+            pass
+        return _ok({
+            "symbol": sym,
+            "gap_type": gap_type,
+            "verdict": "provisional_claim",
+            "reason": reason,
+            "provisional": pc.to_dict(),
+            "winner": {"strategy_id": strategy_id, "sharpe": sharpe},
+            "candidates": candidates_payload,
+            "scores": scores_payload,
+            "claimed": True,
+            "execution_quarantined": True,
+        })
+
     # Build candidate list.
     if gap_type:
         candidates = find_strategies_for_gap(gap_type)
@@ -1418,6 +1483,10 @@ def triage_symbol(
                 f"{gap_type!r}. Saturday research must add or "
                 "activate a template that handles this gap_type."
             )
+            if provisional and auto_claim:
+                return _provisional_attach(
+                    memory.DEFAULT_FALLBACK_STRATEGY, None, reason_text, [], [],
+                )
             try:
                 memory.append_library_gap(
                     sym, gap_type=gap_type, reason=reason_text,
@@ -1477,7 +1546,13 @@ def triage_symbol(
     # Pick the winner from scoreable rows.
     rankable = [s for s in scores if "sharpe" in s]
     if not rankable:
-        reason_text = "every candidate backtest errored — cannot rank"
+        reason_text = (
+            "every candidate backtest errored / no price history — cannot rank"
+        )
+        if provisional and auto_claim:
+            return _provisional_attach(
+                memory.DEFAULT_FALLBACK_STRATEGY, None, reason_text, scores, list(candidates),
+            )
         try:
             memory.append_library_gap(
                 sym, gap_type=gap_type or "unknown",
@@ -1508,6 +1583,10 @@ def triage_symbol(
             "No library strategy is good enough on this symbol — "
             "log for Saturday research to build a new template."
         )
+        if provisional and auto_claim:
+            return _provisional_attach(
+                top["strategy_id"], top["sharpe"], reason_text, rankable, list(candidates),
+            )
         try:
             memory.append_library_gap(
                 sym, gap_type=gap_type or "unknown",

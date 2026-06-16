@@ -254,6 +254,7 @@ def cmd_triage_symbol(ctx: ToolContext, args: argparse.Namespace) -> int:
         end=args.end,
         baseline_sharpe=args.baseline_sharpe,
         auto_claim=not args.no_claim,
+        provisional=not args.no_provisional,
     ))
     return 0
 
@@ -581,11 +582,24 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     sp.add_argument(
         "--baseline-sharpe", type=float, default=0.5,
-        help="Top candidate must clear this Sharpe to claim. Below = true_library_gap.",
+        help=(
+            "Top candidate must clear this Sharpe to claim a VALIDATED claim. "
+            "Below baseline → provisional attach (mandatory-attach doctrine), "
+            "or true_library_gap with --no-provisional."
+        ),
     )
     sp.add_argument(
         "--no-claim", action="store_true",
         help="Score and rank but do NOT auto-claim. Useful for dry runs.",
+    )
+    sp.add_argument(
+        "--no-provisional", action="store_true",
+        help=(
+            "Disable the mandatory-attach fallback. When no candidate clears "
+            "baseline, return the legacy true_library_gap verdict (leaving the "
+            "symbol unclaimed) instead of attaching a provisional, "
+            "execution-quarantined claim. Diagnostic / research use."
+        ),
     )
     sp.set_defaults(func=cmd_triage_symbol)
 

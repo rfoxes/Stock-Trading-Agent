@@ -65,17 +65,15 @@ strategies:
   - NUVL
   - NVDA
   - QQQ
+  - SPCX
   - SPY
   - TSLA
   - TSM
-  since: '2026-06-10'
-  reason: "Migrated 2026-06-02 from legacy state/active_strategy.md. Strategy owns\
-    \ the inherited long positions. Operator-assigned attribution per 2026-05-27 directive;\
-    \ not yet validated by head-to-head \u2014 research agent should run head-to-head\
-    \ battery to confirm trend-following is optimal for each of these symbols. TSM/CBRS/NUVL\
-    \ added 2026-06-09 per P0 zero-unclaimed rule (safe-default heuristic predating\
-    \ triage; research agent owns proper claim, especially NUVL biotech M&A target\
-    \ \u2014 library gap)."
+  since: '2026-06-16'
+  reason: "PROVISIONAL/UNVALIDATED triage 2026-06-16: every candidate backtest errored\
+    \ / no price history \u2014 cannot rank Attached best-available equity_trend_following_ema_cross\
+    \ for coverage; QUARANTINED from execution until Saturday research validates (clears\
+    \ baseline 0.50) or escalates."
 ---
 
 Active strategy set. Each entry owns its declared symbols exclusively. Conflicts are resolved by head-to-head backtest at the research layer, never at runtime.

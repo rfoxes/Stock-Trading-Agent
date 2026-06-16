@@ -5,14 +5,31 @@ trading harness. It changes rarely — only when the harness gains or loses
 a capability, or when accumulated experience uncovers a new operating
 rule. Today's Claude reads this and `tasks.md`, then acts.
 
-## P0 — EVERY SYMBOL ALGORITHMICALLY EVALUATED RULE (operator directive, 2026-06-04, refined 2026-06-10)
+## P0 — EVERY SYMBOL ALGORITHMICALLY EVALUATED RULE (operator directive, 2026-06-04, refined 2026-06-10, mandatory-attach 2026-06-16)
 
-**Every symbol in the composed universe MUST be either (a) claimed by an
-active strategy via head-to-head backtest, or (b) flagged as a true
-library gap by `cli triage-symbol`. No exceptions, no character-match
-shortcuts, no operator overrides.** This rule is permanent, generalized,
-and applies to every future run regardless of which symbols are in the
-universe.
+**Every symbol in the composed universe MUST have a strategy attached —
+no symbol is ever left strategy-less (operator directive 2026-06-16,
+"Option 3 / mandatory-attach").** Attachment comes in two grades:
+
+- **(a) VALIDATED claim** — a library strategy cleared baseline Sharpe
+  (default 0.5) in a `cli triage-symbol` backtest and was claimed. Trades
+  normally.
+- **(b) PROVISIONAL claim** — no candidate cleared baseline (or there was
+  no price history at all, e.g. a brand-new IPO), so `cli triage-symbol`
+  attached the **best-available** strategy as an unvalidated claim. The
+  symbol is claimed (coverage = 100%, `unclaimed_count == 0`) but is
+  **QUARANTINED FROM EXECUTION** — `run_active_strategies` subtracts it
+  from its strategy's tradable slice, so it never fires a real order
+  until Saturday research validates it. Recorded in
+  `state/provisional_claims.md` with a `revalidate_by` deadline.
+
+This supersedes the 2026-06-10 `true_library_gap` *terminal* state: a gap
+no longer leaves a symbol unclaimed — it becomes a provisional, quarantined
+attachment instead. (The legacy `true_library_gap` verdict still exists
+behind `cli triage-symbol --no-provisional` for diagnostics.) The
+2026-06-10 anti-character-match guarantee is preserved: no unvalidated
+strategy ever trades. No exceptions, no character-match shortcuts. This
+rule is permanent and applies to every future run.
 
 **The end of character-match (2026-06-10 refinement).** Earlier versions
 of this rule allowed first-pass character-match claims ("AVGO has
@@ -35,17 +52,21 @@ The fix is to remove the human-judgment step entirely.
      active+testing equity strategy).
    - The verdict is one of:
      - **`claimed`** — top library candidate cleared baseline Sharpe
-       (default 0.5). Symbol is now claimed by the winner.
-       Auto-recorded in `state/active_strategies.md`.
-     - **`true_library_gap`** — either the `gap_type` has no responder
-       in the library (coverage hole), or every candidate scored below
-       baseline. Symbol is auto-recorded in
-       `state/library_gaps.md`. Saturday research owns it.
-3. Re-run `cli list-active`. The new `unclaimed_count` should equal the
-   number of `library_gap_flagged` symbols. Those are tolerated by the
-   gate.
-4. Run `cli execute`. The unclaimed-gate now lets through symbols whose
-   only excuse for being unclaimed is a fresh library-gap marker.
+       (default 0.5). Symbol is now VALIDATED-claimed by the winner.
+       Auto-recorded in `state/active_strategies.md`. Trades normally.
+     - **`provisional_claim`** — no candidate cleared baseline (or no
+       price history / no responder). The best-available strategy is
+       attached anyway (mandatory-attach) and recorded in
+       `state/provisional_claims.md` with a `revalidate_by` deadline.
+       The symbol is claimed (so `unclaimed_count` drops) but is
+       **quarantined from execution** — it will not trade until research
+       validates it. Saturday research owns the revalidation.
+3. Re-run `cli list-active`. After mandatory-attach, `unclaimed_count`
+   should be **0** — every symbol is claimed (validated or provisional).
+   `provisional_count` shows how many are quarantined.
+4. Run `cli execute`. The unclaimed-gate passes (nothing unclaimed); the
+   execution gate silently skips provisional symbols (they appear under
+   `skipped` / `provisional_quarantined` in the execute output).
 
 **Code enforcement.** `cli execute` (without `--allow-unclaimed`) still
 REFUSES to run when any unclaimed symbol exists AND is not in

@@ -88,6 +88,15 @@ STATE_DIR = KB_DIR / "state"
 ACTIVE_STRATEGY_FILE = STATE_DIR / "active_strategy.md"            # legacy single
 ACTIVE_STRATEGIES_FILE = STATE_DIR / "active_strategies.md"        # new plural
 LIBRARY_GAPS_FILE = STATE_DIR / "library_gaps.md"                  # triage-marked unclaimed
+PROVISIONAL_CLAIMS_FILE = STATE_DIR / "provisional_claims.md"      # mandatory-attach quarantine (Option 3)
+
+# When triage finds no library strategy clears baseline Sharpe (or there is
+# no data / no responder), the mandatory-attach doctrine (operator directive
+# 2026-06-16) still attaches a *provisional* best-available strategy so that
+# every universe symbol has a strategy. This is the fallback when there is no
+# rankable candidate at all (e.g. a brand-new IPO with no price history): the
+# most generic price-driven strategy in the library.
+DEFAULT_FALLBACK_STRATEGY = "equity_trend_following_ema_cross"
 HANDOFF_FILE = STATE_DIR / "last_handoff.md"
 SUMMARY_FILE = STATE_DIR / "summary.md"
 
@@ -840,6 +849,177 @@ def clear_library_gap(symbol: str) -> bool:
 def library_gap_symbols() -> list[str]:
     """Convenience: just the symbols currently flagged as library gaps."""
     return sorted({g.symbol for g in read_library_gaps()})
+
+
+# ---------------------------------------------------------------------------
+# Provisional-claim quarantine (state/provisional_claims.md)
+#
+# Option 3 / mandatory-attach doctrine (operator directive 2026-06-16).
+# Every universe symbol MUST have a strategy attached — no symbol is ever
+# left strategy-less. When `cli triage-symbol` finds no library strategy
+# that clears baseline Sharpe (or there is no data / no responder), instead
+# of leaving the symbol an unclaimed `true_library_gap`, the harness:
+#
+#   1. ATTACHES the best-available strategy in state/active_strategies.md
+#      (so the symbol counts as claimed; coverage is 100%), AND
+#   2. records a PROVISIONAL (unvalidated) marker here with a hard
+#      `revalidate_by` deadline (N Saturdays out).
+#
+# Provisional claims are QUARANTINED FROM EXECUTION: run_active_strategies
+# subtracts provisional symbols from each strategy's tradable slice, so an
+# unvalidated strategy is attached for coverage but never trades until
+# Saturday research validates it (re-triage clears baseline → promote to a
+# normal claim, or the deadline passes and it is escalated to the operator).
+# This preserves the 2026-06-10 anti-character-match guarantee (no
+# unvalidated strategy fires real orders) while giving 100% attachment.
+#
+# File format — `state/provisional_claims.md`:
+#
+#     ---
+#     provisional:
+#       - symbol: SPCX
+#         strategy_id: equity_trend_following_ema_cross
+#         gap_type: volatility_regime
+#         sharpe: null            # null = no rankable backtest (e.g. fresh IPO)
+#         baseline_sharpe: 0.5
+#         provisional_since: 2026-06-16
+#         revalidate_by: 2026-06-27
+#         reason: "no candidate cleared baseline; attached best-available, quarantined"
+#     ---
+#     <free-form notes>
+# ---------------------------------------------------------------------------
+
+# Default re-validation horizon: 2 Saturdays (~14 days) for the research
+# agent to either validate (clear baseline) or escalate to the operator.
+PROVISIONAL_REVALIDATION_DAYS = 14
+
+
+@dataclass
+class ProvisionalClaim:
+    symbol: str
+    strategy_id: str
+    gap_type: str
+    provisional_since: str
+    revalidate_by: str
+    reason: str
+    sharpe: float | None = None
+    baseline_sharpe: float = 0.5
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "symbol": self.symbol,
+            "strategy_id": self.strategy_id,
+            "gap_type": self.gap_type,
+            "sharpe": self.sharpe,
+            "baseline_sharpe": self.baseline_sharpe,
+            "provisional_since": self.provisional_since,
+            "revalidate_by": self.revalidate_by,
+            "reason": self.reason,
+        }
+
+
+def read_provisional_claims() -> list[ProvisionalClaim]:
+    """Return the current provisional (unvalidated, quarantined) claims."""
+    if not PROVISIONAL_CLAIMS_FILE.exists():
+        return []
+    fm, _ = _parse_frontmatter(PROVISIONAL_CLAIMS_FILE)
+    raw = fm.get("provisional", []) or []
+    out: list[ProvisionalClaim] = []
+    for entry in raw:
+        if not isinstance(entry, dict):
+            continue
+        sym = str(entry.get("symbol", "")).strip().upper()
+        sid = str(entry.get("strategy_id", "") or "").strip()
+        if not sym or not sid:
+            continue
+        out.append(ProvisionalClaim(
+            symbol=sym,
+            strategy_id=sid,
+            gap_type=str(entry.get("gap_type", "") or ""),
+            provisional_since=str(entry.get("provisional_since", "") or ""),
+            revalidate_by=str(entry.get("revalidate_by", "") or ""),
+            reason=str(entry.get("reason", "") or ""),
+            sharpe=(
+                float(entry["sharpe"])
+                if isinstance(entry.get("sharpe"), (int, float))
+                else None
+            ),
+            baseline_sharpe=float(entry.get("baseline_sharpe", 0.5)),
+        ))
+    return out
+
+
+def write_provisional_claims(claims: Iterable[ProvisionalClaim], notes: str = "") -> Path:
+    """Replace the provisional-claims file. Use append_provisional_claim()
+    in normal flow; this is for batch edits / research revalidation sweeps."""
+    _ensure_dirs()
+    claim_list = list(claims)
+    fm = {"provisional": [c.to_dict() for c in claim_list]}
+    fm_yaml = yaml.safe_dump(fm, sort_keys=False, default_flow_style=False).strip()
+    body = notes.lstrip() if notes else (
+        "PROVISIONAL (unvalidated) strategy attachments — Option 3 / "
+        "mandatory-attach doctrine (2026-06-16). Each symbol here HAS a "
+        "strategy attached in active_strategies.md for coverage, but is "
+        "QUARANTINED FROM EXECUTION (run_active_strategies skips it) until "
+        "Saturday research re-triages it: clearing baseline Sharpe promotes "
+        "it to a normal validated claim (clear_provisional_claim); a passed "
+        "`revalidate_by` deadline is escalated to the operator. NEVER trades "
+        "while listed here.\n"
+    )
+    PROVISIONAL_CLAIMS_FILE.write_text(
+        f"---\n{fm_yaml}\n---\n\n{body}", encoding="utf-8"
+    )
+    return PROVISIONAL_CLAIMS_FILE
+
+
+def append_provisional_claim(
+    symbol: str,
+    *,
+    strategy_id: str,
+    gap_type: str,
+    reason: str,
+    sharpe: float | None = None,
+    baseline_sharpe: float = 0.5,
+    revalidation_days: int = PROVISIONAL_REVALIDATION_DAYS,
+) -> ProvisionalClaim:
+    """Add (or refresh) a provisional-claim marker for `symbol`. Idempotent
+    per symbol — re-running refreshes provisional_since/revalidate_by."""
+    sym = symbol.strip().upper()
+    today = dt.date.today()
+    new_claim = ProvisionalClaim(
+        symbol=sym,
+        strategy_id=strategy_id.strip(),
+        gap_type=gap_type,
+        provisional_since=today.isoformat(),
+        revalidate_by=(today + dt.timedelta(days=revalidation_days)).isoformat(),
+        reason=reason,
+        sharpe=sharpe,
+        baseline_sharpe=baseline_sharpe,
+    )
+    current = [c for c in read_provisional_claims() if c.symbol != sym]
+    current.append(new_claim)
+    current.sort(key=lambda c: c.symbol)
+    write_provisional_claims(current)
+    return new_claim
+
+
+def clear_provisional_claim(symbol: str) -> bool:
+    """Remove a symbol from the provisional quarantine. Research calls this
+    once a re-triage clears baseline (the claim becomes a normal validated
+    claim that trades). Returns True if removed."""
+    sym = symbol.strip().upper()
+    current = read_provisional_claims()
+    kept = [c for c in current if c.symbol != sym]
+    if len(kept) == len(current):
+        return False
+    write_provisional_claims(kept)
+    return True
+
+
+def provisional_claim_symbols() -> set[str]:
+    """Convenience: just the symbols currently quarantined as provisional.
+    Used by run_active_strategies to gate them out of execution."""
+    return {c.symbol for c in read_provisional_claims()}
 
 
 def read_summary() -> str:

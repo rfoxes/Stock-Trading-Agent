@@ -23,11 +23,13 @@ plot; algorithmic-only mandate governs.
 
 (Held longs per the 6/16 trader handoff: **AAPL 72, AVGO 26, MU 7, ORCL 38,
 QQQ 28, SPY 35.** Active set: 7 strategies. **Universe expanded to 23 — SPCX was
-operator-directed-promoted this run (see below); it is currently UNCLAIMED.** So
-22/23 claimed, unclaimed_count == 1 (SPCX). The trader should triage SPCX on its
-next run (`cli triage-symbol SPCX ...`) per the P0 zero-unclaimed rule.
-`coverage_holes` is now **empty** in `gap-registry` — the Saturday research run
-closed the `volatility_regime` hole by tagging the 4 options strategies.)
+operator-directed-promoted this run, then attached under the new mandatory-attach
+doctrine (Option 3).** Now 23/23 claimed, unclaimed_count == 0. SPCX is a
+**PROVISIONAL (unvalidated) claim** on equity_trend_following_ema_cross
+(no price history yet — 3 bars), **quarantined from execution** (it will NOT
+trade) until Saturday research revalidates it by 2026-06-30. `coverage_holes` is
+now **empty** in `gap-registry` — the Saturday research run closed the
+`volatility_regime` hole by tagging the 4 options strategies.)
 
 - **MU — EVENT (pre-print, Q3 FY26 = Tue 6/24 AMC; held long).** New 52-week
   high in premarket; analysts raising PTs on booming AI-memory demand
@@ -121,21 +123,22 @@ closed the `volatility_regime` hole by tagging the 4 options strategies.)
   - gap_type: trending
   - responder: equity_trend_following_ema_cross (claims SPY; no fresh signal)
 
-- **SPCX — NEW UNIVERSE MEMBER (operator-directed promotion this run; UNCLAIMED).**
-  SpaceX (listed 6/12, ~$2T, largest IPO ever). Today: **historic options debut**
+- **SPCX — NEW UNIVERSE MEMBER (operator-directed promotion; PROVISIONAL claim,
+  execution-quarantined).** SpaceX (listed 6/12, ~$2T, largest IPO ever). Today:
+  **historic options debut**
   (3rd-most-traded single name behind TSLA/NVDA; ~500k contracts in hour one;
   gamma-squeeze-to-$400 talk on a 3-5% float), **exercising a $60B option to buy
   Anysphere/Cursor**, and **pending Nasdaq-100 fast-entry inclusion ~July 1**
   (~$22-27B forced index buying; the QQQ rebalance channel above) + Russell 6/26.
-  36 Alpaca items — the highest-density name in the universe. **No strategy claims
-  it yet** — the trader triages on its next run; Saturday research owns the proper
-  head-to-head claim. Hyper-volatile new listing; an IPO is not a Tier-B trigger,
-  so this is an operator override, not an automated promotion.
+  36 Alpaca items — the highest-density name in the universe. **Attached under the
+  new mandatory-attach doctrine:** triage found 3 bars (< 60 required), so it
+  PROVISIONALLY attached the best-available strategy
+  (equity_trend_following_ema_cross) and quarantined it from execution. It will
+  NOT trade until Saturday research revalidates (by 2026-06-30) — by then it
+  should have enough price history to backtest a real claim.
   - gap_type: volatility_regime (new hyper-IV listing; no price/earnings history)
-  - responder: NONE — UNCLAIMED. Trader triage pending. Note: as a brand-new IPO
-    with no bars/indicator history, trend/momentum/breakout rules will have little
-    to work with for several sessions; expect triage to report a true library gap
-    or a low-confidence provisional claim.
+  - responder: equity_trend_following_ema_cross (PROVISIONAL/UNVALIDATED,
+    execution-quarantined; research revalidates by 2026-06-30)
 
 - **No fresh single-name news** (caught the tape / screen mentions only):
   **ARM, CBRS, CSCO, HPE, JPM, MRVL, NUVL, ORCL, TSM.** MRVL slipped

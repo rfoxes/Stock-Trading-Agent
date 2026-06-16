@@ -453,12 +453,41 @@ def run_active_strategies(
     rejected_total = 0
     error_total = 0
 
+    # Option 3 / mandatory-attach execution gate (operator directive
+    # 2026-06-16). Provisional (unvalidated) claims are attached for
+    # coverage but MUST NOT trade until research validates them. Subtract
+    # provisional symbols from each strategy's tradable slice. When the
+    # provisional file is empty (the common case) this is a no-op and
+    # behaviour is identical to before.
+    try:
+        provisional_syms = memory.provisional_claim_symbols()
+    except Exception as e:
+        logger.warning("provisional_claim_read_failed err=%s", e)
+        provisional_syms = set()
+
     for claim in claims:
         # Empty claim list = "no explicit symbol claim". We still run; the
         # strategy will get its frontmatter-filtered universe (legacy
         # behaviour). If you want a strategy idle, archive it; don't leave
         # it active with an empty claim.
         claim_syms = claim.symbols if claim.symbols else None
+
+        # Execution gate: drop provisional symbols from this strategy's slice.
+        if claim_syms and provisional_syms:
+            tradable = [s for s in claim_syms if s.upper() not in provisional_syms]
+            gated = [s for s in claim_syms if s.upper() in provisional_syms]
+            if gated:
+                skipped.append({
+                    "strategy_id": claim.strategy_id,
+                    "symbols": sorted(gated),
+                    "reason": "provisional_unvalidated_claim (execution-quarantined)",
+                })
+                if not tradable:
+                    # Entire claim is provisional → do NOT run this strategy at
+                    # all. Passing claimed_symbols=None would fall back to the
+                    # frontmatter universe and trade MORE, not less — guard it.
+                    continue
+                claim_syms = tradable
 
         result = run_strategy(
             claim.strategy_id,
@@ -499,6 +528,7 @@ def run_active_strategies(
         "rejected_count": rejected_total,
         "error_count": error_total,
         "unclaimed_symbols": gaps,
+        "provisional_quarantined": sorted(provisional_syms),
         "skipped": skipped,
     }
 

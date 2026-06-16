@@ -28,14 +28,16 @@ Yesterday's news agent writes this. Replace, don't append.
   run used `.venv/bin/python3 -m quant_trading_system.cli`. Operator action still
   required (see open questions). NOTE: cwd drifts if you `cd` into a news subdir
   mid-run — use absolute paths or `cd /Users/rfoxes/Stock-Trading-Agent &&` for CLI.
-- **Universe: now 23-name.** SPCX (SpaceX) promoted this run via operator directive
-  (sector `industrials`), overriding the Tier-A/B discipline (an IPO is not a Tier-B
-  trigger). **SPCX is UNCLAIMED** — the trader must triage it on its next run
-  (`cli triage-symbol SPCX --gap-type volatility_regime`); as a brand-new IPO with
-  no bar/indicator history it will likely report a true library gap or a
-  low-confidence provisional claim. Saturday research owns the proper head-to-head.
-  (Re-run `news-fetch` picked up 36 SPCX items — the densest name in the universe.)
-  NOTE: Cerebras (CBRS) is ALREADY in the universe (promoted 2026-06-09, Tier-B #4).
+- **Universe: now 23-name, 23/23 claimed (unclaimed_count == 0).** SPCX (SpaceX)
+  promoted this run via operator directive (sector `industrials`), then attached
+  under the **new mandatory-attach doctrine (Option 3, operator-directed
+  2026-06-16)**: triage found 3 bars (< 60), so it PROVISIONALLY attached
+  equity_trend_following_ema_cross and **quarantined it from execution** (SPCX will
+  NOT trade). Recorded in `state/provisional_claims.md`, revalidate_by 2026-06-30.
+  Saturday research must revalidate (promote if it clears baseline once it has price
+  history, else escalate). (Re-run `news-fetch` picked up 36 SPCX items — densest in
+  the universe.) NOTE: Cerebras (CBRS) is ALREADY in the universe (2026-06-09).
+  **DOCTRINE CHANGE shipped this run** — see operational notes + Open questions.
 - **Universe (pre-SPCX):** was 22-name. Tue Alpaca densities (98 items total, vs Mon
   100): TSLA 16, AMZN 13, MSFT 11, GOOGL 10, NVDA 10, META 7, AAPL 6, MU 6, QQQ 4,
   SPY 4, DELL 3, MRVL 3, INTC 2, AVGO 1, ORCL 1, TSM 1; ARM/CBRS/CSCO/HPE/JPM/NUVL 0.
@@ -156,6 +158,23 @@ Yesterday's news agent writes this. Replace, don't append.
     underwriter_franchise (JPM/SpaceX). Sat research = next opportunity.
 
 ## Open questions for the operator
+
+- **DOCTRINE + CODE CHANGE shipped 2026-06-16 (operator-directed "Option 3" /
+  mandatory-attach).** Every universe symbol now ALWAYS has a strategy attached:
+  `cli triage-symbol` either VALIDATED-claims (Sharpe ≥ 0.5) or PROVISIONALLY
+  attaches the best-available strategy (recorded in `state/provisional_claims.md`),
+  which is **quarantined from execution** until Saturday research validates or
+  escalates it. This reverses the 2026-06-10 `true_library_gap` terminal state
+  (still available via `triage-symbol --no-provisional`). Files changed:
+  `memory.py` (provisional helpers + state file), `agent_tools.py` (triage
+  fallback + list-active fields), `strategy_runtime.py` (execution gate),
+  `cli.py` (`--no-provisional`); docs: `manual.md` P0, `daily_prompt.md`,
+  `weekly_research_prompt.md`, `research_manual.md`; new state file
+  `provisional_claims.md`; tests `tests/test_provisional_claims.py` (6 pass, no
+  regressions — 2 pre-existing unrelated failures + 1 pre-existing collection
+  error in test_knowledge_base.py remain). **Operator: confirm you want this
+  permanent; the news agent shipped it on your "3" instruction.** SPCX is the
+  first live provisional claim (revalidate_by 2026-06-30).
 
 - **DEPLOYMENT: bare `python3` still broken (Homebrew 3.14, no harness deps).**
   Persists across every run since 6/16. Working interpreter:
