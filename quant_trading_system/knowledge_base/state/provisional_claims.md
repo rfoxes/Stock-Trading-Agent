@@ -5,8 +5,8 @@ provisional:
   gap_type: volatility_regime
   sharpe: null
   baseline_sharpe: 0.5
-  provisional_since: '2026-06-16'
-  revalidate_by: '2026-06-30'
+  provisional_since: '2026-06-20'
+  revalidate_by: '2026-07-04'
   reason: "every candidate backtest errored / no price history \u2014 cannot rank"
 ---
 

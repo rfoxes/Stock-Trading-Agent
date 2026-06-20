@@ -7,93 +7,106 @@ Brief is fine. Full narrative belongs in the weekly log.
 
 ---
 
-## Status as of the last update (2026-06-16)
+## Status as of the last update (2026-06-20)
 
-- **RUN VIA `.venv/bin/python3`, NOT bare `python3`.** Homebrew upgraded
-  `/opt/homebrew/bin/python3` to 3.14.5 on 6/11; it has none of the harness
-  deps, so every CLI call (incl. `git-sync`) fails `No module named 'requests'`.
-  The working interpreter is `.venv/bin/python3` (Python 3.13.13, all deps).
-  This last run and the trader's daily runs all use the venv. See
-  `research_log/2026-06-16.md` §0.
-- **Library size:** 19 strategies on disk (11 equity, 8 options). All `active`.
-  0 archived.
-- **Last week's adds/updates/archives:** none (all three zero — correct).
-- **One metadata fix applied:** tagged 4 options strategies (`iron_condor_high_iv`,
-  `jade_lizard`, `calendar_spread`, `long_straddle_earnings`) with `gap_types`
-  → closed the `volatility_regime` registry coverage hole. `gap-registry` now
-  reports `coverage_holes: []`.
-- **Archive sweep:** 11/11 active equity strategies → KEEP.
-- **Head-to-head:** ran 11 contested first-pass claims vs `trend_following`.
-  Validated META/macd (0.043,16tr) and MRVL/breakout (1.31,8tr) solidly; HPE/CSCO/
-  ORCL hold on thin evidence. **No reassignments** — every "trend_following wins"
-  was degenerate (0-trade inaction or 1-trade fluke). Active set UNCHANGED.
-- **Active set:** 7 strategies × 22/22 claimed (`unclaimed_count == 0`).
-  `state/library_gaps.md` empty. No symbol-level gaps.
-- **Structural blocker (3rd wk):** addition battery `num_trades ≥ 20` unreachable
-  on single-symbol simulate. No operator response.
+- **RUN VIA `.venv/bin/python3`, NOT bare `python3`.** Homebrew 3.14.5 still lacks
+  harness deps; bare `python3 -m quant_trading_system.cli ...` fails
+  `No module named 'requests'`. Working interpreter: `.venv/bin/python3` (3.13.13).
+  5th+ run on the venv. Operator hasn't repointed the tasks. (Open Q#1.)
+- **Library size:** 19 strategies on disk (11 equity, 8 options). All `active` status.
+  0 archived. `gap-registry coverage_holes: []`.
+- **This week's adds/updates/archives: none (all three zero — correct).** Every
+  library gap this week is an overlay/architecture/activation gap blocked by already-
+  escalated structural issues; none is `propose-strategy`-shaped. See
+  `research_log/2026-06-20.md` §1–2.
+- **PRIORITY-ZERO provisional claim — SPCX:** re-triaged 6/20, still
+  **insufficient bars (5 < 60)** — fresh IPO, no backtest possible. Its gap_type
+  `volatility_regime` has only options responders (no chain-data backtest). Remains
+  PROVISIONAL/quarantined on `equity_trend_following_ema_cross`. The re-triage
+  **auto-bumped `revalidate_by` to 2026-07-04** (original was 6/30). NOT escalation-
+  due yet (original deadline hadn't passed). Doubly stuck — see To-Do #1 + Open Q#7.
+- **Archive sweep:** 7/7 active equity strategies → KEEP (trend_following healthy:
+  rolling Sharpe 1.10, PSR 0.56, 7 trades; others have no/thin trading evidence).
+- **Head-to-head:** none run, intentional — degenerate 0-trade tiebreak (Open Q#3)
+  makes them invalid while it stands. Active set UNCHANGED.
+- **Active set:** 7 strategies × 23/23 claimed (`unclaimed_count == 0`),
+  `provisional_count == 1` (SPCX). `state/library_gaps.md` → `gaps: []`.
+- **Web research:** VIX-regime equity timer and index-rebalance strategy both
+  researched and NOT run (foregone REJECT — num_trades floor + claim-conflict; index
+  effect is also empirically disappearing per HBS/S&P DJI). Log §2.
 
 ## To do this Saturday
 
-1. **Confirm interpreter fix.** If bare `python3 -m quant_trading_system.cli
-   list-active` still errors `No module named 'requests'`, the operator hasn't
-   repointed the tasks — keep using `.venv/bin/python3` and re-flag as P0. If a
-   `.git-sync-queue/` marker pile-up appears, also note the gitrunner LaunchAgent.
+1. **PRIORITY ZERO — re-triage SPCX again.** `cli triage-symbol SPCX
+   --gap-type volatility_regime`. Check `cli simulate
+   equity_trend_following_ema_cross --symbol SPCX` for bar count — it had 5 bars on
+   6/20; needs 60 before any equity backtest. **If `revalidate_by` (now 2026-07-04,
+   but note the re-triage keeps auto-extending it) has effectively lapsed AND it still
+   can't be ranked, ESCALATE under Open Q#7** — do NOT let it trade unvalidated, do
+   NOT auto-remove. SPCX won't accrue 60 bars until ~September; flag that the
+   auto-extending deadline is masking a permanent block.
 
-2. **Re-tag check (optional).** Verify `gap-registry` still `coverage_holes: []`.
-   If the operator added/removed strategies, re-run the options `gap_types`
-   tagging logic from `research_log/2026-06-16.md` §1.
+2. **Confirm interpreter + git-sync infra.** If bare `python3 ... list-active` still
+   errors `No module named 'requests'`, keep using `.venv/bin/python3` and re-flag
+   Q#1. Check `.git-sync-queue/` for marker pile-up (none on 6/20 → LaunchAgent OK).
 
-3. **MSFT and ARM are NEGATIVE-fit claims — find a real responder, do NOT dump
-   on trend_following.** Head-to-head this week: macd loses on MSFT
-   (Sharpe −0.274/13tr); breakout loses on ARM (−1.154/12tr). `trend_following`
-   only "wins" by doing 0 trades. These two are the best candidates for a
-   *dedicated* responder once the `num_trades` floor or a new template lands.
+3. **Re-tag check (optional).** Verify `gap-registry coverage_holes: []` still holds.
+   If the operator added/removed strategies, re-apply the options `gap_types` tagging
+   from `research_log/2026-06-16.md` §1.
 
-4. **Do NOT re-run head-to-head on event_driven_catalyst symbols (AVGO/MU/ORCL).**
-   Confirmed structurally un-backtestable: it enters on `news_brief` signal the
-   backtester can't replay → 0 trades in every sim. Re-running is pure noise.
-   Same for any 0-trade-vs-0-trade pair until open-q #3 (tiebreak) is fixed.
+4. **MU Q3 FY26 printed Wed 6/24 AMC.** `equity_event_driven_catalyst`'s MU claim may
+   finally have a *closed-trade* data point. Re-run `cli evaluate-archive
+   equity_event_driven_catalyst` — it may now have real rolling-window evidence
+   (was rolling_sharpe null / 0 trades in window on 6/20).
 
-5. **MU Q3 FY26 print Tue 6/24 AMC.** After the print, `event_driven_catalyst`'s
-   MU claim may finally get a *closed-trade* data point. Re-run
-   `evaluate-archive equity_event_driven_catalyst` the following Saturday — it
-   may then have real rolling-window evidence (currently rolling_sharpe null).
+5. **MSFT & ARM remain NEGATIVE-fit claims — do NOT dump on trend_following.** macd
+   loses on MSFT (−0.274/13tr), breakout loses on ARM (−1.154/12tr); trend_following
+   only "wins" by 0 trades. Best candidates for a *dedicated* responder once the
+   num_trades floor (Q#2) or a new template lands. Hold until then.
 
-6. **News pipeline down since ~6/11.** Brief stale at 6/15, no 6/16 brief —
-   likely the same interpreter outage. If still stale next Saturday, raise as a
-   joint P0 with the operator (no live brief ⇒ event_driven_catalyst can't fire
-   AND `_load_news_brief` feeds stale data as live — see open-q below).
+6. **Do NOT re-run head-to-head on event_driven_catalyst symbols (AVGO/MU/ORCL)** or
+   any 0-trade-vs-0-trade pair — pure noise until Q#3 (tiebreak) is fixed.
 
-7. **Archive sweep.** Re-run `evaluate-archive` on every `status: active` equity
-   strategy. All KEEP this week.
+7. **Archive sweep.** Re-run `cli evaluate-archive` on every `status: active` equity
+   strategy. All KEEP on 6/20.
 
 ## Open questions for the operator (unanswered — escalating)
 
-1. **[NEW — HIGH] Repoint scheduled tasks/prompts to `.venv/bin/python3`,** or
-   reinstall harness deps into Homebrew Python 3.14, or pin Python. Bare
-   `python3` is dead for the harness as of 6/11. Affects trader, news, AND
-   research scheduled tasks. The `weekly_research_prompt.md` "no virtualenv"
-   line is now wrong.
+1. **[HIGH] Repoint scheduled tasks/prompts to `.venv/bin/python3`** (or reinstall
+   harness deps into Homebrew 3.14, or pin Python). Bare `python3` dead for the
+   harness since 6/11. Affects trader, news, AND research tasks. The
+   `weekly_research_prompt.md` "no virtualenv" line is stale.
 
-2. **`num_trades ≥ 20` floor (3rd week).** Unreachable on single-symbol simulate
-   (max observed ~16 on META/macd). Blocks every realistic ADD candidate.
-   Suggested: (b) multi-symbol aggregation in `simulate`, or (a) lower floor ~10.
+2. **`num_trades ≥ 20` floor (4th+ week).** Unreachable on single-symbol simulate
+   (max ~16 on META/macd). Blocks every realistic ADD candidate, incl. every
+   event-scheduled gap-filler researched this week (FOMC ~8/yr, index-rebalance
+   ~4/yr, VIX-regime flips). Suggested: (b) multi-symbol aggregation in `simulate`,
+   or (a) lower floor ~10.
 
-3. **Head-to-head degenerate 0-trade tiebreak (open-q, 2nd+ week).** A 0-trade
-   strategy "wins" on Sharpe=0 / smaller-drawdown vs any negative-Sharpe active
-   trader, and a 1-trade strategy "wins" on a fluke. Would have wrongly churned
-   6 symbols this week. Suggested: "both <2 trades ⇒ winner: null."
+3. **Head-to-head degenerate 0-trade tiebreak (3rd+ week).** A 0-trade strategy
+   "wins" on Sharpe=0 / smaller-DD vs any negative-Sharpe active trader; a 1-trade
+   strategy wins on a fluke. Invalidates all outstanding first-pass-claim
+   validations. Suggested: "both < ~5 trades ⇒ winner: null."
 
-4. **Event/overlay architecture (open-q, 3rd+ week).** Most real library gaps
-   (macro_event_window/FOMC, export-control shock, underwriter_franchise,
-   m_a_arbitrage, event_window_posture, keyword-detector asymmetry) are *overlay
-   primitives* or *code fixes*, not standalone strategies — outside
-   `propose-strategy`. Need an architectural decision or they stay open forever.
+4. **Event/overlay architecture (4th+ week).** Nearly every recurring library gap
+   (event_catalyst on price-claimed names, semi industrial-policy, index-rebalance/
+   forced-flow, macro_event_window/FOMC, AI-capex-crowding, export-control, M&A-arb)
+   is an *overlay primitive*, *claim-set broadening*, or *new category* — NOT a
+   standalone `propose-strategy` addition. Needs an architectural decision or these
+   stay open forever. This is the single biggest blocker to clearing gaps.
 
-5. **`event_driven_catalyst` un-backtestable.** Needs a backtest news-replay
-   fixture, or it can never be adjudicated by any battery / head-to-head.
+5. **`event_driven_catalyst` un-backtestable.** Needs a backtest news-replay fixture,
+   or it can never be adjudicated by any battery / head-to-head.
 
-6. **`_load_news_brief()` staleness guard** (trader-logged, code fix). Acute now
-   that briefs are stale 6/11–6/15: stale briefs are fed to strategies as live
-   signal. Reject/down-weight a brief whose `date_in_file != today`.
-</content>
+6. **`_load_news_brief()` staleness guard** (trader-logged code fix). A stale brief is
+   fed to strategies as live signal (no `date_in_file == today` check).
+
+7. **[NEW] SPCX provisional deadline auto-extends — masks a permanent block.** Each
+   `cli triage-symbol SPCX` re-stamps `revalidate_by` (6/30 → 7/04 on 6/20), so the
+   doctrine's "escalate once the deadline passes" never fires. SPCX is doubly stuck:
+   needs ~60 trading bars (~Sept) before *any* equity backtest, AND its gap_type
+   `volatility_regime` has only options responders the backtester can't run (no chain
+   data). Operator decision needed: (a) options-chain backtest fixture; (b) a fixed
+   (non-auto-extending) ~Sept deadline for IPO bar-accrual; or (c) reassign SPCX to an
+   equity-backtestable gap_type. Until then it correctly stays quarantined (never
+   trades) but will never validate either.

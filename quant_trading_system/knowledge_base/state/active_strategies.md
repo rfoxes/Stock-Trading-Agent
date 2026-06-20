@@ -69,8 +69,8 @@ strategies:
   - SPY
   - TSLA
   - TSM
-  since: '2026-06-16'
-  reason: "PROVISIONAL/UNVALIDATED triage 2026-06-16: every candidate backtest errored\
+  since: '2026-06-20'
+  reason: "PROVISIONAL/UNVALIDATED triage 2026-06-20: every candidate backtest errored\
     \ / no price history \u2014 cannot rank Attached best-available equity_trend_following_ema_cross\
     \ for coverage; QUARANTINED from execution until Saturday research validates (clears\
     \ baseline 0.50) or escalates."
