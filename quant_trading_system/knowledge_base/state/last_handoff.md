@@ -1,42 +1,49 @@
 # Handoff to tomorrow's Claude
 
-(Run on the 2026-06-19 clock — snapshot read 2026-06-19 16:18 PT. **Today is
-Juneteenth: US equity, bond and bank markets were CLOSED — there was NO cash
-session today.** This post-close run plans into **Monday 2026-06-22**. News brief
-is FRESH today (6/19, NORMAL FLOW). Ran the entire workflow via the venv again —
-bare `python3` is still the wrong interpreter, see Open issue #1.)
+(Run on the 2026-06-22 clock — snapshot read 2026-06-22 16:06–16:50 PT. **First
+live cash session after the Juneteenth holiday.** Ran the entire workflow via the
+venv again — bare `python3` is still the wrong interpreter, see Open issue #1.
+**⚠️ The news brief was STALE — dated 2026-06-19 (the Juneteenth holiday brief),
+not a fresh Monday 6/22 brief. Proceeded WITHOUT live news signal and noted the
+gap — see below and Open issue #2.**)
 
 ## TL;DR
 
 **Clean do-nothing day. `cli execute` fired 0 intents across all 7 strategies
 (0 submitted / 0 rejected / 0 errors). Decision: Keep.** No rotations, no strategy
-`.py`/`.md` edits, no manual P0-section changes. Correct outcome — markets were
-closed (no session), and even on a normal day none of these gates should have fired.
+`.py`/`.md` edits, no manual P0-section changes. Correct outcome under the
+algorithmic-only mandate — no strategy fired and none should have.
+
+**MRVL did NOT fire despite S&P 500 inclusion effective at today's open.**
+equity_breakout_volume_confirmation claims MRVL but its volume gate was not met, so
+no breakout entry — exactly the non-curve-fit outcome yesterday's tasks called for.
+Do NOT override a gate to chase index-add flow; the do-nothing on MRVL is correct.
 
 **P0 triage: nothing to do — `unclaimed_count == 0`.** `cli list-active` →
 universe 23, claimed 23, unclaimed 0, `provisional_count: 1` (SPCX). No new
-unclaimed symbols appeared, so no `triage-symbol` call was needed. SPCX remains a
-PROVISIONAL/UNVALIDATED claim on equity_trend_following_ema_cross (no price
-history), **quarantined from execution, revalidate_by 2026-06-30**.
+unclaimed symbols → no `triage-symbol` call needed. SPCX remains a
+PROVISIONAL/UNVALIDATED claim on equity_trend_following_ema_cross,
+**quarantined from execution, revalidate_by now 2026-07-04** (auto-extended from
+6/30 by Saturday 6/20 research — still <60 bars to backtest).
 
 **Execute confirmed the quarantine still works.** `provisional_quarantined:
 ["SPCX"]`; `skipped` = equity_trend_following_ema_cross → SPCX,
 `provisional_unvalidated_claim (execution-quarantined)`. The unvalidated SPCX claim
 did NOT trade. All other strategies returned empty.
 
-**News brief FRESH and NORMAL FLOW — Juneteenth holiday, market closed.** The tape
-was lighter (52 items vs 126 Thu), all follow-throughs to the week's chip/AI
-threads: an **Intel foundry leadership hire** (ex-SK Hynix CEO Seok-Hee Lee → EVP
-advanced packaging), the **MU print date now firmly confirmed Wed 6/24 AMC**, the
-**MRVL + FLEX S&P 500 inclusion effective Mon 6/22**, and an active **SPCX -20%+
-drawdown** on the $60B Cursor-deal dilution (execution-quarantined; won't trade).
-**NOT HALT-WORTHY:** no active/pending FOMC on the planned Monday session, no held
-name with a confirmed negative overnight catalyst, no adverse futures gap — and no
-session today at all. Standard workflow into Monday was correct.
+**NEWS BRIEF STALE — no fresh 6/22 brief.** `news_brief.md` is still the 6/19
+Juneteenth brief (NORMAL FLOW, market-closed). Its `date_in_file` (2026-06-19) does
+NOT match today (2026-06-22). Per the manual ("if news_brief is missing or dated
+wrong, proceed without it and note the gap"), I treated it as ABSENT for live signal
+and ran the standard workflow on broker state + regime only. This is exactly the
+`_load_news_brief()` staleness-guard gap that's been a standing research item — a
+stale brief would otherwise be fed to strategies as live signal. The news pipeline
+appears to have skipped the Monday run. Flagged for the operator (Open issue #2).
 
-**Book essentially flat on the holiday (last-close marks) — equity $109,484.18,
-+$25 vs yesterday's $109,459.46.** All 6 longs green; three double-digit: MU
-+15.37%, QQQ +14.30%, AAPL +9.85%; AVGO +9.03%, SPY +5.35%, ORCL +3.96%.
+**Book: live Monday session repriced — equity $108,940.77, -$543 vs Friday's
+holiday last-close mark ($109,484.18).** Still 6 longs, 5 of 6 green; only ORCL
+flipped slightly red. Standout: **MU surged to +25.04%** ($1,229 vs avg $982.90)
+into Wed's print.
 
 **Interpreter still broken on bare `python3`.** Homebrew 3.14.5 lacks harness deps.
 Ran everything via `/Users/rfoxes/Stock-Trading-Agent/.venv/bin/python3` (3.13, all
@@ -45,104 +52,100 @@ deps, reaches the live broker cleanly). Operator action still required — Open 
 ## Summary of what I did today
 
 1. **Read context.** daily_prompt.md, manual.md (P0 = mandatory-attach doctrine,
-   2026-06-16), tasks.md, last_handoff.md, news_brief.md (FRESH 6/19, NORMAL FLOW,
-   Juneteenth/market-closed). Verified the brief date matches today.
+   2026-06-16), tasks.md, last_handoff.md, news_brief.md. **Caught that the brief is
+   the stale 6/19 holiday brief, not a fresh 6/22 one** — verified `date_in_file`
+   != today and proceeded without live news context per the manual.
 
 2. **Confirmed interpreter state.** Used `.venv/bin/python3` for the entire run
    (bare `python3` still fails at context-build with `No module named 'requests'`).
 
 3. **Snapshot (via venv).**
-   - Account: equity **$109,484.18**; cash $15,518.15; buying power $325,177.48;
-     day_trade_count 0. (Essentially flat vs 6/18 $109,459.46 — market closed; these
-     are last-close marks.)
-   - Positions: 6 longs, ALL GREEN — AAPL 72 (+9.85%, $298.01), AVGO 26 (+9.03%,
-     $411.35), MU 7 (+15.37%, $1,133.99), ORCL 38 (+3.96%, $184.29), QQQ 28
-     (+14.30%, $740.62), SPY 35 (+5.35%, $746.74).
+   - Account: equity **$108,940.77**; cash $15,518.15; buying power $323,655.93;
+     day_trade_count 0. (Down $543 vs 6/19's $109,484.18 holiday last-close mark —
+     this is the first live repricing since the holiday.)
+   - Positions: 6 longs — AAPL 72 (+8.85%, $295.31), AVGO 26 (+4.06%, $392.60),
+     MU 7 (**+25.04%**, $1,229.00), ORCL 38 (**-1.02%**, $175.47), QQQ 28
+     (+13.58%, $735.95), SPY 35 (+4.91%, $743.59).
    - Open orders: empty (clean JSON; parser bug stays provisionally closed).
-   - Regime: bull, conf 0.73, ADX 22.63 (slight further ADX softening from 23.38).
+   - Regime: bull, conf 0.71, ADX 21.04 (further softening from 22.63 → trend
+     weakening but still bull; price 8.1% above 200-SMA).
 
 4. **Reconciliation.** No positions closed since the prior handoff — all 6 longs
    still held. Nothing to `log-closed`.
 
 5. **P0 triage.** `cli list-active` → universe 23, claimed 23, `unclaimed_count: 0`,
-   `provisional_count: 1` (SPCX, revalidate_by 2026-06-30). Nothing unclaimed → no
+   `provisional_count: 1` (SPCX, revalidate_by 2026-07-04). Nothing unclaimed → no
    `triage-symbol` needed. No `add-active`, no character-match.
 
 6. **Execute (via venv).** 0 intents. All 7 strategies returned empty
    (`submitted_count: 0, rejected_count: 0, error_count: 0`).
    `provisional_quarantined: ["SPCX"]`; `skipped` lists SPCX with reason
    `provisional_unvalidated_claim (execution-quarantined)`. Quarantine confirmed
-   working end-to-end. (No session today, so nothing was ever going to fire.)
+   working end-to-end. MRVL's breakout gate unmet → no entry (correct).
 
 7. **Decision: Keep.** No rotation criteria met. No `.py`/`.md` edits, no manual
-   P0 changes, no manual.md "Recent feedback" append (no new durable lesson beyond
-   the already-recorded interpreter-drift bullet).
+   P0 changes, no manual.md "Recent feedback" append.
 
 ## Observations and reasoning
 
-- **The do-nothing is correct, not a gap — and trivially so today.** US markets were
-  closed for Juneteenth; there was no cash session. Even setting that aside, no
-  strategy fired and none should have: every held event-name (AVGO/MU/ORCL) is in the
-  book so entry guards skip; no held name has a negative signal; regime is steady
-  bull. Per the algorithmic-only mandate, zero intents is the right outcome.
+- **The do-nothing is correct, not a gap.** No strategy fired and none should have:
+  every held event-name (AVGO/MU/ORCL) is already in the book so entry guards skip;
+  MRVL's breakout volume gate was unmet; regime is steady-but-softening bull. Per the
+  algorithmic-only mandate, zero intents is the right outcome.
 
-- **MRVL is the single most plausible firer Monday — let the volume gate decide.**
-  Marvell's S&P 500 inclusion (with FLEX, replacing POOL/CPB) goes effective before
-  Monday 6/22's open, which can bring a passive-flow buy on a breakout-claimed name.
-  If equity_breakout_volume_confirmation's volume gate is met Monday, executing is
-  correct; if not, no trade is the correct (non-curve-fit) outcome. Do NOT override
-  the gate to chase index-add flow. NB: the index-inclusion forced flow itself is an
-  unmodeled event_catalyst — the breakout volume gate is the only algorithmic handle.
+- **MRVL S&P-inclusion flow did NOT produce a tradable breakout.** Marvell joined the
+  S&P 500 at today's open (with FLEX, replacing POOL/CPB). The single most plausible
+  firer per yesterday's plan was an MRVL volume-confirmed breakout —
+  equity_breakout_volume_confirmation claims it — but the volume gate was not met, so
+  no order. This is the textbook "let the gate decide; do not override to chase
+  index-add flow" outcome. The index-inclusion forced flow itself remains an unmodeled
+  event_catalyst (library gap), and the breakout volume gate is the only algorithmic
+  handle on MRVL.
 
-- **MU print DATE RESOLVED: Wed 6/24 AMC (confirmed by Micron IR / StockTitan /
-  Nasdaq / Zacks).** Prior ambiguity (6/24 vs 6/25) is closed. Position held and
-  running +15.37%, riding the AI-memory demand stack (SK Hynix HBM4E, Cook memory
-  warning, bullish pre-print roundups). equity_event_driven_catalyst's window logic +
-  trailing stop govern — no discretionary action. **Watch the trailing stop into the
-  print** (a big unrealized gain is exactly what it protects). Monday is the last
-  full session before the Wed print.
+- **MU is the watch item into Wed 6/24 AMC.** Held and now running **+25.04%** (up
+  hard from the +15.37% Friday holiday mark) on the live Monday session, riding the
+  AI-memory demand stack into the now-confirmed Q3 FY26 print Wednesday after the
+  close. equity_event_driven_catalyst's window logic + trailing stop govern — no
+  discretionary action. **Watch the trailing stop into the print**: a +25% unrealized
+  gain is exactly what the trailing stop is there to protect, and Tue 6/23 is the last
+  full session before the print.
 
-- **INTC foundry-mgmt hire — real strategy event, no algorithmic handle.** Intel
-  named ex-SK Hynix CEO Seok-Hee Lee as EVP of Intel Foundry (advanced packaging),
-  extending the Apple→Intel domestic-chip win. INTC's only claim is breakout_volume
-  (price); no active rule reads a management/foundry-strategy event on INTC, and there
-  was no session today. Logged as a library gap, not an action.
+- **ORCL flipped slightly red (-1.02%).** First red position in the book; modest, no
+  threshold breach, no action. equity_event_driven_catalyst holds it; nothing to do.
 
-- **Mandatory-attach doctrine behaved exactly as specified, again.** SPCX is claimed
-  (so `unclaimed_count == 0` — coverage invariant holds) yet quarantined from
-  execution (so an unvalidated claim never trades — anti-character-match guarantee
-  holds). Saturday research owns validation by 2026-06-30 (SPCX needs ≥60 bars). The
-  brief notes SPCX is now -20%+ from its post-IPO high on the $60B Cursor-deal
-  dilution (Grantham "could break the index") — a research data point, not a trader
-  action.
+- **NEWS BRIEF STALE — first time the staleness-guard gap bit in practice.** The
+  news pipeline did not produce a fresh 6/22 brief; the on-disk brief is the 6/19
+  Juneteenth one. I caught it by date-checking and ran without live news, exactly as
+  the manual prescribes. Had `_load_news_brief()` been wired into a strategy as a live
+  signal, it would have silently fed Friday's holiday brief as today's truth — this is
+  the latent risk the standing research item describes. No held name has a known
+  negative catalyst from broker state, so proceeding was safe; but the operator should
+  fix the news-agent Monday run AND the harness should reject/down-weight a stale brief.
 
-- **AI-crowding is now an explicitly flagged risk.** BofA's June fund-manager survey
-  calls "long semiconductors" the most crowded trade in market history (80% of
-  managers). Compounds with the standing higher-for-longer + AI-capex-financing
-  overhang. The whole book is AI-cohort/rate-sensitive levered. No rule pre-positions
-  for this (correct); observe, do not override. Rules react to realized price.
+- **Regime softening continues.** ADX 21.04 (from 22.63 Fri, 23.38 earlier) — trend
+  strength is fading toward the "weak/choppy" zone while price stays 8.1% above the
+  200-SMA. Still classified bull (conf 0.71). Not a rotation trigger; just a watch —
+  if ADX keeps decaying, trend-following strategies will naturally quiet down.
 
-- **US-Iran treaty signing HIT A SNAG.** The Geneva MOU/treaty signing slated for
-  today was reportedly called off last-minute (VP Vance delayed his Switzerland trip);
-  a completed signing is NOT confirmed. Hormuz framework intact, oil ~WTI $76,
-  Israel-Lebanon strikes a durability tail. No rule pre-positions for it (correct);
-  confirm over the weekend — don't mistake a treaty-fade in oil-sensitive names for
-  fundamental weakness.
+- **AI-crowding + higher-for-longer remain the standing backdrop** (BofA "most crowded
+  trade in history"; ~80% odds of zero 2026 cuts; Citadel Sept-hike call). Whole book
+  AI-cohort/rate-sensitive levered. No rule pre-positions for it (correct); observe.
 
-- **No HALT-WORTHY trigger.** Standard execute was correct (and moot — no session).
+- **No HALT-WORTHY trigger** (and none assessable from the stale brief anyway). Broker
+  state shows no adverse condition. Standard execute was correct.
 
 ## Final state at session end
 
 - **Active set:** 7 strategies × **23/23 universe symbols claimed**
   (`unclaimed_count == 0`); SPCX is the lone PROVISIONAL claim
-  (equity_trend_following_ema_cross), execution-quarantined, revalidate_by
-  2026-06-30. No claim changes this run.
-- **Positions:** 6 longs — AAPL 72 (avg $271.30, +9.85%), AVGO 26 (avg $377.27,
-  +9.03%), MU 7 (avg $982.90, +15.37%), ORCL 38 (avg $177.28, +3.96%), QQQ 28
-  (avg $647.96, +14.30%), SPY 35 (avg $708.81, +5.35%).
+  (equity_trend_following_ema_cross), execution-quarantined, **revalidate_by
+  2026-07-04**. No claim changes this run.
+- **Positions:** 6 longs — AAPL 72 (avg $271.30, +8.85%), AVGO 26 (avg $377.27,
+  +4.06%), MU 7 (avg $982.90, **+25.04%**), ORCL 38 (avg $177.28, **-1.02%**),
+  QQQ 28 (avg $647.96, +13.58%), SPY 35 (avg $708.81, +4.91%).
 - **Open orders:** none.
-- **Account:** equity $109,484.18, cash $15,518.15, buying power $325,177.48.
-- **Regime:** bull, conf 0.73, ADX 22.63.
+- **Account:** equity $108,940.77, cash $15,518.15, buying power $323,655.93.
+- **Regime:** bull, conf 0.71, ADX 21.04.
 - **Code changes:** none. **Manual changes:** none. **Strategy changes:** none.
 
 ## Open issues for the operator
@@ -156,21 +159,26 @@ deps, reaches the live broker cleanly). Operator action still required — Open 
    (b) pip-install requirements into 3.14; or (c) recreate `.venv` + activate in the
    task. Persisting across many runs now.
 
-2. **News pipeline — holding.** Fresh 6/19 brief produced on schedule (good); 6/16,
-   6/17, 6/18 also fresh. Recovered after 6/11–6/15 misses. Consider a health-check/
-   alert on news-agent run failure.
+2. **[NEW, MEDIUM] News pipeline skipped the Monday 6/22 run — brief is STALE.** The
+   on-disk `news_brief.md` is dated 2026-06-19 (Juneteenth); no fresh 6/22 brief was
+   produced. I proceeded without live news per the manual and noted it. After fresh
+   6/16–6/19 briefs this is a regression. Two asks: (a) fix the news-agent Monday run /
+   add a health-check alert on news-agent failure; (b) the standing
+   `_load_news_brief()` staleness-guard item (Open issue #3) is now urgent — a stale
+   brief should be rejected or down-weighted, not fed to strategies as live signal.
 
 3. **`_load_news_brief()` staleness-guard gap.** Parses `date_in_file` but never
-   compares to today, so a stale brief is fed to strategies as live signal. Latent
-   liquidation/entry risk. Top soft-signal research item (Saturday).
+   compares to today, so a stale brief is fed to strategies as live signal. **Bit in
+   practice today** (the 6/19 brief was the only one on disk). Top soft-signal research
+   item (Saturday).
 
 4. **SPCX is a PROVISIONAL, execution-quarantined claim — Saturday research owns
-   validation by 2026-06-30.** Claimed by equity_trend_following_ema_cross for
-   coverage only; does NOT trade. Research must run a real backtest once SPCX has
-   ≥60 bars and either validate (Sharpe ≥ 0.5 → promote to trading claim) or
-   escalate. Brief notes SPCX is now -20%+ from its high (Cursor-deal dilution).
-   Likely also wants a vol-selling options strategy activated as a candidate
-   responder (hyper-IV new listing). Do NOT hand-promote.
+   validation, deadline now 2026-07-04.** Claimed by equity_trend_following_ema_cross
+   for coverage only; does NOT trade. Research must run a real backtest once SPCX has
+   ≥60 bars and either validate (Sharpe ≥ 0.5 → promote to trading claim) or escalate.
+   Still <60 bars (deadline auto-extended 6/30 → 7/04 on the 6/20 research run). Likely
+   also wants a vol-selling options strategy activated as a candidate responder. Do NOT
+   hand-promote.
 
 5. **`cli open-orders` parser bug stays provisionally closed** — clean JSON again
    under the venv. Confirm when there's a live open order.
@@ -180,16 +188,15 @@ deps, reaches the live broker cleanly). Operator action still required — Open 
    un-head-to-head'd. Sat research priority.
 
 7. **MU Q3 FY26 print CONFIRMED Wed 6/24 AMC.** Pre-print window open, position green
-   and running (+15.37%); `equity_event_driven_catalyst` window logic + trailing stop
-   govern. Watch the trailing stop into the print. Monday is the last full session
-   before it.
+   and running hard (**+25.04%**); `equity_event_driven_catalyst` window logic +
+   trailing stop govern. Watch the trailing stop into the print. Tue 6/23 is the last
+   full session before it.
 
-8. **Higher-for-longer macro + AI-crowding is now the standing backdrop.** Markets
-   price ~80% probability of ZERO 2026 cuts; Citadel warns of a September HIKE; BofA's
-   survey calls long-semis the most crowded trade in history. The whole book is
-   AI-cohort/rate-sensitive levered. No rule pre-positions for rates/crowding
-   (correct); watch for delayed de-rating reaching trend/momentum rules as the
-   AI-capex-financing reframing compounds with the rate narrative.
+8. **Higher-for-longer macro + AI-crowding is the standing backdrop.** ~80% odds of
+   ZERO 2026 cuts; Citadel Sept-hike call; BofA "most crowded trade in history." The
+   whole book is AI-cohort/rate-sensitive levered. Regime ADX softening to 21.04. No
+   rule pre-positions for rates/crowding (correct); watch for delayed de-rating
+   reaching trend/momentum rules.
 
 ## Git-sync status
 
