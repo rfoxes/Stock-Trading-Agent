@@ -1,8 +1,8 @@
 # Tasks for the next run
 
-This file is the focused to-do list for the next run (Tue 2026-06-23 — last full
-session before the MU Wed 6/24 AMC print). Yesterday's Claude wrote it after the
-6/22 run. Replace it (don't append) when you write the next version.
+This file is the focused to-do list for the next run (Wed 2026-06-24 — **MU Q3 FY26
+print day, Wed AMC**). Yesterday's Claude wrote it after the 6/23 run. Replace it
+(don't append) when you write the next version.
 
 ---
 
@@ -16,9 +16,8 @@ RULE". Two grades of attachment:
 - **(b) PROVISIONAL claim** — nothing cleared baseline (or no price history), so
   triage attached the best-available strategy as an UNVALIDATED claim, recorded in
   `state/provisional_claims.md` with a `revalidate_by` deadline and
-  **QUARANTINED from execution** (`cli execute` auto-skips it; see
-  `provisional_quarantined`/`skipped` output). It never trades until Saturday
-  research validates it.
+  **QUARANTINED from execution** (`cli execute` auto-skips it). Never trades until
+  Saturday research validates it.
 
 After triage, `unclaimed_count` should be **0**. Run `cli triage-symbol <SYM>
 [--gap-type X]` for any NEW unclaimed symbol — it auto-claims OR provisionally
@@ -31,7 +30,7 @@ attaches. Character-match shortcuts and direct YAML edits to
 
 **Homebrew `/opt/homebrew/bin/python3` is 3.14.5 and lacks the harness deps
 (requests/alpaca-py/dotenv).** Bare `python3 -m quant_trading_system.cli ...`
-fails with `No module named 'requests'`. Confirmed still broken today (6/22).
+fails with `No module named 'requests'`. Confirmed still broken 6/23.
 **RUN EVERYTHING VIA THE VENV:**
 
 ```
@@ -42,41 +41,40 @@ The `.venv` (Python 3.13.13) has all deps and reaches the live broker cleanly.
 NOT a "stop on ModuleNotFoundError" situation — complete the run via the venv and
 document the drift.
 
-## ⚠️ READ SECOND: NEWS BRIEF WAS STALE ON 6/22 — DATE-CHECK IT
+## ⚠️ READ SECOND: DATE-CHECK THE NEWS BRIEF
 
-On 6/22 the on-disk `news_brief.md` was still the **6/19 Juneteenth** brief — the
-news pipeline skipped the Monday run. **Check `news_brief.md`'s `# News brief for
-<date>` header matches today's date BEFORE trusting it.** If it doesn't match,
-treat the brief as ABSENT (proceed without live news per the manual) and re-flag the
-news-pipeline issue. Do NOT act on a stale brief.
+The 6/22 Monday brief was SKIPPED (the trader ran on the stale 6/19 brief). The
+6/23 brief was produced fresh. **Always check `news_brief.md`'s `# News brief for
+<date>` header matches today BEFORE trusting it.** If it doesn't, treat the brief as
+ABSENT (proceed without live news per the manual) and re-flag the news pipeline.
 
-## Status as of last update (2026-06-22, first live session post-Juneteenth)
+## Status as of last update (2026-06-23, AI/semis de-rating day, NOTABLE)
 
 - **Clean do-nothing day. `cli execute` → 0 intents** across all 7 strategies
   (0 submitted / 0 rejected / 0 errors). **Decision: Keep.** No rotations, no
   `.py`/`.md` edits, no manual changes.
-- **MRVL did NOT fire** despite S&P 500 inclusion effective at today's open — the
-  breakout volume gate was unmet (correct; do not override to chase index flow).
+- **NOTABLE brief: live AI/semiconductor/memory de-rating** (KOSPI −10% w/ circuit
+  breakers, Nasdaq −1.3% Mon, US futures −2.4% Tue). **NOT halt-worthy** (no FOMC this
+  session; MU print is Wed AMC not tonight; the futures move is a tech de-rating, not
+  a geopolitical shock — Iran oil waiver is risk-positive). Observe, don't override.
 - **P0 = 0 unclaimed.** `cli list-active` → universe 23, **claimed 23,
   unclaimed_count 0, provisional_count 1**. No new unclaimed symbols → no triage.
-- **SPCX = PROVISIONAL/UNVALIDATED claim on equity_trend_following_ema_cross,
-  execution-quarantined, revalidate_by 2026-07-04** (auto-extended from 6/30 — still
-  <60 bars). Execute confirmed it skips (`provisional_quarantined: ["SPCX"]`).
+- **SPCX = PROVISIONAL/UNVALIDATED, execution-quarantined, revalidate_by 2026-07-04**
+  (still <60 bars; drawdown now ~−30% from post-IPO high). Execute confirmed skip.
   Do NOT hand-promote.
-- **News brief STALE (dated 6/19) — proceeded without live news per the manual.**
-- **Account: equity $108,940.77; cash $15,518.15; buying power $323,655.93.**
-  (Down $543 vs 6/19 $109,484.18 holiday last-close mark — first live repricing.)
-- **Positions (6 longs, 5 green):** AAPL 72 (+8.85%), AVGO 26 (+4.06%),
-  MU 7 (**+25.04%**, running into the 6/24 print), ORCL 38 (**-1.02%**, lone red),
-  QQQ 28 (+13.58%), SPY 35 (+4.91%).
-- **Regime: bull, conf 0.71, ADX 21.04** (further softening from 22.63 — trend
-  weakening but still bull, price 8.1% above 200-SMA).
+- **Account: equity $106,488.44; cash $15,518.15; buying power $316,789.41.**
+  (Down $2,452 vs 6/22 $108,940.77 — the de-rating.)
+- **Positions (6 longs, 5 green):** AAPL 72 (+10.12%), AVGO 26 (+1.33%),
+  MU 7 (**+7.61%** — gave back the +25% pre-print spike but HELD; trailing stop did
+  NOT fire), ORCL 38 (**−6.33%**, only red, widened on 21k job cuts), QQQ 28 (+10.53%),
+  SPY 35 (+3.81%).
+- **Regime: bull, conf 0.71, ADX 21.04** (unchanged from 6/22).
 
-## To do next run (Tue 6/23 — last full session before MU print)
+## To do next run (Wed 6/24 — MU PRINT DAY, Wed AMC)
 
 1. **Read last_handoff.md and news_brief.md FIRST.** Use the venv interpreter
-   (see warning #1). **Date-check the brief** (warning #2) — if it's not a fresh
-   6/23 brief, proceed without it and re-flag the news pipeline.
+   (warning #1). **Date-check the brief** (warning #2) — expect a fresh 6/24 brief
+   that should cover CBRS's 6/23 post-print reaction.
 
 2. **Snapshot + P0 check.** `cli list-active`. Expect `unclaimed_count: 0` and
    SPCX still PROVISIONAL (revalidate_by 7/04). If any NEW symbol shows as
@@ -84,25 +82,33 @@ news-pipeline issue. Do NOT act on a stale brief.
    `cli add-active`.
 
 3. **Reconcile.** Confirm the 6 longs (AAPL/AVGO/MU/ORCL/QQQ/SPY) are still held.
-   If any exited via a strategy's logic, `log-closed <strategy_id> <SYM>
-   <pnl_fraction>`. No action if all still held.
+   **MU is the one to watch** — if equity_event_driven_catalyst's trailing stop or
+   window logic exited MU (or trimmed it) on its own rule, `log-closed
+   equity_event_driven_catalyst MU <pnl_fraction>`. Do NOT discretionarily sell MU
+   ahead of the print to "lock in" — that's forbidden. Let the rule decide.
 
 4. **Position watch:**
-   - **MU — Q3 FY26 print Wed 6/24 AMC. Tue 6/23 is the LAST full session before
-     it.** Held and running **+25.04%**. `equity_event_driven_catalyst` window logic
-     + trailing stop govern. **Watch the trailing stop into the print** — a +25%
-     unrealized gain is exactly what the trailing stop protects. If the strategy
-     trims/exits on its own rule, that's correct; do NOT discretionarily sell.
-   - **ORCL — lone red (-1.02%).** Modest, no threshold breach. equity_event_driven_
-     catalyst holds it. Watch but no action unless a rule fires.
-   - **MRVL/INTC — breakout_volume claims both.** S&P-inclusion flow did NOT produce
-     a volume-confirmed breakout Monday. Watch for a volume-confirmed entry; if the
-     gate isn't met, no trade is correct. Don't override.
-   - **QQQ — SPCX Nasdaq-100 fast-entry (~July 1) + Russell 6/26.** Soft awareness;
-     no active rule reads rebalance flow (correct). SPCX's drawdown shrinks the flow.
+   - **MU — Q3 FY26 print TODAY (Wed 6/24 AMC).** The trader run (~4pm PT / 7pm ET)
+     sits around/after the print. Options priced ~14% move; history = fell after 6 of
+     last 8 reports despite beats. Held +7.61% (gave back from +25%). Fresh Anthropic
+     deal tailwind; SK Hynix HBM4-slowdown cross-current. `equity_event_driven_catalyst`
+     window logic + trailing stop govern. **Watch the trailing stop** and reconcile any
+     rule-driven exit. No discretionary action either way.
+   - **ORCL — book's only red (−6.33%), widened on 21k job cuts.** No threshold breach,
+     no rule fired, held. Workforce-reduction event has no algorithmic handle
+     (event-driven strategy models earnings, not restructuring) — soft library gap.
+     Watch but no action unless a rule fires.
+   - **CBRS — printed its first public quarter 6/23 AMC.** Check the 6/24 brief for the
+     reaction. CBRS has no earnings-window responder (claimed by trend-following only)
+     — assignment gap for Saturday. No action.
+   - **MRVL/INTC — breakout_volume claims both;** both fell ~8% in the rout, no
+     volume-confirmed breakout. Watch; if the gate isn't met, no trade is correct.
 
 5. **Run `cli execute` (via venv).** SPCX appears under `provisional_quarantined`/
-   `skipped` — expected, not an error.
+   `skipped` — expected, not an error. The AI/semis de-rating is realized price the
+   rules see — if a trend/momentum rule fires on a rolling-over name, execute; if none
+   fires, do-nothing is the correct, non-curve-fit outcome. Do NOT discretionarily
+   de-risk the AI-cohort book — forbidden by the algorithmic-only mandate.
 
 6. **Library gaps — see list below (Saturday research owns them).**
 
@@ -111,47 +117,44 @@ news-pipeline issue. Do NOT act on a stale brief.
 ## Library gaps + research items (carry to research_tasks.md Sat)
 
 - **SPCX validation (TOP PRIORITY, deadline 2026-07-04).** Provisional claim on
-  equity_trend_following_ema_cross, execution-quarantined. Research must run a real
-  backtest once SPCX has ≥60 bars and either VALIDATE (Sharpe ≥ 0.5 → promote to a
-  trading claim) or ESCALATE. SPCX down 20%+ from its post-IPO high (Cursor-deal
-  dilution). Likely also wants a vol-selling options strategy activated as a candidate
-  responder (hyper-IV new listing; `volatility_regime` type). Recorded in
-  `state/provisional_claims.md`.
-- **`_load_news_brief()` staleness guard (NOW URGENT — bit in practice 6/22).** Parses
-  `date_in_file` but never compares to today; on 6/22 the only on-disk brief was the
-  stale 6/19 one, which would have been fed to strategies as live signal. Reject or
-  down-weight a brief whose `date_in_file` != today. Top soft-signal item.
-- **News-pipeline reliability / health-check.** The 6/22 Monday brief was never
-  produced (regression after fresh 6/16–6/19). Add a health-check / alert on
-  news-agent run failure so a missed brief is visible.
-- **Scheduled index-rebalance / forced-flow overlay (MRVL/FLEX → S&P 500 6/22 [now
-  effective, no breakout]; SPCX → Nasdaq-100 ~July 1; Russell 6/26; held QQQ).** No
-  active rule reads a known index-rebalance schedule as a flow event. Suggested
-  research: an index-rebalance/forced-flow overlay (anticipated add/drop dates +
-  estimated flow) as a soft posture signal. Open Q: should index-inclusion become a
-  6th Tier-B promotion trigger? gap_type: event_catalyst — responder: NONE.
-- **US semiconductor industrial-policy / reshoring overlay (Intel foundry build-out).**
-  Apple→Intel domestic-chip deal + the Lee (ex-SK Hynix CEO) EVP-Foundry hire — no
-  rule maps a domestic-manufacturing policy/management catalyst to the affected names.
-  INTC's only handle is breakout_volume (price). gap_type: event_catalyst — responder:
+  equity_trend_following_ema_cross, execution-quarantined. Research must backtest once
+  SPCX has ≥60 bars and either VALIDATE (Sharpe ≥ 0.5 → trading claim) or ESCALATE.
+  Drawdown ~−30% from post-IPO high; new: $20B debt raise + $6.3B Reflection compute
+  deal (bond/equity signals diverging). Likely also wants a vol-selling options
+  strategy activated as a candidate responder (hyper-IV new listing; volatility_regime).
+- **Earnings-window activation on CBRS (printed first public quarter 6/23 AMC).** CBRS
+  is claimed by trend-following (price-driven); the earnings_window responder
+  (equity_event_driven_catalyst) does NOT claim it. Assign CBRS to the event-driven
+  responder via head-to-head vs trend-following. gap_type: earnings_window — responder:
   NONE.
-- **Event-window coverage on price-claimed names (INTC foundry-mgmt; META/GOOGL
-  regulatory [Ohio under-16 law]; AMZN cost-curve; QQQ rebalance flow).**
-  `event_catalyst` is declared only by equity_event_driven_catalyst, which claims
-  AVGO/MU/ORCL — not these names. Broaden its claim set to event-prone large caps OR
-  add a lightweight event-window co-claim overlay. gap_type: event_catalyst —
-  responder: NONE.
-- **Macro-event-window category (FOMC higher-for-longer; Citadel Sept-hike call).**
-  No canonical gap_type covers a scheduled macro print. gap_type: NEW_CATEGORY_NEEDED
-  — responder: NONE.
-- **AI-capex financing / crowding overlay** (ORCL/DELL/hyperscalers/semis) — higher-
-  for-longer + BofA "most-crowded-trade-in-history" compound into a cohort
-  financing/leverage + crowding headwind with no rule flagging it. gap_type:
+- **Restructuring / workforce-reduction events (ORCL 21k job cuts).** ORCL is claimed
+  by equity_event_driven_catalyst, but the strategy models earnings windows, not
+  restructuring disclosures — no true handle even on a covered name. Decide whether a
+  restructuring/cost-event sub-trigger belongs in the event-driven strategy. gap_type:
+  event_catalyst — responder: partial (claimed, unmodeled).
+- **Event-window coverage on price-claimed names (GOOGL DeepMind departure; META CRED
+  investment + WhatsApp leadership; MSFT Chevron power deal; TSLA NHTSA probe/Megapod;
+  DELL product launch; AAPL data leak; carry-forward INTC foundry-mgmt; QQQ rebalance).**
+  `event_catalyst` is declared only by equity_event_driven_catalyst (claims AVGO/MU/ORCL).
+  Broaden its claim set to event-prone large caps OR add a lightweight event-window
+  co-claim overlay. gap_type: event_catalyst — responder: NONE.
+- **AI-capex financing / crowding overlay — NOW ACTIVELY UNWINDING** (KOSPI −10%, Wall
+  St de-rating on top of higher-for-longer-with-hike-bias). Cohort financing/leverage +
+  crowding drawdown (held AVGO/MU/ORCL/QQQ + watchlist semis) with no rule flagging it.
+  Moved from theoretical to active this week. gap_type: NEW_CATEGORY_NEEDED — responder:
+  NONE.
+- **Macro-event-window category (FOMC higher-for-longer / hawkish dots; Citadel
+  Sept-hike call).** No canonical gap_type covers a scheduled macro print. gap_type:
   NEW_CATEGORY_NEEDED — responder: NONE.
-- **Vol-regime activation** (VIX last reported close 16.40, sub-17). Registry hole
-  CLOSED (volatility_regime declared by iron_condor_high_iv, calendar_spread,
-  jade_lizard, long_straddle_earnings) but none active / none claim a universe symbol.
-  Activate one vol-selling options strategy with a claim; doubles as SPCX candidate.
+- **Index-rebalance / forced-flow overlay (SPCX → Nasdaq-100 ~July 1; Russell 6/26;
+  held QQQ).** No active rule reads a known index-rebalance schedule as a flow event.
+  Open Q: should index-inclusion become a 6th Tier-B promotion trigger? gap_type:
+  event_catalyst — responder: NONE.
+- **Vol-regime activation** (VIX ~17.3 sub-18; MU ~14% pre-print IV; SPCX hyper-IV).
+  Registry hole CLOSED (volatility_regime declared by iron_condor_high_iv,
+  calendar_spread, jade_lizard, long_straddle_earnings) but none active / none claim a
+  universe symbol. Activate one vol strategy with a claim (MU pre-print is the textbook
+  long-straddle/event-vol setup); doubles as SPCX candidate.
 - **Validate the 5 first-pass + 3 provisional-placeholder assignments via
   head-to-head:**
   - `equity_momentum_macd_histogram` vs `equity_trend_following_ema_cross` on META, MSFT
@@ -160,13 +163,13 @@ news-pipeline issue. Do NOT act on a stale brief.
   - `equity_rsi_divergence` vs `equity_trend_following_ema_cross` on HPE
   - `equity_event_driven_catalyst` vs `equity_trend_following_ema_cross` on AVGO, MU, ORCL
   - `equity_sector_rotation_momentum` vs `equity_trend_following_ema_cross` on DELL
-  - `equity_trend_following_ema_cross` placeholders → CBRS, NUVL, TSM
+  - `equity_trend_following_ema_cross` placeholders → CBRS, NUVL, TSM (CBRS → event-driven)
 - **AI-policy / export-control overlay** (Anthropic Fable 5/Mythos 5 export ban;
   Sanders AI-equity-tax bill) — no rule responds to national-security/export/AI-tax
   events. Soft signal. gap_type: event_catalyst — responder: NONE.
 - **`m_a_arbitrage_event` (NUVL/GSK)** — `pairs_arbitrage` responder
-  (equity_pairs_trading_cointegration) not active; NUVL claimed by trend-following
-  (price-driven). Activation gap.
+  (equity_pairs_trading_cointegration) not active; NUVL claimed by trend-following.
+  Activation gap.
 
 ## Open questions for the operator
 
@@ -174,18 +177,17 @@ news-pipeline issue. Do NOT act on a stale brief.
    3.14.5 (no harness deps). Repoint the Cowork task / daily_prompt to
    `.venv/bin/python3`, or reinstall deps into 3.14, or recreate the venv.
    Persisting across many runs.
-2. **[NEW] News pipeline skipped the Monday 6/22 run — brief was STALE (6/19).**
-   Fix the news-agent Monday run; add a health-check / alert on news-agent failure.
-   Tue 6/23: confirm a fresh 6/23 brief is produced.
-3. **SPCX is a PROVISIONAL, execution-quarantined claim** — Sat research owns
-   validation by 2026-07-04 (needs ≥60 bars). Do NOT character-match / hand-promote.
-4. **MU Q3 FY26 print CONFIRMED Wed 6/24 AMC** — pre-print window open, position
-   running hard (+25.04%). Watch the trailing stop into the print. Tue 6/23 is the
-   last full session before it.
-5. **Higher-for-longer + AI-crowding is the standing macro backdrop** (~80% odds of
-   ZERO 2026 cuts; Citadel Sept-hike call; BofA "most crowded trade in history").
-   Whole book AI-cohort/rate-sensitive levered; regime ADX softening to 21.04. No
-   rule pre-positions for it (correct). Watch for delayed de-rating.
-6. **US-Iran Geneva signing was called off last-minute (NOT confirmed as of 6/19).**
-   Brief is stale; re-confirm status when a fresh brief lands. Don't mistake an
-   oil-sensitive treaty-fade for fundamental weakness.
+2. **News pipeline intermittent — 6/22 Monday run MISSED, 6/23 recovered.** Add a
+   health-check / alert on news-agent run failure so a missed brief is visible. Plus
+   the `_load_news_brief()` staleness guard (Q3) is the harness-side defense.
+3. **`_load_news_brief()` staleness guard** — parses `date_in_file` but never compares
+   to today; bit in practice 6/22. Reject/down-weight a brief whose date != today.
+4. **SPCX PROVISIONAL, execution-quarantined** — Sat research owns validation by
+   2026-07-04 (needs ≥60 bars). Do NOT character-match / hand-promote.
+5. **MU Q3 FY26 print Wed 6/24 AMC (today, this run sits around/after it).** Held
+   +7.61% (gave back from +25%); trailing stop did NOT fire. Options ~14% move. Watch
+   the trailing stop; reconcile any rule-driven exit. No discretionary action.
+6. **Higher-for-longer-with-a-HIKE-BIAS + AI-crowding now ACTIVELY unwinding.** Hawkish
+   June-17 dots; Citadel Sept-hike aligned with dots; KOSPI −10% / Wall-St de-rating.
+   Whole book AI-cohort/rate-sensitive levered. No rule pre-positions (correct); watch
+   for the de-rating reaching trend/momentum rules as realized price rolls over.
