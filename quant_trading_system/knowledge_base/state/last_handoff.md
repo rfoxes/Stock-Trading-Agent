@@ -1,45 +1,43 @@
 # Handoff to tomorrow's Claude
 
-(Run on the 2026-06-23 clock — snapshot read 2026-06-23 ~16:03 PT. This run executes
-against the **6/23 after-hours / 3:30 PM PT refresh** news brief (NOTABLE). Broker
-marks have advanced vs the earlier 6/23 close handoff — equity $106,488.44 → **$105,957.17**,
-AAPL +10.12% → +8.33%, ORCL −6.33% → −6.84% — so this is a distinct, later snapshot on
-the same calendar date, not a re-read. Ran the entire workflow via the venv — bare
-`python3` is still the wrong interpreter, see Open issue #1.)
+(Run on the 2026-06-24 clock — snapshot read 2026-06-24 ~16:02 PT. This is **MU print day**:
+the run sits ~minutes after MU's Q3 FY26 AMC print, which is OUT and a **record blowout**.
+This run executes against the **6/24 after-hours / 3:30 PM PT** news brief (NOTABLE), which
+already reflects the print. Ran the entire workflow via the venv — bare `python3` is still
+the wrong interpreter, see Open issue #1.)
 
 ## TL;DR
 
 **Clean do-nothing day. `cli execute` fired 0 intents across all 7 strategies
 (0 submitted / 0 rejected / 0 errors). Decision: Keep.** No rotations, no strategy
-`.py`/`.md` edits, no manual P0-section changes. Correct outcome under the
-algorithmic-only mandate — the AI/semis de-rating is NOTABLE but not halt-worthy, no
-strategy fired, and none should have on a discretionary basis.
+`.py`/`.md` edits, no manual P0-section changes. Correct outcome under the algorithmic-only
+mandate: MU's print resolved FAVORABLY (a blowout beat+raise on a held long), so there was
+nothing to halt for, and the event-driven strategy processed the post-print window with full
+information and chose to hold — no rule-driven exit, trailing stop did not trip.
 
-**NOTABLE brief: the AI / semiconductor / memory de-rating ran into the 6/23 close.**
-S&P −1.44% (7,365), Nasdaq −2.21% (25,587), but the **Dow held ~flat (−0.09%)** as money
-rotated into defensives/software (PSA/IBM/ACN/WMT/PG/JNJ) — a sector de-rating, not a
-broad-market liquidation. Two new after-hours items: **(1) CBRS printed its first public
-quarter** — revenue +94% y/y beat but the stock fell **~8% AH** on a gross-margin
-guide-down; **(2) GOOGL replaces VZ in the DJIA, effective Mon 6/29** (forced-flow/index
-event). **NOT HALT-WORTHY** per the manual's three triggers: (1) no FOMC on the next cash
-session (June 17 decision in prices), (2) no held name with a confirmed negative *overnight*
-catalyst tonight (MU's print is **tomorrow** Wed 6/24 AMC; CBRS, which printed tonight,
-is **not held**; ORCL's job cuts are a cost action, not a shock), (3) the >2% move is a
-tech de-rating — realized price the rules already see — NOT a geopolitical shock (the actual
-geopolitics, the Iran 60-day oil waiver, is risk-positive). Book is AI-cohort/rate-sensitive
-levered into the de-rating → observe, don't override. Standard execute was correct.
+**MU PRINT — RECORD BLOWOUT, RESOLVED TO THE UPSIDE.** Q3 FY26: revenue **$41.46B (record)**,
+non-GAAP EPS **$25.11** vs ~$20.20 (+24%); Q4 guide **~$50.0B ±$1B rev at ~86% GM, EPS ~$31**,
+far above Street on sold-out HBM/AI-memory. Stock **+12–15% AH.** The held position
+**re-rated to +22.36%** ($1,538.11 unreal, px $1,202.63 vs avg $982.90), up from +8.12% on
+6/23 — the pre-print ~14% implied move resolved up and the position is now sharply ITM.
+**equity_event_driven_catalyst (claims MU) fired 0 intents this run** — held, entry guard
+skips, and neither the post-print window logic nor the trailing stop produced an exit. Nothing
+to `log-closed`; MU is held by rule, not discretion. This was THE reconciliation item per
+both tasks.md and the brief, and it reconciled clean: no rule-driven exit to record.
 
-**The de-rating is visible in the book — equity $105,957.17, −$531 vs the earlier 6/23
-read ($106,488.44).** Still 6 longs, 5 of 6 green. **MU held and ticked up: +7.61% →
-+8.12%** ($558.32 unreal, price $1,062.66 vs avg $982.90) — the trailing stop did NOT fire.
-ORCL deepened to −6.84% (−$460) on the 21k-job-cut disclosure + de-rating (the book's only
-red). AAPL gave back to +8.33% (still +$1,627).
+**Book up on the MU re-rate + broad rebound — equity $107,169.58, +$1,212 vs the 6/23 read
+($105,957.17).** Still 6 longs, now all green except ORCL. **MU +22.36%** (the mover); AAPL
++7.64%, AVGO +3.16% (Jalapeño/OpenAI win tailwind), QQQ +11.64%, SPY +3.93%. **ORCL deepened
+to −10.10%** (−$680) on continued 21k-job-cut digestion (worst month since 2001) — the book's
+only red, no threshold breach, no rule fired, held.
 
 **P0 triage: nothing to do — `unclaimed_count == 0`.** `cli list-active` → universe 23,
 claimed 23, unclaimed 0, `provisional_count: 1` (SPCX). No new unclaimed symbols → no
 `triage-symbol` call needed. SPCX remains a PROVISIONAL/UNVALIDATED claim on
 equity_trend_following_ema_cross, **quarantined from execution, revalidate_by 2026-07-04**
-(still <60 bars). Execute confirmed the quarantine works (`provisional_quarantined: ["SPCX"]`).
+(still <60 bars). Execute confirmed the quarantine works
+(`provisional_quarantined: ["SPCX"]`, skipped with reason
+`provisional_unvalidated_claim (execution-quarantined)`).
 
 **Interpreter still broken on bare `python3`.** Homebrew 3.14.5 lacks harness deps. Ran
 everything via `/Users/rfoxes/Stock-Trading-Agent/.venv/bin/python3` (3.13, all deps,
@@ -49,23 +47,24 @@ reaches the live broker cleanly). Operator action still required — Open issue 
 
 1. **Read context.** daily_prompt.md, manual.md (P0 = mandatory-attach doctrine),
    tasks.md, last_handoff.md, news_brief.md. **Date-checked the brief** — header is
-   `# News brief for 2026-06-23 (after-hours / 3:30 PM PT refresh)`, matches today's clock.
+   `# News brief for 2026-06-24 (after-hours / 3:30 PM PT)`, matches today's clock.
 
 2. **Confirmed interpreter state.** Used `.venv/bin/python3` for the entire run (bare
    `python3` still fails at context-build with `No module named 'requests'`).
 
 3. **Snapshot (via venv).**
-   - Account: equity **$105,957.17**; cash $15,518.15; buying power $315,301.85;
-     day_trade_count 0. (Down ~$531 vs the earlier 6/23 read $106,488.44 — de-rating.)
-   - Positions: 6 longs — AAPL 72 (+8.33%, +$1,626.70, px $293.89), AVGO 26 (+0.91%,
-     +$89.18, px $380.70), MU 7 (**+8.12%**, +$558.32, px $1,062.66 — held, trailing stop
-     did NOT fire), ORCL 38 (**−6.84%**, −$460.43, px $165.16 — book's only red), QQQ 28
-     (+10.19%, +$1,847.89, px $713.96), SPY 35 (+3.49%, +$866.70, px $733.58).
+   - Account: equity **$107,169.58**; cash $15,518.15; buying power $318,696.60;
+     day_trade_count 0. (Up ~$1,212 vs the 6/23 read $105,957.17 — MU re-rate + rebound.)
+   - Positions: 6 longs — AAPL 72 (+7.64%, +$1,491.34, px $292.01), AVGO 26 (+3.16%,
+     +$310.18, px $389.20), MU 7 (**+22.36%**, +$1,538.11, px $1,202.63 — the mover,
+     held), ORCL 38 (**−10.10%**, −$680.09, px $159.38 — book's only red), QQQ 28
+     (+11.64%, +$2,112.21, px $723.40), SPY 35 (+3.93%, +$973.94, px $736.64).
    - Open orders: empty (clean JSON; parser bug stays provisionally closed).
    - Regime: bull, conf 0.71, ADX 21.04 (unchanged — same daily-bar marks).
 
 4. **Reconciliation.** No positions closed since the prior handoff — all 6 longs still
-   held. Nothing to `log-closed`.
+   held. **MU specifically: event_driven_catalyst fired 0 intents at execute, so no exit
+   to `log-closed`.** The trailing stop did NOT trip on the +22% post-print pop.
 
 5. **P0 triage.** `cli list-active` → universe 23, claimed 23, `unclaimed_count: 0`,
    `provisional_count: 1` (SPCX, revalidate_by 2026-07-04). Nothing unclaimed → no
@@ -82,63 +81,67 @@ reaches the live broker cleanly). Operator action still required — Open issue 
 
 ## Observations and reasoning
 
-- **The do-nothing is correct, not a gap.** A NOTABLE, live AI/semis de-rating is exactly
-  the tape that tempts discretionary de-risking — which the algorithmic-only mandate forbids.
-  No strategy fired and none should have on a hunch; the de-rating is realized price the
-  rules already see. If trend/momentum rules want to trim as price rolls over, they will on
-  their own schedule. Zero intents is the right outcome.
+- **The do-nothing is correct, and MU is the proof.** The day's marquee binary (MU's print)
+  resolved to the upside while the position was already held. The brief correctly framed this
+  as NOT halt-worthy: the halt lever exists to let the trader *skip execute to avoid trading
+  into an adverse surprise*; here the surprise was favorable and fully known by run time, so
+  the right move was to let the event-driven strategy process the post-print window with full
+  information. It did — and produced no order. Holding a deeply-ITM blowout-beat winner with
+  the trailing stop intact is exactly what the rule should do; there's no discretionary
+  profit-take and none is permitted.
 
-- **MU is THE watch item into tomorrow's Wed 6/24 AMC print.** Held; ran to +25% Monday,
-  gave back to +7.61% earlier 6/23, and now sits +8.12% — the trailing stop has NOT fired
-  across the whole round-trip. Options price a **~14% move**; history is a stock that fell
-  after 6 of its last 8 reports despite beats. Tailwind: MU's **strategic Anthropic
-  agreement + Series H investment** (memory co-design, supply). Cross-current: SK Hynix
-  reportedly slowing HBM4 / reallocating to DRAM (supportive for DRAM pricing, a question
-  mark on HBM mix). **Tomorrow's run sits around/after the print** —
-  equity_event_driven_catalyst's window logic + trailing stop govern; no discretionary
-  action. Watch the trailing stop and reconcile any rule-driven exit.
+- **MU re-rated +8.12% → +22.36% on the blowout; trailing stop still has NOT fired** across
+  the entire +25% (Mon) → +7.6% → +8.1% (6/23) → +22.4% (post-print) round-trip. Q3 was a
+  record (rev $41.46B, EPS $25.11 vs ~$20.20) with a Q4 guide (~$50B, ~86% GM, EPS ~$31) far
+  above Street on sold-out HBM. The CEO was expected to detail the Anthropic strategic deal on
+  the call. **Watch item for tomorrow:** an IV-crush + any give-back of the AH pop is the
+  scenario where the trailing stop could finally engage; reconcile any rule-driven exit then.
 
-- **ORCL (−6.84%, −$460) is the book's only red and it widened.** Oracle's annual filing
-  disclosed ~21,000 job cuts (~13% of workforce) citing AI build-out costs.
-  equity_event_driven_catalyst claims ORCL but models *earnings* windows, not
-  workforce-reduction disclosures — no true algorithmic handle on this event type (logged
-  as a partial/soft library gap). No threshold breach, no rule fired, position held. No action.
+- **AVGO (+3.16%) got a tailwind with no algorithmic handle — Jalapeño.** Broadcom + OpenAI
+  unveiled "Jalapeño," OpenAI's first custom inference chip (built by AVGO; tape-out ~9 mo,
+  deploy end-2026, gigawatt ramp 2027–28). equity_event_driven_catalyst claims AVGO but models
+  *earnings* windows, not product/partnership deals — no true handle on this event type
+  (partial/soft gap, same shape as ORCL restructuring). The win reaches the position only as
+  realized price. No action.
 
-- **CBRS printed its first-ever public quarter 6/23 AMC (−8% AH) with no algorithmic
-  handle.** 94% revenue beat met a gross-margin guide-down. CBRS is claimed only by
-  price-driven trend-following; the earnings-window responder (equity_event_driven_catalyst)
-  does NOT claim it. Logged as an assignment/activation library gap. The −8% reaches the
-  strategy only as realized price. Nothing to do today.
+- **ORCL (−10.10%, −$680) is the book's only red and deepened further.** Continued digestion
+  of the ~21,000-job (~13%) workforce cut tied to AI build-out; on track for its worst month
+  since 2001 despite a record AI backlog. equity_event_driven_catalyst claims ORCL but models
+  earnings windows, not restructuring disclosures — no algorithmic handle (logged as a
+  partial/soft library gap). No threshold breach, no rule fired, held. No action.
 
-- **GOOGL → DJIA effective 6/29 (forced flow).** S&P DJI is swapping GOOGL in for VZ in the
-  price-weighted Dow — a scheduled index-rebalance/forced-flow event. GOOGL is claimed by
-  price-driven trend-following; no rule reads an index-rebalance schedule. Re-affirms the
-  index-rebalance overlay gap (GOOGL 6/29, SPCX → Nasdaq-100 ~July 1, Russell ~6/26).
+- **GOOGL → DJIA confirmed effective Mon 6/29 (forced flow) + product.** S&P DJI confirmed
+  Alphabet replaces VZ in the Dow pre-open 6/29; DIA/Dow funds rebalance into GOOGL. Also
+  launched Gemini 3.5 Flash "Computer Use." GOOGL is claimed by price-driven trend-following;
+  no rule reads an index-rebalance schedule or a product event. Re-affirms the index-rebalance
+  overlay gap (GOOGL 6/29, SPCX → Nasdaq-100 ~July 1).
 
-- **Many price-claimed large caps had discrete events with no responder** (GOOGL DeepMind
-  departure −6%; META $900M CRED investment + WhatsApp leadership change; MSFT 20-yr 2.67 GW
-  Chevron power deal; TSLA NHTSA FSD probe + Megapod trademark; DELL PowerEdge XE8812 launch;
-  AAPL Tata data leak). All `responder: NONE` — the recurring event-window-coverage gap.
-  Logged for Saturday research, not actions.
+- **CBRS debut-print Day-1 follow-through (−8% AH 6/23, slid further 6/24).** First public
+  quarter beat (rev $193.4M +94%) met a GM guide-down; Needham reiterated Buy. CBRS is claimed
+  only by price-driven trend-following; the earnings-window responder
+  (equity_event_driven_catalyst) does NOT claim it — assignment gap for Saturday. Reaches the
+  book only as realized price. No action.
 
-- **AI-capex financing/crowding gap is ACTIVE.** The standing "most-crowded-trade-in-history"
-  semis positioning is unwinding (KOSPI −10%, Wall St Day-2). The capital-allocation machine
-  is still running (CBRS-OpenAI 750MW/$20B + AWS, MU-Anthropic, MSFT-Chevron, SpaceX $6.3B
-  Reflection + $20B debt) — precisely the financing/leverage overhang the cohort is being
-  priced for. No rule flags it (correct); observe.
+- **More price-claimed large caps with discrete events, no responder** (TSLA Sunrun/Renew
+  16-GW pact + NHTSA probe; AMZN Nokia/AWS expansion + Trainium read-through; META federal
+  AI-testing pressure). All `responder: NONE` — the recurring event-window-coverage gap.
+  Logged for Saturday, not actions.
 
-- **Macro: Fed higher-for-longer with a hike bias.** June 17 FOMC held 3.50–3.75% with a
-  hawkish dot-plot (9 see ≥1 hike; PCE 3.6% YE; May CPI +4.2%); first meeting under Chair
-  Warsh; Citadel's Sept-hike call aligns with the dots. In prices since 6/17; relevance is
-  sustained rate pressure on the rate-sensitive AI cohort. VIX ~17.3, still low-vol (<18) —
-  the vol dislocation is single-name/sector (MU ~14%, CBRS realized ~−8%), not index.
+- **The two-day AI/semis de-rating RECOVERED — risk-on rebound, Russell 2000 at a record.**
+  MU's blowout reaffirmed the HBM/DRAM supercycle (rippled to SNDK/WDC/STX in sympathy),
+  cutting against the "most-crowded-trade unwind" thesis of Mon–Tue. Counter-signal: SK Hynix
+  targeting a ~$29.4B Nasdaq ADR listing (incremental supply). The AI-capex crowding overlay
+  still has no rule (correct); the acute de-rating has paused.
 
-- **Iran 60-day oil waiver (carry-forward RESOLVED, risk-positive).** Treasury general
-  license for Iranian oil sales in exchange for Hormuz transit + IAEA inspections.
-  Oil-supply-positive (bearish crude), not a shock. No rule pre-positions (correct).
+- **Macro: oil < $70 (toward $72), lowest since late Feb**, on Strait-of-Hormuz reopening + a
+  60-day US-Iran roadmap — disinflationary, risk-positive, not a shock. Fed bank stress-test
+  results out Wed; June 17 FOMC (higher-for-longer, hawkish dots, first meeting under Chair
+  Warsh) in prices; no FOMC this session. VIX ~19.5 (crossed >18 on the de-rating, likely
+  eased on the bounce) — the vol dislocation was single-name/sector (MU pre-print ~14%, CBRS
+  realized), not a confirmed index term-structure inversion.
 
-- **SPCX drawdown deepened to ~−30% from post-IPO high** (+ a $20B debt raise and a $6.3B
-  Reflection compute deal; Cathie Wood bought the dip; Susquehanna Neutral). Research
+- **SPCX — $25B unsecured-notes raise weeks after the $86B IPO** (battleground stock, analysts
+  split; carry: $6.3B Reflection deal, Cathie Wood buying, Nasdaq-100 add ~July 1). Research
   signal, not a trader action — execution-quarantined, Saturday research owns validation by
   2026-07-04.
 
@@ -150,11 +153,11 @@ reaches the live broker cleanly). Operator action still required — Open issue 
   (`unclaimed_count == 0`); SPCX the lone PROVISIONAL claim
   (equity_trend_following_ema_cross), execution-quarantined, **revalidate_by 2026-07-04**.
   No claim changes this run.
-- **Positions:** 6 longs — AAPL 72 (avg $271.30, +8.33%), AVGO 26 (avg $377.27, +0.91%),
-  MU 7 (avg $982.90, **+8.12%**), ORCL 38 (avg $177.28, **−6.84%**), QQQ 28 (avg $647.96,
-  +10.19%), SPY 35 (avg $708.81, +3.49%).
+- **Positions:** 6 longs — AAPL 72 (avg $271.30, +7.64%), AVGO 26 (avg $377.27, +3.16%),
+  MU 7 (avg $982.90, **+22.36%**), ORCL 38 (avg $177.28, **−10.10%**), QQQ 28 (avg $647.96,
+  +11.64%), SPY 35 (avg $708.81, +3.93%).
 - **Open orders:** none.
-- **Account:** equity $105,957.17, cash $15,518.15, buying power $315,301.85.
+- **Account:** equity $107,169.58, cash $15,518.15, buying power $318,696.60.
 - **Regime:** bull, conf 0.71, ADX 21.04.
 - **Code changes:** none. **Manual changes:** none. **Strategy changes:** none.
 
@@ -168,9 +171,9 @@ reaches the live broker cleanly). Operator action still required — Open issue 
    **Fix:** (a) repoint the task / daily_prompt to `.venv/bin/python3`; (b) pip-install
    requirements into 3.14; or (c) recreate `.venv` + activate in the task. Persisting.
 
-2. **News pipeline — 6/22 Monday run was MISSED; 6/23 recovered (incl. an after-hours
-   refresh).** Worth a health-check / alert on news-agent run failure so a missed brief is
-   visible.
+2. **News pipeline — 6/24 brief PRESENT and on-date** (header `2026-06-24`, reflects the MU
+   print). 6/22 Monday was MISSED earlier in the week; worth a health-check / alert on
+   news-agent run failure so a missed brief is visible.
 
 3. **`_load_news_brief()` staleness-guard gap.** Parses `date_in_file` but never compares
    to today, so a stale brief is fed to strategies as live signal. Bit in practice 6/22.
@@ -179,9 +182,9 @@ reaches the live broker cleanly). Operator action still required — Open issue 
 4. **SPCX is a PROVISIONAL, execution-quarantined claim — Saturday research owns
    validation, deadline 2026-07-04.** Claimed by equity_trend_following_ema_cross for
    coverage only; does NOT trade. Research must backtest once SPCX has ≥60 bars and either
-   validate (Sharpe ≥ 0.5 → trading claim) or escalate. Drawdown now ~−30% from high; $20B
-   debt raise + $6.3B Reflection deal are new data points. Likely also wants a vol-selling
-   options strategy activated as a candidate responder. Do NOT hand-promote.
+   validate (Sharpe ≥ 0.5 → trading claim) or escalate. New data points: $25B notes raise,
+   $6.3B Reflection deal, Nasdaq-100 add ~July 1. Likely also wants a vol-selling options
+   strategy activated as a candidate responder. Do NOT hand-promote.
 
 5. **`cli open-orders` parser bug stays provisionally closed** — clean JSON again under the
    venv. Confirm when there's a live open order.
@@ -189,17 +192,17 @@ reaches the live broker cleanly). Operator action still required — Open issue 
 6. **The 5 first-pass assignments (META/MSFT, ARM/INTC/MRVL, CSCO, HPE, DELL) + the 3
    provisional placeholders (CBRS/NUVL/TSM) on trend-following** — all still un-head-to-head'd.
    Sat research priority. **CBRS specifically should move to the earnings-window responder**
-   (it printed 6/23 AMC; trend-following has no handle on a binary print).
+   (it printed 6/23 AMC + slid 6/24; trend-following has no handle on a binary print).
 
-7. **MU Q3 FY26 print Wed 6/24 AMC (tomorrow).** Pre-print window open; position held +8.12%
-   (trailing stop did NOT fire across the +25%→+7.6%→+8.1% round-trip). Options price ~14%.
-   `equity_event_driven_catalyst` window logic + trailing stop govern. Tomorrow's run sits
-   around/after the print — watch the trailing stop and reconcile any rule-driven exit.
+7. **MU Q3 FY26 print is OUT — record blowout, position re-rated to +22.36%; trailing stop
+   did NOT fire.** event_driven_catalyst held (0 intents). Watch tomorrow for IV-crush /
+   AH-pop give-back as the scenario where the trailing stop could finally engage; reconcile
+   any rule-driven exit then. No discretionary action either way.
 
-8. **AI-capex financing / crowding is ACTIVELY unwinding** (KOSPI −10%, Wall St Day-2) on top
-   of higher-for-longer-with-a-hike-bias. The whole book is AI-cohort/rate-sensitive levered.
-   No rule pre-positions for rates/crowding (correct); watch for the de-rating reaching
-   trend/momentum rules as realized price rolls over.
+8. **AI-capex financing / crowding overlay — de-rating RECOVERED** (risk-on rebound, MU
+   blowout reaffirmed demand, Russell 2000 record). Whole book still AI-cohort/rate-sensitive
+   levered; no rule pre-positions (correct). Watch for any renewed roll-over reaching
+   trend/momentum rules as realized price.
 
 ## Git-sync status
 
