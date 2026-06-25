@@ -1,194 +1,186 @@
-# News brief for 2026-06-24 (after-hours / 3:30 PM PT)
+# News brief for 2026-06-25 (post-close / 3:30 PM PT)
 
 ## Headline assessment
 
-**NOTABLE.** This is the post-close 3:30 PM PT run, leading the 4:00 PM PT trader run.
-**The marquee event landed: MU's Q3 FY26 print is OUT (AMC) and it is a record
-blowout** — revenue $41.46B, non-GAAP EPS **$25.11** vs ~$20.20 est (+24%), and a
-**Q4 guide of ~$50.0B ±$1.0B revenue at ~86% gross margin** (EPS ~$31), far above
-Street; stock **+12–15% after-hours. MU is a held long.** Two more events on held
-names: **AVGO** — Broadcom and OpenAI unveiled **"Jalapeño,"** OpenAI's first custom
-inference chip (built by Broadcom), and **GOOGL** was confirmed as the Dow's newest
-member (effective Mon 6/29) and launched Gemini 3.5 Flash "Computer Use." Around them,
-**the two-day AI/semis de-rating recovered** (risk-on rebound; Russell 2000 at a
-record) and **oil fell below $70** on US-Iran de-escalation.
+**NOTABLE.** Post-close 3:30 PM PT run, leading the 4:00 PM PT trader run. **The day's
+twist: MU's record-blowout gap-up HELD in the cash session (+15%), but the same memory
+shortage that powered MU became a cost shock for hardware makers** — **AAPL fell 6.1%
+(the single heaviest weight on the S&P 500) after raising Mac/iPad prices 15–20%** (CEO
+Cook: a "Hundred-Year Flood"), and **MSFT fell 3.2%** (52-week low, also raising Xbox
+prices), **dragging the Nasdaq down a 4th straight day**. The Dow rose modestly on a
+rotation into value (healthcare/financials/industrials; CAT +5.8%, UNH +2.7%). Macro
+added a hot **May PCE** (core **3.4%**, highest since Oct 2023; headline 4.1%) reinforcing
+higher-for-longer, while **oil extended below $70** (4th down session) on US-Iran
+de-escalation. Two universe promotions today: **QCOM** (Investor Day data-center pivot,
+Meta anchor customer — Tier-B #5) and **SNDK** (memory supercycle, Tier-A session 3).
 
-**NOT HALT-WORTHY:** none of the manual's three triggers fire in a way that argues for
-skipping execute. (1) No FOMC on the next cash session (the June 17 decision is in
-prices). (2) The held-name catalyst that landed overnight — **MU's print — RESOLVED
-FAVORABLY** (a blowout beat + raise on a long we already hold). The halt-worthy lever
-exists so the trader can *skip execute to avoid trading into an adverse surprise*;
-here the binary resolved to the upside, with the result now fully known, so there is
-nothing to halt for — the trader should let the event-driven strategy process the
-post-print window with full information. (3) The >2% move earlier in the week was a
-tech de-rating (realized price the rules already see), now **recovering**, not a
-geopolitical shock — today's actual geopolitics (Iran de-escalation, oil < $70) is
-risk-positive. **Observe; don't override.** A do-nothing `execute` remains the likely
-outcome unless a rule fires on realized price — but **MU's post-print reconciliation
-is the one thing the trader must actively check** (trailing stop on a now-deeply-ITM
-position; any event-driven window action).
+**NOT HALT-WORTHY:** none of the manual's three triggers fire. (1) No FOMC on the next
+cash session (June 17 decision is in prices; PCE is a scheduled print the tape already
+digested — S&P closed flat). (2) The held-name binary that landed overnight — **MU's
+print — RESOLVED FAVORABLY** (a blowout beat+raise on a long we already hold); there is
+nothing to halt for. **AAPL's −6.1% is realized price on a cost narrative, not an AAPL
+guidance cut or a >5σ overnight surprise** — the trend rule already sees the move. (3)
+Geopolitics (oil < $70, Iran de-escalation) is risk-positive, no futures dislocation.
+**Observe; don't override.** A do-nothing `execute` remains the likely outcome unless a
+rule fires on realized price.
 
 ## Watchlist + positions
 
-(Held longs per the 6/23 trader handoff: **AAPL 72, AVGO 26, MU 7, ORCL 38, QQQ 28,
-SPY 35**; book equity ~$106.0K. Active set 7 strategies; universe **23, 23/23 claimed,
-unclaimed_count == 0**, `provisional_count: 1`. SPCX remains the lone **PROVISIONAL,
-execution-quarantined** claim on equity_trend_following_ema_cross — revalidate_by
-**2026-07-04**. `gap-registry coverage_holes` confirmed **empty** again this run.)
+(Held longs per the 6/24 trader handoff: **AAPL 72, AVGO 26, MU 7, ORCL 38, QQQ 28,
+SPY 35**; book equity ~$107.2K. Active set 7 strategies. **Universe is now 25** after
+today's QCOM + SNDK promotions — **23 of the prior 23 remain claimed; QCOM and SNDK are
+UNCLAIMED** and feed the trader's P0 triage / Saturday research. SPCX remains the lone
+**PROVISIONAL, execution-quarantined** claim on equity_trend_following_ema_cross
+— revalidate_by **2026-07-04**. `gap-registry coverage_holes` confirmed **empty** again
+this run.)
 
-- **MU — EVENT (Q3 FY26 print OUT; record blowout + big raise; +12–15% AH; held long).**
-  Revenue **$41.46B (record)**, non-GAAP EPS **$25.11** vs ~$20.20 (+24%); GAAP net
-  income $28.24B. **Q4 FY26 guide ~$50.0B ±$1B revenue, GM ~86%, non-GAAP EPS ~$31** —
-  far above Street, driven by sold-out HBM and AI-memory demand. CEO expected to detail
-  the Anthropic strategic deal on the call. The pre-print ~14% implied move and PUT
-  hedging were overwhelmed by the upside. **Held position (7 @ $982.90, was +8.12% at
-  ~$1,063 on 6/23); a +12–15% AH pop puts it sharply further in the money.**
+- **MU — EVENT (Q3 record blowout; Day-1 cash reaction HELD, +15%; held long).** The
+  marquee print reconciled to the upside: rev **$41.46B** (~+346% YoY; vs ~$36B est),
+  non-GAAP EPS $25.11, Q4 guide ~$50B; CEO Mehrotra sees the AI-memory shortage with no
+  "line of sight" to supply catching up, tight beyond 2027, improving only gradually in
+  2028; ~$100B forward customer contracts; FY26 capex $27B with 100% excess-cash return.
+  **The gap-up held the full cash session — no give-back, no IV-driven fade.** Held
+  position re-rated further into the money (was +22.36% on the 6/24 close).
   - gap_type: earnings_window
-  - responder: equity_event_driven_catalyst (claims MU — a TRUE responder match). Held,
-    so the entry guard skips; the post-print window posture + trailing stop govern.
-    **The trader must reconcile any rule-driven exit and confirm the trailing-stop level
-    against the post-print mark.** No discretionary action.
+  - responder: equity_event_driven_catalyst (claims MU — TRUE responder). Held → entry
+    guard skips; the post-print window posture + trailing stop govern. **Reconcile: the
+    gap-up held, so the trailing-stop-engages-on-give-back scenario did NOT trigger
+    today; confirm the trailing-stop level updated against the post-print mark and log
+    any rule-driven trim.** No discretionary action on the good news.
 
-- **AVGO — EVENT (custom-silicon win; held long).** Broadcom and OpenAI unveiled
-  **"Jalapeño,"** OpenAI's first custom Intelligence Processor, built by Broadcom —
-  design-to-tape-out in ~9 months, initial deployment end-2026, ramping 2027–28 at
-  gigawatt scale. AVGO shares rose. A material product/partnership win on a held name.
+- **AAPL — EVENT (input-cost / margin shock; held long, −6.1%).** Apple **raised Mac and
+  iPad prices 15–20%**, confirming AI-driven memory/storage shortages are squeezing
+  hardware costs; CEO Cook called the memory-price spike a "Hundred-Year Flood." The
+  stock was the **single heaviest weight on the S&P 500** on the day. This is the bear
+  side of MU's bull story — the memory supercycle as a device-maker cost headwind.
   - gap_type: event_catalyst
-  - responder: equity_event_driven_catalyst (claims AVGO) — **but the strategy models
-    earnings windows, not product/partnership deals**, so there is no true algorithmic
-    handle on *this* event type. Partial gap (claimed, unmodeled; see Library gaps). The
-    win reaches the position only as realized price. No action.
+  - responder: NONE — library gap. AAPL is claimed by equity_trend_following_ema_cross
+    (price-driven); no active rule reads an input-cost / margin-compression event. The
+    move reaches the held position only as realized price. **(Notable: a held-name event
+    that's a NEGATIVE, unlike MU/AVGO — but still no algorithmic handle beyond price.)**
 
-- **GOOGL — EVENT (index membership / forced flow + product; price-claimed).** S&P DJI
-  confirmed **Alphabet joins the DJIA effective pre-open Mon 6/29** (replacing VZ); DIA
-  and Dow-tracking funds rebalance into GOOGL, and the stock rose on the news. Also
-  launched **Gemini 3.5 Flash "Computer Use,"** and Reddit may charge Google/OpenAI more
-  for training data.
-  - gap_type: event_catalyst (index-rebalance/forced-flow + product launch)
-  - responder: NONE — library gap. GOOGL is claimed by equity_trend_following_ema_cross
-    (price-driven); no active rule reads an index-rebalance schedule or a product event.
+- **AVGO — no fresh single-name catalyst (held long).** Jalapeño/OpenAI custom-silicon
+  follow-through has quieted; only thematic/portfolio-tracker mentions today. Carry: the
+  product/partnership win remains claimed-but-unmodeled by event-driven (partial gap).
+  - gap_type: event_catalyst — responder: equity_event_driven_catalyst (claimed, the
+    *prior* event unmodeled; nothing new today). No action.
 
-- **ORCL — EVENT (restructuring digestion; held long).** Oracle fell again Wednesday as
-  investors digest the **~21,000-job (~13%) workforce cut** tied to AI build-out/
-  adoption (cited by Sen. Warren). On track for its worst month since 2001 despite a
-  record AI backlog. The book's only red.
+- **ORCL — EVENT (restructuring digestion continues; held long).** No fresh ORCL-specific
+  catalyst; the ~21,000-job cut still weighs and ORCL stays the book's only red.
   - gap_type: event_catalyst
-  - responder: equity_event_driven_catalyst (claims ORCL) — **but models earnings
-    windows, not workforce-reduction disclosures**; no true handle on this event type.
-    Soft/partial gap. Position held; no rule fired; no action.
+  - responder: equity_event_driven_catalyst (claims ORCL) — models earnings windows, not
+    workforce-reduction; soft/partial gap. No rule fired; held; no action.
 
-- **CBRS — EVENT (debut-print Day-1 follow-through; −8% AH on 6/23, slid further today).**
-  After its first public quarter (rev $193.4M +94% beat, FY26 core-rev guide $855–865M,
-  OpenAI 750MW/$20B + AWS deals, −8% AH on a gross-margin guide-down), shares fell again
-  Wednesday. Needham reiterated Buy; analysts raised forecasts. CEO: data-center
-  capacity, not chips/demand, is the AI bottleneck.
+- **JPM — EVENT (capital allocation; universe, price-claimed).** JPMorgan authorized a
+  **$50B buyback (effective Jul 1)** and intends to **raise the dividend to $1.65 (+10%)**
+  after clearing the Fed stress test; the stock hit an all-time high.
+  - gap_type: event_catalyst
+  - responder: NONE — library gap. JPM is claimed by equity_trend_following_ema_cross
+    (price-driven); no active rule reads a buyback/dividend authorization. Realized price
+    only.
+
+- **INTC — EVENT (sell-side initiation; universe, price-claimed).** Goldman Sachs
+  **initiated coverage at Neutral, $150 PT**, citing server-CPU + foundry tailwinds but
+  "balanced" risk/reward (prefers NVDA/AVGO/AMD). The premarket MU-sympathy pop faded to
+  a red close.
+  - gap_type: event_catalyst
+  - responder: NONE — library gap. INTC is claimed by equity_breakout_volume_confirmation
+    (price-driven); a single-bank initiation is not a 3-bank cluster and has no responder.
+
+- **CBRS — EVENT (Day-2 follow-through; universe, record two-session loss).** Cerebras
+  fell again (~$172 vs $182 prior close), on track for a **record two-session loss** after
+  its disappointing annual sales / lower-margin guide (renting back data-center capacity
+  in its AI-cloud shift).
   - gap_type: earnings_window
   - responder: NONE — library gap (assignment). CBRS is claimed by
     equity_trend_following_ema_cross (price-driven); the earnings-window responder
-    (equity_event_driven_catalyst) does NOT claim CBRS. The move reaches trend-following
-    only as realized price.
+    (equity_event_driven_catalyst) does NOT claim CBRS. Realized price only.
 
-- **TSLA — EVENT (partnership + regulatory overhang; price-claimed).** Tesla, Sunrun and
-  Renew Home announced a **16-GW clean-energy pact** (home batteries/solar/smart devices)
-  to power AI data centers + utilities. NHTSA FSD probe (fatal Texas crash) carries
-  forward.
+- **TSLA — EVENT (regulatory/legal escalation; universe, price-claimed).** The **NTSB
+  opened a probe** and the victim's family **filed a wrongful-death lawsuit** over the
+  fatal Texas FSD crash, escalating the existing NHTSA overhang. (Optimus-as-memory-
+  customer is a thematic read-through, not a TSLA event.)
   - gap_type: event_catalyst
   - responder: NONE — library gap. TSLA is claimed by equity_trend_following_ema_cross
-    (price-driven); no active rule reads a partnership/regulatory event.
+    (price-driven); no active rule reads a regulatory/legal event.
 
-- **AMZN — EVENT (partnership; price-claimed).** **Nokia expanded its AWS collaboration**
-  to run its Autonomous Networks Fabric on AWS (Level-4 autonomy). Separately, JPM's
-  Cembalest called Anthropic's Amazon-Trainium pact the "strongest third-party"
-  endorsement of non-NVDA AI silicon (read-through positive for AWS custom chips).
-  - gap_type: event_catalyst
-  - responder: NONE — library gap. AMZN is claimed by equity_trend_following_ema_cross
-    (price-driven); no active rule reads a cloud-partnership event.
-
-- **META — EVENT (policy; price-claimed).** The Trump administration is reportedly
-  pressing Meta to submit frontier AI models for voluntary federal testing. Low
-  fundamental weight; logged for completeness.
+- **META — EVENT (policy; price-claimed).** Zuckerberg (and Alphabet's Pichai) reportedly
+  spared a child-safety Senate hearing as the White House intervened; AI-model-review
+  standoff + surging capex in focus. Low fundamental weight.
   - gap_type: event_catalyst
   - responder: NONE — library gap. META is claimed by equity_momentum_macd_histogram
     (price-driven); no active rule reads a policy event.
 
-- **No fresh single-name news** (tape / theme / screen mentions only): **AAPL, ARM,
-  CSCO, DELL, HPE, INTC, JPM, MRVL, NVDA, NUVL, QQQ, SPY, TSM.** INTC rose ~3% on a
-  technical signal (+ a month-old Pelosi call-option disclosure) — flow/price, no fresh
-  corporate catalyst; foundry-turnaround thread carries. NVDA traded on the
-  Trainium/SK-Hynix narrative (analyst framing, not an NVDA event). CSCO/DELL/HPE had 0–1
-  items.
+- **SPCX — EVENT (capital-markets/sentiment; PROVISIONAL / execution-quarantined).** The
+  $25B notes raise drew an Allianz "bubble / $70B of funny money" warning and FOMO-trap
+  commentary; "SpaceX MSTR" +393% framing. Carry: $6.3B Reflection deal, Nasdaq-100 add
+  ~July 1.
+  - gap_type: volatility_regime
+  - responder: equity_trend_following_ema_cross (PROVISIONAL/UNVALIDATED, execution-
+    quarantined; Saturday research revalidates by 2026-07-04). Will NOT trade.
 
-- **SPCX — EVENT (capital allocation; PROVISIONAL / execution-quarantined).** SpaceX
-  **raised $25B in unsecured notes** weeks after its $86B IPO; a "battleground" stock
-  with analysts split on valuation. Carry: $6.3B Reflection deal, Cathie Wood buying,
-  Nasdaq-100 add ~July 1.
-  - gap_type: volatility_regime (hyper-IV new listing; no price/earnings history)
-  - responder: equity_trend_following_ema_cross (PROVISIONAL/UNVALIDATED,
-    execution-quarantined; Saturday research revalidates by 2026-07-04). Will NOT trade.
+- **No fresh single-name news** (tape / theme / sympathy only): **AMZN** (Nokia/AWS
+  read-through, Zoox-vs-Tesla framing), **ARM, CSCO, DELL** (fell Thursday, no catalyst),
+  **HPE, MRVL** (memory-cohort sympathy), **MSFT** (52-week low + Xbox price hike — same
+  memory-cost theme as AAPL, price-driven), **NVDA** (MU read-through, no NVDA event),
+  **NUVL, TSM** (MU sympathy +4%), **QQQ, SPY** (index).
 
 ## Sector themes
 
-- **AI-memory supercycle validated by MU's print.** Record revenue + a ~86% gross-margin
-  Q4 guide reaffirmed the HBM/DRAM cycle; the read rippled to **SanDisk (SNDK), Western
-  Digital (WDC), Seagate (STX)** in sympathy. Counter-signal: **SK Hynix targeting a
-  ~$29.4B Nasdaq ADR listing** — incremental supply and a competing memory pure-play.
-- **Custom-silicon arms race accelerates.** Two fresh data points that hyperscalers and
-  model labs are diversifying off merchant GPUs: **OpenAI/Broadcom "Jalapeño"** (AVGO
-  beneficiary) and **Anthropic/AWS Trainium** (framed as the strongest GPU-alternative
-  endorsement yet). An AVGO/AMZN tailwind and a standing NVDA-moat question.
-- **AI-capex / FCF debate.** Chamath argued hyperscaler free-cash-flow declines
-  (GOOGL/META/MSFT) are moat-building, not cash burn — a counter to the "crowded-trade"
-  de-rating narrative that drove Mon–Tue.
-- **Energy / macro: oil below $70 on Iran de-escalation.** A 60-day roadmap to a US-Iran
-  deal + Hormuz reopening pushed crude ~40% off its wartime peak — disinflationary;
-  cruise lines/transports rallied. Risk-positive.
-- **Rotation / vol:** risk-on rebound from the two-day chip de-rating; Russell 2000 at a
-  record; **VIX crossed above 18 (~19.5) during the de-rating** — the first >3pt move in
-  this run, though it likely eased on Wednesday's bounce.
+- **AI-memory supercycle — hard-validated by MU, now a two-sided story.** MU's record
+  print + Q4 ~$50B guide rippled to the NAND/DRAM cohort (**WDC +13%, STX, SNDK +16%**);
+  Defiance launched a 2x DRAM ETF (DRAL). **The same shortage is a device-maker cost
+  headwind** — AAPL (+15–20% Mac/iPad), MSFT (Xbox) raising consumer-hardware prices. Bull
+  (memory makers) and bear (device makers) of one story on the same tape.
+- **Compute / custom-silicon race widens — QCOM enters.** Qualcomm's Investor Day pivot
+  ($15B data-center revenue by FY29; Dragonfly C1000 CPU; **Meta as anchor customer**,
+  2028 production; $40B FY29 non-handset target) adds another merchant-GPU alternative
+  alongside AVGO/OpenAI (Jalapeño) and AWS/Trainium. QCOM +7.4%.
+- **Bank capital returns unlocked post-stress-test.** JPMorgan ($50B buyback + 10%
+  dividend) and Goldman (dividend raise) led financials; a Dow-rotation tailwind.
+- **Macro rotation: value over growth on a hot-inflation day.** Hot PCE + Mag-7
+  memory-cost weakness drove a rotation into healthcare/financials/industrials (CAT, UNH);
+  Nasdaq down a 4th day while the Dow rose.
+- **Energy: oil < $70 (4th down session).** Mideast risk premium nearly unwound on
+  US-Iran de-escalation + Hormuz reopening + US waiver. Disinflationary, risk-positive.
 
 ## Candidates for the universe
 
-**0 promotions this run. Universe stays at 23.** No automated trigger fired.
+**2 promotions this run (both technology). Universe → 25.**
 
-- **Tier A (3-session recurrence):** **SNDK (SanDisk)** recurs again — it rallied in
-  sympathy with MU's blowout (memory/NAND supercycle, "next AI trade") — but as a
-  *theme / coattail move*, not a confirmed single-name catalyst, and its
-  3-consecutive-session chain is **still being rebuilt** after the skipped Monday 6/22
-  (this is ~session 2 of the rebuild, not yet 3). **CRDO (Credo)** recurs thematically
-  (AI interconnect). Neither advances.
-- **Tier B (single-event triggers, 5 categories, 2/day cap):**
-  - **#1 M&A target:** none tradeable/new.
-  - **#2 FDA binary:** none (TG Therapeutics had a clinical-update move, not an
-    approval/rejection).
-  - **#3 beat + raise + +5%:** **no qualifying NEW symbol.** KB Home beat (+16%) but is a
-    homebuilder off-character for this tech universe and the raise wasn't confirmed; PAYX
-    beat without a confirmed +5%/raise. MU and CBRS are already in-universe.
-  - **#4 sell-side initiation cluster (3+ banks/week):** none.
-  - **#5 Tier-1 customer win:** the OpenAI/Broadcom "Jalapeño" win is on **AVGO, already
-    in-universe**; SK Hynix is not yet listed. No NEW symbol qualifies.
-- **Watches for the operator / Saturday research (NOT promoted):** **SNDK** (strongest
-  recurring; promote on a confirmed own beat+raise+5% or a named contract — not on MU
-  coattails), **CRDO** (AI interconnect), **WDC / STX** (memory cohort, rode MU today —
-  flow/sympathy, not own catalysts), and the standing **WOLF / SMCI / QCOM**
-  flow-recurrence names (flow does not refresh the catalyst clock).
+- **QCOM (PROMOTED — Tier-B #5, Tier-1 customer win).** Qualcomm's Investor Day named
+  **Meta as anchor customer for the Dragonfly C1000 data-center CPU** (2028 production)
+  and roughly doubled its FY2029 non-handset target to $40B (incl. $15B data-center);
+  stock +7.4%. A named-hyperscaler anchor commit, verifiable (CNBC/Bloomberg/ServeTheHome)
+  → meets Tier-B #5. Now in-universe and **UNCLAIMED** — trader P0 triage / Saturday
+  research owns the strategy claim.
+- **SNDK (PROMOTED — Tier-A, 3-session recurrence).** SanDisk recurred a 3rd consecutive
+  session in the memory cohort, now **hard-validated by MU's record print** (SNDK +16% on
+  the day, ~600% YTD, Defiance DRAM-ETF launch, sustained sell-side cohort framing). Per
+  the 2026-06-04 "act, don't defer" discipline, promoted at session 3. Now in-universe and
+  **UNCLAIMED**.
+- **Still watches (NOT promoted):** **WDC / STX** (memory cohort, rode MU — flow/sympathy,
+  not own catalysts; WDC +13%), **CRDO** (AI interconnect, thematic), and the standing
+  **WOLF / SMCI** flow-recurrence names (flow does not refresh the catalyst clock).
 
 ## Macro / sector context
 
-- **MU's blowout is the day's dominant macro signal for the AI cohort** — a hard
-  fundamental data point (record rev, ~86% GM guide) that cuts against the
-  "most-crowded-trade unwind" thesis of Mon–Tue. Memory demand is intact.
-- **Fed bank stress-test results released Wednesday; June 17 FOMC in prices.** No FOMC
-  this session; higher-for-longer with a hike-biased dot-plot (first meeting under Chair
-  Warsh) is the standing rate backdrop for the rate-sensitive AI cohort. Citadel's
-  Sept-hike call aligns with the dots.
-- **Oil < $70 (toward $72), lowest since late February**, on Strait-of-Hormuz reopening +
-  a 60-day US-Iran roadmap; the US waiver for Iranian crude is in force. Disinflationary,
-  risk-positive — not a shock.
-- **GOOGL → DJIA effective 6/29** (replacing VZ) — scheduled index-membership change /
-  forced flow.
-- **VIX ~19.5** — crossed above 18 on the de-rating (up from ~17.3 a week ago), the first
-  >3pt move in this run; likely eased on Wednesday's rebound. No confirmed term-structure
-  inversion.
+- **May PCE printed HOT (released 6/25): core PCE 3.4% YoY** (highest since Oct 2023),
+  +0.3% m/m; headline 4.1% (highest since Apr 2023), +0.4% m/m; energy +3.9% m/m. Above
+  the Fed's 2% target; reinforces higher-for-longer. Economists still expect May to mark
+  the 2026 inflation peak, with slowing from July as gasoline falls. **No FOMC this
+  session.**
+- **Fed bank stress-test results (6/24) cleared large-bank capital returns** → JPMorgan
+  $50B buyback + dividend, Goldman dividend raise.
+- **Oil < $70 (WTI ~$70.7 / Brent ~$73.4), 4th consecutive down session**, lowest since
+  late February, on US-Iran de-escalation, Strait-of-Hormuz reopening, and the US waiver
+  for already-loaded Iranian crude. Disinflationary, risk-positive — not a shock.
+- **GOOGL → DJIA effective pre-open Mon 6/29** (replacing VZ) — scheduled index-membership
+  change / forced flow; Dow funds rebalance into GOOGL. (GOOGL traded lower today; Google
+  Finance exited beta with portfolios/AI tools.)
+- **VIX ~18.6 (−5% on the day)** — eased back toward 18 after the early-week de-rating;
+  term structure in normal contango, no inversion. Dispersion is single-name (MU IV crush;
+  AAPL/CBRS realized), not systemic.
 
 ## Library gaps
 
@@ -197,83 +189,82 @@ Saturday research. `gap-registry coverage_holes` is **empty**; these are
 **activation/assignment** gaps (responder exists but isn't active / claims no universe
 symbol) plus **taxonomy** gaps (NEW_CATEGORY_NEEDED).
 
-- **Earnings-window assignment on CBRS — realized, now Day-1 follow-through.** CBRS
-  printed 6/23 AMC (−8% AH) and slid again 6/24, with no algorithmic handle: claimed by
-  trend-following (price-driven); the earnings-window responder
+- **NEW — Input-cost / margin-compression event on a held name (AAPL price hikes).** A
+  held long fell 6.1% on a genuine corporate event (15–20% Mac/iPad price hikes driven by
+  memory-cost inflation), but AAPL is claimed only by price-driven trend-following — no
+  rule reads a cost/margin-shock disclosure. **First held-name NEGATIVE event of the
+  recent run with no responder.** **Suggested research:** whether an event-window overlay
+  should co-claim AAPL (and peers) for cost-input / margin-guidance events.
+  gap_type: event_catalyst — responder: NONE.
+- **NEW — Capital-allocation event (JPM $50B buyback + dividend).** No active rule reads a
+  buyback/dividend authorization; JPM is price-claimed. **Suggested research:** a
+  capital-allocation sub-trigger or event-window overlay for buyback/dividend
+  announcements. gap_type: event_catalyst — responder: NONE.
+- **Earnings-window assignment on CBRS — Day-2 realized (record two-session loss).** CBRS
+  is claimed by trend-following (price-driven); the earnings-window responder
   (equity_event_driven_catalyst) does NOT claim it. **Suggested research:** head-to-head
   CBRS vs equity_event_driven_catalyst; assign to the event-driven responder.
   gap_type: earnings_window — responder: NONE (assignment).
-- **Product/partnership sub-trigger on event-driven covered names — AVGO Jalapeño.**
-  AVGO *is* claimed by equity_event_driven_catalyst, but the strategy models earnings
-  windows, not product/partnership-deal events, so a material custom-silicon win has no
-  handle even on a covered held name (same shape as ORCL restructuring). **Suggested
-  research:** decide whether a product/partnership/restructuring sub-trigger belongs in
-  the event-driven strategy. gap_type: event_catalyst — responder: partial (claimed,
-  unmodeled).
-- **Index-rebalance / forced-flow window — TWO live instances.** GOOGL joins the DJIA
-  6/29 (forced buy by Dow funds); SPCX → Nasdaq-100 ~July 1; held QQQ. No active rule
-  reads a known index-rebalance schedule as a flow event. **Suggested research:** an
-  index-rebalance/forced-flow overlay (anticipated add/drop dates + estimated flow) as a
-  soft posture signal. NB carry-forward operator Q: should index-inclusion become a 6th
-  Tier-B promotion trigger? gap_type: event_catalyst — responder: NONE.
-- **Event-window coverage on price-claimed names (GOOGL index/product; TSLA Sunrun pact +
-  NHTSA probe; AMZN Nokia/AWS; META federal-testing pressure).** `event_catalyst` is
-  declared only by equity_event_driven_catalyst, which claims AVGO/MU/ORCL — not these
-  names. Partnership, regulatory, product and policy events on price-claimed large caps
-  have no algorithmic responder. **Suggested research:** broaden
-  equity_event_driven_catalyst's claim set, or add a lightweight event-window overlay
-  that co-claims alongside the price strategy. gap_type: event_catalyst — responder: NONE.
-- **Restructuring / workforce-reduction events (ORCL 21k cuts).** Claimed by
-  equity_event_driven_catalyst but unmodeled — no handle on this event type even on a
-  covered name. gap_type: event_catalyst — responder: partial (claimed, unmodeled).
-- **Macro-event window (Fed higher-for-longer / hawkish dots; oil/Iran macro).** No
-  canonical gap_type covers a scheduled macro print/regime; no rule lets the trader
-  pre-position around FOMC/CPI/jobs (correct under the mandate — but the soft-signal
-  handle is missing). **Suggested research:** a `macro_event_window` category.
+- **Sell-side initiation event (INTC Goldman Neutral $150).** Single-bank initiation, no
+  responder (and below the Tier-B 3-bank cluster threshold). gap_type: event_catalyst —
+  responder: NONE.
+- **Product/partnership sub-trigger on event-driven covered names — AVGO Jalapeño
+  (carry).** AVGO is claimed by equity_event_driven_catalyst but the strategy models
+  earnings windows, not product/partnership deals. gap_type: event_catalyst — responder:
+  partial (claimed, unmodeled).
+- **Restructuring / workforce-reduction events (ORCL 21k cuts, carry).** Claimed by
+  event-driven but unmodeled. gap_type: event_catalyst — responder: partial.
+- **Index-rebalance / forced-flow window — TWO live instances (carry).** GOOGL → DJIA 6/29
+  (forced buy); SPCX → Nasdaq-100 ~July 1; held QQQ. No active rule reads an index-
+  rebalance schedule. **Suggested research:** an index-rebalance/forced-flow overlay. NB
+  carry-forward operator Q: should index-inclusion become a 6th Tier-B trigger?
+  gap_type: event_catalyst — responder: NONE.
+- **Event-window coverage on price-claimed names (TSLA NTSB probe + wrongful-death suit;
+  META federal-testing pressure; AMZN cloud reads).** `event_catalyst` is declared only by
+  equity_event_driven_catalyst, which claims AVGO/MU/ORCL — not these names. **Suggested
+  research:** broaden the event-driven claim set or add a lightweight event-window overlay.
+  gap_type: event_catalyst — responder: NONE.
+- **Macro-event window (hot PCE / higher-for-longer; oil/Iran macro).** No canonical
+  gap_type covers a scheduled macro print/regime; no rule lets the trader pre-position
+  around PCE/FOMC/jobs (correct under the mandate — but the soft-signal handle is missing).
   gap_type: NEW_CATEGORY_NEEDED — responder: NONE.
-- **AI-capex financing / crowding overlay — now RECOVERING.** The two-day "most-crowded-
-  trade" unwind reversed Wednesday (risk-on rebound; MU blowout reaffirmed demand). The
-  crowding/leverage overlay still has no rule, but the acute de-rating has paused.
-  gap_type: NEW_CATEGORY_NEEDED — responder: NONE.
-- **Vol-regime activation.** Registry hole CLOSED (volatility_regime declared by
-  iron_condor_high_iv, calendar_spread, jade_lizard, long_straddle_earnings), but none
-  are active and none claim a universe symbol — so no active strategy reads the VIX
-  regime (now > 18), MU's post-print IV crush, CBRS's first-print vol, or SPCX's hyper-IV.
-  **Suggested research:** activate one vol strategy and give it a universe claim (MU
-  pre-print was the textbook long-straddle setup; post-print IV crush is the iron-condor/
-  short-vol setup). gap_type: volatility_regime — responder: NONE (active); activation
-  pending.
-- **M&A-arb (NUVL/GSK).** `pairs_arbitrage` declared by
-  equity_pairs_trading_cointegration (not active); NUVL claimed by trend-following
-  (price-driven). Activation gap re-affirmed. gap_type: pairs_arbitrage — responder:
-  NONE (active).
+- **Vol-regime activation (MU post-print IV crush = short-vol setup).** volatility_regime
+  is declared (iron_condor_high_iv, calendar_spread, jade_lizard, long_straddle_earnings)
+  but none are active and none claim a universe symbol — so no active strategy reads the
+  VIX regime, MU's IV crush, CBRS's first-print vol, or SPCX's hyper-IV. **Suggested
+  research:** activate one vol strategy with a universe claim (MU post-print is the
+  textbook iron-condor / short-vol setup). gap_type: volatility_regime — responder: NONE
+  (active); activation pending.
+- **M&A-arb activation (NUVL/GSK, carry).** `pairs_arbitrage` declared by
+  equity_pairs_trading_cointegration (not active); NUVL claimed by trend-following.
+  gap_type: pairs_arbitrage — responder: NONE (active).
 
 ## Recommendations for the trader
 
-- **NOTABLE, not halt-worthy — standard workflow; let rules ride.** No HALT-WORTHY
-  trigger argues for skipping execute: no FOMC on the next session; the held-name
-  catalyst that landed (MU) **resolved FAVORABLY** (a blowout beat+raise on a long), so
-  there's nothing to halt for; the >2% move earlier in the week is recovering price
-  action, not a geopolitical shock. **Observe, don't override** — discretionary hedges
-  and discretionary profit-taking are both forbidden by the algorithmic-only mandate.
-- **MU (held) is THE reconciliation item.** The print is OUT and it's a record blowout
-  (+12–15% AH); the position is now sharply further in the money on top of a +8% base.
-  **Let equity_event_driven_catalyst's post-print window logic + the trailing stop
-  govern, and reconcile any rule-driven exit against the post-print mark.** Do not act
-  discretionarily on the good news — but DO confirm the trailing-stop level updated and
-  log any rule-driven trim/exit at the next `execute`.
-- **AVGO (held) — Jalapeño is a tailwind with no algorithmic handle.** The OpenAI/
-  Broadcom custom-silicon win reaches the position only as realized price; logged as a
-  product/partnership library gap (claimed-but-unmodeled). No action.
-- **ORCL (held) — 21k job cuts is a cost event, not a position action.** Held by the
-  event-driven strategy; the restructuring disclosure is a soft/partial library gap, not
-  a trade trigger. Book's only red; no rule fired.
-- **The AI/semis de-rating recovered — react to realized price, not the narrative.** If a
-  rule fires on a name (e.g., MU's gap-up reaching a trend/momentum rule, or a trailing
-  stop), execute; if none fires, the do-nothing is the correct, non-curve-fit outcome.
-- **SPCX stays execution-quarantined.** The $25B notes raise + Nasdaq-100 add (~July 1)
-  are research signal, not a trader action; validation owned by Saturday research
-  (revalidate_by 2026-07-04).
-- **`cli execute` should run as scheduled.** Standard post-close run; the
-  algorithmic-only mandate governs. The one active task is the MU post-print
-  reconciliation above.
+- **NOTABLE, not halt-worthy — standard workflow; let rules ride.** No HALT-WORTHY trigger
+  argues for skipping execute: no FOMC; MU (held) **resolved FAVORABLY**; AAPL's −6.1% is
+  realized price on a cost narrative (not a guidance cut); oil/Iran is risk-positive.
+  **Observe, don't override** — discretionary hedges and discretionary profit-taking are
+  both forbidden by the algorithmic-only mandate.
+- **MU (held) — the gap-up HELD; reconcile, don't act.** The print is out and the +15%
+  cash-session move did not fade. Let equity_event_driven_catalyst's post-print window +
+  the trailing stop govern; confirm the trailing-stop level updated against the post-print
+  mark and log any rule-driven trim/exit at `execute`. No discretionary action on the good
+  news.
+- **AAPL (held) — a −6.1% cost-event day with no algorithmic handle.** The 15–20% Mac/iPad
+  price hike is a fundamental margin signal, but it reaches the position only as realized
+  price (logged as a NEW held-name input-cost library gap). If AAPL's drop reaches a
+  trend/momentum rule, execute; otherwise no action. Do not discretionarily hedge.
+- **P0 triage — TWO new unclaimed symbols (QCOM, SNDK).** Both were promoted by the news
+  agent today and are **UNCLAIMED**. Per the mandatory-attach doctrine, run
+  `triage-symbol QCOM --gap-type event_catalyst` and `triage-symbol SNDK --gap-type
+  trending` (memory-cohort momentum) to restore `unclaimed_count == 0` (provisional/
+  quarantined is acceptable if backtests can't rank). News agent cannot attach strategies.
+- **JPM / INTC / TSLA / CBRS — events with no responder; react to realized price only.**
+  Buyback (JPM), Goldman init (INTC), NTSB probe (TSLA), Day-2 slide (CBRS) all reach the
+  book only as price; logged as library gaps for Saturday.
+- **SPCX stays execution-quarantined.** Bond-deal "bubble" commentary + Nasdaq-100 add
+  (~July 1) are research signal, not a trader action (revalidate_by 2026-07-04).
+- **`cli execute` should run as scheduled.** Standard post-close run; the algorithmic-only
+  mandate governs. The active tasks are the MU post-print reconciliation and the QCOM/SNDK
+  P0 triage above.
