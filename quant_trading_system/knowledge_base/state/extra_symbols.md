@@ -53,3 +53,9 @@ NUVL
 
 # Added 2026-06-16 (news, promote-candidate): Operator-directed 2026-06-16: SpaceX largest-IPO-ever (~$2T, listed 6/12); FAB-10 frontier cohort; Nasdaq-100 fast-entry inclusion ~July1 forces QQQ rebalance + historic options debut. Operator override of Tier-A/B discipline (an IPO is not a Tier-B trigger). Sector=industrials (aerospace; Starlink leg => could be communication_services).
 SPCX
+
+# Added 2026-06-25 (news, promote-candidate): Tier-B #5 Tier-1 customer win: Qualcomm Investor Day named Meta as anchor customer for Dragonfly C1000 data-center CPU (2028 production); raised FY2029 non-handset target to $40B incl $15B data-center; stock +7.4%
+QCOM
+
+# Added 2026-06-25 (news, promote-candidate): Tier-A 3-session recurrence: memory/NAND supercycle now hard-validated by MU record print; SNDK +16% in cohort (WDC/STX), ~600% YTD, Defiance DRAM ETF launch, sustained sell-side cohort framing
+SNDK

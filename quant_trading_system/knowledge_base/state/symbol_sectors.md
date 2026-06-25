@@ -75,3 +75,9 @@ NUVL: healthcare
 
 # Added 2026-06-16 (news, promote-candidate)
 SPCX: industrials
+
+# Added 2026-06-25 (news, promote-candidate)
+QCOM: technology
+
+# Added 2026-06-25 (news, promote-candidate)
+SNDK: technology
