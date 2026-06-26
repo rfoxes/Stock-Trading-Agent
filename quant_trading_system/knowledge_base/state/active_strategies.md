@@ -1,14 +1,5 @@
 ---
 strategies:
-- id: equity_momentum_macd_histogram
-  symbols:
-  - META
-  - MSFT
-  since: '2026-06-04'
-  reason: 'Operator directive 2026-06-04: every universe symbol must be claimed. Large-cap
-    momentum tech names match MACD-histogram strategy character (trending/momentum
-    regime). First-pass assignment without head-to-head per operator override; research
-    agent should validate.'
 - id: equity_breakout_volume_confirmation
   symbols:
   - ARM
@@ -36,17 +27,6 @@ strategies:
     \ RSI 87.56 per Thu news brief (historic AI-server rally, overbought) \u2014 RSI\
     \ divergence is the textbook setup for trend-exhaustion at extreme RSI. Research\
     \ agent should validate via head-to-head."
-- id: equity_event_driven_catalyst
-  symbols:
-  - AVGO
-  - MU
-  - ORCL
-  since: '2026-06-04'
-  reason: "Operator directive 2026-06-04: every universe symbol must be claimed. AVGO\
-    \ just printed Q2 (Wed AMC, -12.59% Day-1) and MU prints Q3 ~June 24. Event-driven\
-    \ catalyst is the on-character match for earnings-window names. First-pass without\
-    \ head-to-head per operator override. ORCL added 2026-06-09 per P0 zero-unclaimed\
-    \ rule \u2014 Wed AMC Q4 FY26 print is exactly the strategy's on-character event."
 - id: equity_sector_rotation_momentum
   symbols:
   - DELL
@@ -74,6 +54,35 @@ strategies:
     \ / no price history \u2014 cannot rank Attached best-available equity_trend_following_ema_cross\
     \ for coverage; QUARANTINED from execution until Saturday research validates (clears\
     \ baseline 0.50) or escalates."
+- id: equity_event_driven_catalyst
+  symbols:
+  - AVGO
+  - MU
+  - ORCL
+  - QCOM
+  since: '2026-06-26'
+  reason: "PROVISIONAL/UNVALIDATED triage 2026-06-26: top candidate 'equity_event_driven_catalyst'\
+    \ has Sharpe 0.000 < baseline 0.500. No library strategy is good enough on this\
+    \ symbol \u2014 log for Saturday research to build a new template. Attached best-available\
+    \ equity_event_driven_catalyst for coverage; QUARANTINED from execution until\
+    \ Saturday research validates (clears baseline 0.50) or escalates."
+- id: equity_momentum_macd_histogram
+  symbols:
+  - META
+  - MSFT
+  - SNDK
+  since: '2026-06-26'
+  reason: 'triage-symbol 2026-06-26: equity_momentum_macd_histogram beat 3 other candidate(s)
+    on SNDK with Sharpe 2.254 (vs baseline 0.50)'
+- id: equity_pairs_trading_cointegration
+  symbols:
+  - SYNA
+  since: '2026-06-26'
+  reason: "PROVISIONAL/UNVALIDATED triage 2026-06-26: top candidate 'equity_pairs_trading_cointegration'\
+    \ has Sharpe 0.000 < baseline 0.500. No library strategy is good enough on this\
+    \ symbol \u2014 log for Saturday research to build a new template. Attached best-available\
+    \ equity_pairs_trading_cointegration for coverage; QUARANTINED from execution\
+    \ until Saturday research validates (clears baseline 0.50) or escalates."
 ---
 
 Active strategy set. Each entry owns its declared symbols exclusively. Conflicts are resolved by head-to-head backtest at the research layer, never at runtime.
