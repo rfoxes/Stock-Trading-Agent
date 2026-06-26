@@ -81,3 +81,6 @@ QCOM: technology
 
 # Added 2026-06-25 (news, promote-candidate)
 SNDK: technology
+
+# Added 2026-06-26 (news, promote-candidate)
+SYNA: technology

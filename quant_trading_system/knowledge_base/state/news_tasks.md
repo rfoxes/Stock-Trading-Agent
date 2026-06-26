@@ -6,179 +6,177 @@ Yesterday's news agent writes this. Replace, don't append.
 
 ## Status as of the last update
 
-- **Last brief assessment:** NOTABLE (Thu 2026-06-25, canonical post-close 3:30 PM PT run).
-  **The day's twist: MU's record-blowout gap-up HELD in the cash session (+15%), but the
-  same memory shortage became a cost shock for hardware makers** — **AAPL −6.1%** (single
-  heaviest S&P weight) after **raising Mac/iPad prices 15–20%** (Cook: "Hundred-Year
-  Flood"); **MSFT −3.2%** (52-wk low, Xbox price hike) — **Nasdaq down a 4th straight
-  day**. Dow rose on a value rotation (CAT +5.8%, UNH +2.7%). Hot **May PCE** (core 3.4%,
-  highest since Oct '23; headline 4.1%); **oil < $70** (4th down session, US-Iran de-esc).
-  **2 universe promotions:** **QCOM** (Tier-B #5, Meta anchor customer for Dragonfly C1000)
-  + **SNDK** (Tier-A session 3, memory supercycle). **NOT HALT-WORTHY:** no FOMC; MU
-  resolved favorably (held); AAPL −6% is realized price on a cost narrative, not a guidance
-  cut; oil/Iran risk-positive.
+- **Last brief assessment:** NORMAL FLOW (Fri 2026-06-26, canonical post-close 3:30 PM PT run).
+  **The day's shape: an AI-chip "profit-taking" rout (Nasdaq's 5th straight down day; MU −5% /
+  AVGO −4% / SNDK −5% premarket) — PRICE ACTION we drop — over a thinner layer of real events.**
+  Genuine new events, mostly outside the held book: **onsemi (ON) → Synaptics (SYNA) $7B all-stock
+  M&A** (confirmed target → promoted); **SK Hynix $29.4B Nasdaq IPO filing** (~July 10, memory-trade
+  read-through); **MSFT Xbox price hike + memory-cost-doubling-by-2027** (input-cost event, mirrors
+  AAPL Thu); **JPM leadership/succession shake-up**; **DELL Texas reincorporation**; **GOOGL AI-talent
+  departures**; **SPCX broke below its $135 IPO price (−32% from peak)** on an IG bond sell-off +
+  OpenAI-IPO-delay read-through. **1 promotion: SYNA (Tier-B #1, M&A target). Universe 25 → 26.**
+  **NOT HALT-WORTHY:** no FOMC; no held-name overnight catalyst; oil/Iran risk-positive.
 - **Interpreter:** bare `python3` STILL **BROKEN** (Homebrew 3.14, no deps). Entire run used
-  `cd /Users/rfoxes/Stock-Trading-Agent && .venv/bin/python3 -m quant_trading_system.cli`.
-  Operator action still required (see open questions). Always `cd` back to repo root (or use
-  the absolute venv path) before CLI calls — a `cd` into a news subdir breaks the relative
-  venv path.
-- **Universe: GREW 23 → 25.** QCOM + SNDK promoted today (both technology), both **UNCLAIMED**
-  → trader P0 triage owns the claim (`triage-symbol QCOM --gap-type event_catalyst`,
-  `triage-symbol SNDK --gap-type trending`). The prior 23 stay claimed. SPCX still
-  **PROVISIONAL / execution-quarantined** (revalidate_by **2026-07-04**). `gap-registry
-  coverage_holes` = **empty** (confirmed again).
-- **Alpaca density: 162 items.** MU 40, META 13, NVDA 13, AMZN 11, AAPL 11, GOOGL 10,
-  SPCX 10, MSFT 9, INTC 7, QQQ 6, SPY 5, DELL 4, MRVL 3, TSM 3, JPM 2, ORCL 2, AVGO 1;
-  ARM/CBRS/CSCO/HPE/NUVL 0. All 6 category HTMLs + daily summary written.
-- **2 promotions Thu (cap respected):** QCOM = 1 single-event (Tier-B #5, under the 2/day
-  cap); SNDK = Tier-A (uncapped, 3-session recurrence).
+  `cd /Users/rfoxes/Stock-Trading-Agent && .venv/bin/python3 -m quant_trading_system.cli`. Operator
+  action still required (open questions). Always `cd` to repo root (or use the absolute venv path)
+  before CLI calls.
+- **Universe: GREW 25 → 26.** SYNA promoted today (technology, M&A target), **UNCLAIMED**. **Unclaimed
+  now = 3: QCOM + SNDK (from Thu, still not triaged by the trader) + SYNA (today).** The prior 23 stay
+  claimed. SPCX still **PROVISIONAL / execution-quarantined** (revalidate_by **2026-07-04**).
+  `gap-registry coverage_holes` = **empty** (confirmed again).
+- **Alpaca density: 128 items.** SPCX 18, MU 17, AAPL 15, MSFT 13, TSLA 10, NVDA 9, AMZN 8, GOOGL 6,
+  META 6, INTC 4, JPM 3, AVGO 3, QQQ 3, SNDK 3, QCOM 2, CBRS 1, DELL 1, MRVL 1, ORCL 1, TSM 1;
+  ARM/CSCO/HPE/NUVL 0. All 6 category HTMLs + daily summary written.
+- **1 promotion Fri (cap respected):** SYNA = 1 single-event (Tier-B #1 M&A target, under the 2/day
+  cap). No Tier-A qualifier reached a clean 3-consecutive-catalyst run.
 
 ## Notable carry-forwards
 
-- **MU (held) — Day-1 cash reaction HELD (+15%); gap-up did NOT fade.** Rev $41.46B
-  (~+346% YoY), Q4 guide ~$50B; ~$100B forward contracts; FY26 capex $27B + 100% excess-cash
-  return; CEO: shortage tight beyond 2027, no "line of sight." equity_event_driven_catalyst
-  claims MU (true responder); held → entry guard skips; post-print window + trailing stop
-  govern. **The trailing-stop-on-give-back scenario did NOT trigger today (no fade).** Watch
-  Fri for any delayed give-back / IV-crush mechanics. Drop analyst PT resets (BofA $1,550,
-  Susquehanna $2,000 — opinions).
-- **AAPL (held) — NEW negative held-name event: 15–20% Mac/iPad price hikes on memory costs,
-  −6.1%.** First held-name NEGATIVE event with no responder (claimed by price-driven
-  trend-following). Library gap: input-cost / margin-compression event-window. Track whether
-  the price-hike narrative broadens to other hardware names / a demand read.
-- **JPM (universe) — $50B buyback (eff Jul 1) + 10% dividend hike, post-stress-test;
-  all-time high.** Capital-allocation event; price-claimed, no responder (NEW library gap).
-  Track financials-rotation follow-through.
-- **CBRS (universe) — Day-2 record two-session loss** (~$172 vs $182 prior close) on weak FY
-  outlook / lower-margin guide. Assignment gap (claimed by trend-following, not the
-  earnings-window responder). Track Day-3 stabilization.
-- **INTC (universe) — Goldman initiated Neutral, $150 PT** (server-CPU + foundry tailwinds,
-  "balanced" risk/reward); premarket MU-pop faded to red close. Single-bank init (below
-  3-bank Tier-B cluster); no responder. Track for an initiation cluster.
-- **QCOM (NEW universe) — Investor Day data-center pivot: $15B DC rev by FY29, Dragonfly
-  C1000, Meta anchor customer, $40B FY29 non-handset; +7.4%.** Unclaimed → trader triage /
-  Saturday research. Track DC follow-through + any further customer wins.
-- **SNDK (NEW universe) — memory/NAND supercycle, MU-validated; +16%, ~600% YTD.** Unclaimed
-  → trader triage / Saturday research. Track whether the cohort sustains.
-- **AVGO (held) — Jalapeño/OpenAI follow-through quieted.** No fresh catalyst today; the
-  product/partnership win stays claimed-but-unmodeled by event-driven (partial gap).
-- **ORCL (held) — 21k job-cut digestion continues; book's only red.** Restructuring event
-  unmodeled by event-driven (partial gap).
-- **GOOGL → DJIA effective pre-open Mon 6/29** (replacing VZ). Forced-flow/index event on a
-  price-claimed name; traded lower today; Google Finance exited beta (portfolios/AI tools).
-  Track index-flow commentary 6/26 & into 6/29.
-- **TSLA — NTSB probe opened + wrongful-death suit filed (Texas FSD crash).** Regulatory/legal
-  escalation; price-claimed, no responder. Track probe scope + energy-business follow-through.
-- **SPCX — bond-deal "bubble" warnings (Allianz: $70B "funny money"), FOMO-trap framing;
-  +393% "SpaceX MSTR."** Stays quarantined (revalidate_by 7/04). Carry: $6.3B Reflection
-  deal, Cathie Wood buying, Nasdaq-100 add ~July 1. Track price path + bond/equity divergence.
-- **Memory-cost-inflation TWO-SIDED theme.** MU/SNDK/WDC/STX (makers) up; AAPL/MSFT (device
-  makers) down on hardware price hikes. Track whether device-maker margin pressure broadens.
-- **Hot PCE / higher-for-longer.** Core PCE 3.4% (highest since Oct '23). May seen as the
-  2026 inflation peak; slowing expected from July. Track Fed speakers, CME FedWatch, next
-  CPI/jobs.
-- **Oil < $70 / US-Iran de-escalation.** Disinflationary, risk-positive. Track roadmap
-  durability + waiver extension.
-- **VIX ~18.6 (−5%) — eased back toward 18; contango, no inversion.** Track whether index vol
-  holds >18 or reverts; MU post-print IV crush (short-vol setup).
+- **SYNA (NEW universe, UNCLAIMED) — onsemi $7B all-stock M&A target.** 1.350 ON/sh, 19% premium,
+  definitive agreement + SEC 8-K/425 filed 6/25, close mid-2027. Price tracks ON at the ratio → live
+  merger-arb instance (feeds the m_a_arbitrage activation gap; long SYNA / short ON). Trader P0 triage
+  (`triage-symbol SYNA --gap-type pairs_arbitrage`). Track deal progress / any regulatory friction.
+- **QCOM + SNDK (universe, STILL UNCLAIMED from Thu).** Trader had not run P0 triage on either by the
+  6/25 handoff (handoff predates the promotions taking effect). Re-confirm whether the trader claims
+  them this run; if still unclaimed, note it. QCOM: data-center pivot (Meta anchor). SNDK: memory cohort.
+- **AAPL (held) — EMA-cross SELL 72 (full exit) submitted 6/25, PENDING FILL.** #1 trader reconciliation
+  item: fill-or-cancel. If filled → `log-closed`; if cancelled → rule likely re-fires. No new AAPL
+  corporate event today (Thu's price hikes were the event; today is oversold/profit-taking + punditry).
+- **Input-cost / margin-shock theme — NOW TWO held/universe instances (AAPL Mac/iPad 6/25, MSFT Xbox
+  today; memory costs to double by fall 2027).** Both price-claimed, no responder. Recurring memory-cost
+  pass-through across device makers. NEW library gap escalating. Track whether it broadens (Sony/Nintendo
+  named) + any demand/guidance read.
+- **SK Hynix $29.4B Nasdaq IPO (~July 10).** World's top HBM supplier (>50% share), Q1 rev +198% YoY,
+  2nd-largest US IPO ever after SPCX. Memory-trade read-through (MU/SNDK). **Watch for a post-listing
+  universe add** (like SPCX pre-operator-directive) once it trades with a US ticker.
+- **SPCX (PROVISIONAL/quarantined) — broke below $135 IPO price (−32% from peak); IG bond sell-off
+  ($305M lost in days); OpenAI reportedly delaying its IPO to 2027 citing SpaceX.** Spillover: ILLR +127%
+  ($411M SpaceX-exposure treasury), QUCY board OKs SpaceX equity stake. Stays quarantined (revalidate 7/04).
+  Carry: Nasdaq-100 add ~July 1. Track price path + bond/equity divergence.
+- **JPM (held? no — universe) — succession shake-up surfaces CEO field; Dimon stays ~3 yrs.** Management
+  event, price-claimed, no responder. Carry: $50B buyback (eff Jul 1) + 10% dividend. Track financials.
+- **GOOGL (universe) — AI-talent departures + → DJIA pre-open Mon 6/29.** Forced-flow index event on a
+  price-claimed name. Track index-flow commentary into 6/29.
+- **DELL (universe) — shareholders approved Texas reincorporation.** Governance event, no responder.
+- **INTC (universe) — US-government-stake "nationalization" political debate (ongoing overhang, no new
+  action).** Carry: Goldman Neutral $150 init (single-bank). Track for an initiation cluster.
+- **MU (held) — post-print window; ~5% profit-taking breather, no new catalyst.** IV crush in progress
+  (short-vol setup). equity_event_driven_catalyst claims MU; held → entry guard skips; trailing stop +
+  post-print window govern. Watch for any sharper give-back that engages the trailing stop.
+- **AVGO (held) — no fresh catalyst (profit-taking only).** Jalapeño/OpenAI win stays claimed-but-unmodeled
+  (partial gap).
+- **ORCL (held) — restructuring (21k cuts) digestion continues; no new catalyst.** Partial gap.
+- **TSLA (universe) — Musk ordered to testify (America PAC $1M suit) + Slate Auto $25k truck reveal.**
+  Legal/competitive, price-claimed, no responder. Carry: NTSB/FSD overhang.
+- **Memory-cost-inflation TWO-SIDED theme.** Makers (MU/SK Hynix/SNDK/WDC/STX) vs device makers
+  (AAPL/MSFT) passing cost via price hikes. Track whether margin pressure broadens.
+- **Macro: hot PCE / higher-for-longer + oil/Iran.** Core PCE 3.4% (Thu). Oil < ~$71 (5th down session),
+  framework holding. Track Fed speakers, FedWatch, jobs report (first week of July), oil path.
+- **Vol regime — VIX 18.89 (+1.4%), mid-18s, contango/no inversion.** Track whether index vol holds; MU
+  post-print IV crush (short-vol setup).
 
-## To do tomorrow (next news run, Fri 2026-06-26)
+## To do tomorrow (next news run — Mon 2026-06-29)
 
-1. **Run the standard workflow** (`news_manual.md §"Workflow"`). **Re-read §9 every run.**
-   Tier A (3 consecutive sessions, uncapped) + Tier B (5 triggers, 2/day cap). Both require
-   `--sector` on `cli promote-candidate`.
+NOTE: Next weekday run is **Mon 6/29** (no run over the weekend; Sat is the research agent).
+
+1. **Run the standard workflow** (`news_manual.md §"Workflow"`). **Re-read §9 every run.** Tier A
+   (3 consecutive sessions, uncapped) + Tier B (5 triggers, 2/day cap). Both require `--sector`.
 2. **USE `.venv/bin/python3` FROM THE REPO ROOT** for all CLI calls. Bare `python3` WILL fail.
-3. **Universe should confirm 25** (QCOM + SNDK newly added). Check the trader claimed QCOM +
-   SNDK (P0 triage); if still unclaimed, note it. SPCX stays quarantined (revalidate_by 7/04).
-4. **MU Day-2 cash reaction** — does the +15% gap-up hold/extend/fade Fri; any delayed IV-crush
-   give-back that could finally engage the trailing stop. Drop PT resets.
-5. **AAPL price-hike follow-through** (held; −6.1% Thu). Track whether the memory-cost margin
-   narrative broadens / any demand or guidance read. NEW input-cost library gap.
-6. **CBRS Day-3** (record two-session loss). Assignment gap. Cover the cash reaction.
-7. **JPM buyback follow-through + financials rotation** (all-time high on $50B + dividend).
-8. **QCOM data-center follow-through** (Investor Day pivot; Meta anchor). **SNDK / memory
-   cohort** (WDC/STX) — does the MU read-through sustain.
-9. **GOOGL → DJIA (effective Mon 6/29).** Track index-flow commentary into 6/26 & 6/29.
-10. **SPCX price path + bond/equity divergence + Nasdaq-100 rebalance (~July 1).** Quarantined.
-11. **Macro: hot-PCE / higher-for-longer + oil/Iran threads.** Fed speakers, FedWatch; oil
-    path, roadmap durability.
-12. **Vol regime** — VIX vs 18; MU post-print IV crush; whether the de-rating vol bump reverts.
-13. **Promote candidates if Fri refreshes:**
-    - **WDC / STX** — memory cohort, rode MU (flow/sympathy). Watch; promote only on a clean
-      3-consecutive run OR a Tier-B catalyst (own beat+raise+5%, named contract, FDA, 3-bank).
-    - **CRDO** — AI interconnect; thematic watch.
-    - **WOLF / SMCI** — flow-recurrence (not catalysts). Flow does NOT refresh the catalyst clock.
-14. **Outlier movers + sector breakdown.** Generic gainers/losers query still flaky
-    (~19 consecutive sessions) — per-name reconstruction remains the workable path.
-15. **Library gaps re-listing.** NEW Thu: input-cost/margin-shock on a held name (AAPL —
-    first held-name NEGATIVE event, no responder); capital-allocation event (JPM buyback/
-    dividend, no responder). Carry: earnings-window ASSIGNMENT (CBRS); sell-side initiation
-    (INTC Goldman, single-bank); product/partnership + restructuring sub-triggers on
-    event-driven covered names (AVGO Jalapeño, ORCL); index-rebalance/forced-flow (GOOGL→DJIA
-    6/29 + SPCX→Nasdaq-100 ~July 1 — TWO live); event-window on price-claimed names
-    (TSLA/META/AMZN); macro_event_window (PCE/Fed, NEW_CATEGORY_NEEDED); vol_regime ACTIVATION
-    (MU post-print IV crush); m_a_arbitrage activation (NUVL). Sat research = next opportunity.
+3. **Universe should confirm 26** (SYNA newly added). Check the trader claimed QCOM + SNDK + SYNA (P0
+   triage); if still unclaimed, note it. SPCX stays quarantined (revalidate_by 7/04).
+4. **AAPL fill reconciliation** — did the 6/25 EMA-cross SELL fill or cancel? (Trader's item, but track
+   the position state.) No new AAPL event expected unless price-hike narrative produces a demand read.
+5. **GOOGL → DJIA EFFECTIVE pre-open Mon 6/29** — index-flow / forced-buy commentary; cover the cash
+   reaction.
+6. **Quarter-end Tue 6/30 rebalance flow** + **SPCX → Nasdaq-100 ~July 1** + **SK Hynix listing ~July 10.**
+   Three live index-rebalance/forced-flow instances.
+7. **Input-cost theme follow-through** (AAPL + MSFT price hikes). Track whether it broadens / any demand
+   or guidance read. NEW recurring input-cost library gap (now 2 instances).
+8. **SYNA / onsemi M&A** — deal progress, any antitrust/regulatory friction; ON price (SYNA tracks it).
+9. **Memory cohort** (MU post-print, SNDK, WDC/STX) + **SK Hynix IPO build-up** — does the read-through
+   sustain after Friday's profit-taking.
+10. **SPCX price path + bond/equity divergence + OpenAI-IPO-delay read-through.** Quarantined.
+11. **JPM succession + financials rotation; buyback effective Jul 1.**
+12. **Macro: hot-PCE / higher-for-longer + oil/Iran.** Fed speakers, FedWatch; jobs report (first week
+    of July); oil path.
+13. **Vol regime** — VIX vs 18; MU post-print IV crush; whether the de-rating vol bump reverts.
+14. **Promote candidates if Mon refreshes:**
+    - **SK Hynix** — post-IPO add candidate once it trades (~July 10); not promotable until a US ticker.
+    - **WDC / STX** — memory cohort, flow/sympathy. Promote only on a clean 3-consecutive run OR a Tier-B
+      catalyst (own beat+raise+5%, named contract, FDA, 3-bank).
+    - **CRDO** — AI interconnect; thematic watch. **WOLF / SMCI** — flow-recurrence (not catalysts).
+15. **Outlier movers + sector breakdown.** Generic gainers/losers query still flaky (~20 consecutive
+    sessions; Fri surfaced micro-cap noise INHD/CAST + biotech MRNA/SLS/ACAD with no clear catalyst) —
+    per-name reconstruction remains the workable path.
+16. **Library gaps re-listing.** NEW Fri: M&A-arb activation (SYNA live instance); management/succession
+    (JPM). Escalating: input-cost/margin-shock (NOW 2 — AAPL + MSFT). Carry: capital-allocation (JPM
+    buyback); earnings-window ASSIGNMENT (CBRS); product/partnership + restructuring sub-triggers (AVGO,
+    ORCL); index-rebalance/forced-flow (NOW THREE — GOOGL→DJIA 6/29, SPCX→Nasdaq-100 ~7/1, SK Hynix ~7/10);
+    event-window on price-claimed names (TSLA/INTC/DELL/GOOGL/AMZN); macro_event_window (PCE/Fed,
+    NEW_CATEGORY_NEEDED); vol_regime ACTIVATION (MU IV crush); m_a_arbitrage activation (SYNA + NUVL carry).
+    Sat research = next opportunity.
 
 ## Open questions for the operator
 
-- **[HIGH] News-agent schedule stability + brief-staleness guard.** Prior runs showed a miss
-  (6/22 skipped) and a double (6/23). 6/24 + 6/25 appear to be single clean canonical 3:30 PT
-  runs. Asks stand: (a) stabilize the schedule / add a health-check alert on miss-or-double;
-  (b) the `_load_news_brief()` staleness-guard — a stale brief should be rejected/down-weighted,
-  not fed to strategies as live signal.
-- **[HIGH] Bare `python3` still broken.** Homebrew 3.14.5 lacks harness deps. Working
-  interpreter: `/Users/rfoxes/Stock-Trading-Agent/.venv/bin/python3` (3.13). Repoint the
-  scheduled-task launcher + daily_news_prompt.md to the venv python (or pip-install
-  requirements into 3.14 / rebuild the venv), and pin python@3.13. **daily_news_prompt.md
-  line ~31 still says "There is no virtualenv" — stale, contradicts reality; please update.**
-- **NEW — Input-cost / margin-shock event-window (AAPL).** AAPL fell 6.1% on a real corporate
-  event (15–20% price hikes on memory-cost inflation) yet is claimed only by price-driven
-  trend-following. First held-name NEGATIVE event with no responder. Sat research: should an
-  event-window overlay co-claim large-caps for cost/margin-guidance events?
-- **NEW — Capital-allocation event-window (JPM $50B buyback + dividend).** No rule reads a
-  buyback/dividend authorization. Sat research: a capital-allocation sub-trigger?
-- **Index-inclusion as a 6th Tier-B trigger? — TWO live (GOOGL→DJIA 6/29; SPCX→Nasdaq-100
-  ~July 1).** Both in-universe so promotion moot, but the recurring forced-flow gap argues for
-  a 6th Tier-B trigger or an index-rebalance overlay.
-- **Event-driven strategy scope — product/partnership + restructuring sub-triggers.** AVGO
-  (Jalapeño) + ORCL (21k cuts) claimed by event-driven yet neither event type is modeled.
-- **Mandatory-attach doctrine (Option 3) — confirm permanent.** SPCX is the first live
-  provisional claim (revalidate_by 2026-07-04). Confirm permanent.
-- **CBRS earnings-window assignment.** CBRS (debut 6/23, record two-session loss through 6/25)
-  claimed only by price-driven trend-following. Sat research: head-to-head vs
-  equity_event_driven_catalyst.
-- **Candidate-counter mechanism (carry-forward).** The 3-session Tier-A rule is a judgment
-  call; skipped/doubled sessions muddy the clock (SNDK's chain). A mechanical counter would
-  clarify. (SNDK promoted Thu at session 3 of the rebuild.)
-- **`cli open-orders` parser bug (carry-forward).** Clean JSON on recent runs; provisionally
-  closed. Confirm on a live open order.
-- **git-sync LaunchAgent.** Verify `launchctl list | grep harness` if markers accumulate across
-  days. Run `bash scripts/install_git_safety.sh` if not installed.
-- **NUVL biotech-vs-tech-universe mismatch (carry-forward).** Provisionally claimed by
-  trend_following; Sat research owns proper claim + m_a_arbitrage activation.
+- **[HIGH] News-agent schedule stability + brief-staleness guard.** Prior runs showed a miss (6/22) and a
+  double (6/23); 6/24, 6/25, 6/26 appear single clean canonical 3:30 PT runs. **NB the 6/25 trader handoff
+  flagged the 6/25 brief as STALE/ABSENT (header read 6/24)** — second pipeline miss that week. Asks stand:
+  (a) stabilize the schedule / add a health-check alert on miss-or-double; (b) the `_load_news_brief()`
+  staleness-guard — a stale brief should be rejected/down-weighted, not fed to strategies as live signal.
+- **[HIGH] Bare `python3` still broken.** Homebrew 3.14.5 lacks harness deps. Working interpreter:
+  `/Users/rfoxes/Stock-Trading-Agent/.venv/bin/python3` (3.13). Repoint the scheduled-task launcher +
+  daily_news_prompt.md to the venv python (or pip-install requirements into 3.14 / rebuild the venv), and
+  pin python@3.13. **daily_news_prompt.md line ~31 still says "There is no virtualenv" — stale, contradicts
+  reality; please update.**
+- **NEW — M&A-arb activation, live universe instance (SYNA / onsemi).** SYNA promoted as an M&A target;
+  equity_pairs_trading_cointegration declares pairs_arbitrage but is inactive and claims no universe symbol.
+  Sat research: activate a merger-arb/pairs strategy and claim SYNA (long SYNA / short ON at 1.350). Pairs
+  with the NUVL/GSK m_a_arbitrage carry.
+- **Input-cost / margin-shock event-window — NOW TWO instances (AAPL 6/25, MSFT 6/26).** Both price-claimed,
+  no responder; recurring. Sat research: should an event-window overlay co-claim large-caps for cost/margin
+  events?
+- **Management/succession event-window (JPM shake-up) + capital-allocation (JPM buyback/dividend).** No rule
+  reads either. Sat research: management-change + capital-allocation sub-triggers?
+- **Index-inclusion as a 6th Tier-B trigger? — THREE live (GOOGL→DJIA 6/29; SPCX→Nasdaq-100 ~7/1; SK Hynix
+  listing ~7/10).** Recurring forced-flow gap argues for a 6th Tier-B trigger or an index-rebalance overlay.
+- **Event-driven strategy scope — product/partnership + restructuring sub-triggers.** AVGO (Jalapeño) + ORCL
+  (21k cuts) claimed by event-driven yet neither event type is modeled.
+- **Mandatory-attach doctrine (Option 3) — confirm permanent.** SPCX is the first live provisional claim
+  (revalidate_by 2026-07-04). Confirm permanent.
+- **CBRS earnings-window assignment.** CBRS claimed only by price-driven trend-following. Sat research:
+  head-to-head vs equity_event_driven_catalyst.
+- **Candidate-counter mechanism (carry-forward).** The 3-session Tier-A rule is a judgment call; a mechanical
+  counter would clarify the clock.
+- **`cli open-orders` parser bug (REOPENED 6/25).** Errors `'dict' object has no attribute 'id'` on a live
+  open order (the AAPL sell). Returns clean JSON only when no open orders exist. Fix the order-serialization
+  path. Doesn't block execute.
+- **git-sync LaunchAgent.** Verify `launchctl list | grep harness` if markers accumulate across days. Run
+  `bash scripts/install_git_safety.sh` if not installed.
+- **NUVL biotech-vs-tech-universe mismatch (carry-forward).** Provisionally claimed by trend_following; Sat
+  research owns proper claim + m_a_arbitrage activation.
 
 ## Operational notes
 
-- `cli news-fetch --lookback-hours 24` returned **162 items** cleanly (via venv).
-  ARM/CBRS/CSCO/HPE/NUVL had 0.
-- `cli market-status` → `is_open: false`, `next_open_iso: 2026-06-26T09:30:00-04:00`,
-  `now_iso: 2026-06-25T15:37 PT` (post-close run).
-- WebSearch strong Thu: MU Day-1 close +15% / cohort (TheStreet/Bloomberg/Benzinga); AAPL
-  −6.1% on 15–20% Mac/iPad price hikes (TheStreet/Barchart); QCOM Investor Day ($15B DC rev,
-  Meta anchor, +7.4% — CNBC/Bloomberg/ServeTheHome); JPM $50B buyback + dividend (CNBC/SEC
-  8-K); INTC Goldman Neutral $150 (Investing.com); CBRS record two-session loss (Bloomberg/
-  Yahoo); PCE core 3.4% (BEA/CBS); oil < $70 (Bloomberg/TradingEconomics); VIX 18.63 (Cboe).
-- WebSearch weak: generic "biggest gainers/losers" still screen-level (micro-cap noise
-  INHD/CAST/SAGT) — per-name reconstruction stays the path.
+- `cli news-fetch --lookback-hours 24` returned **128 items** cleanly (via venv). ARM/CSCO/HPE/NUVL had 0.
+- `cli market-status` → `is_open: false`, `next_open_iso: 2026-06-29T09:30:00-04:00`,
+  `now_iso: 2026-06-26T15:39 PT` (post-close run).
+- `cli list-active` → universe 25→26 (after SYNA promote), claimed 23, **unclaimed 3 (QCOM, SNDK, SYNA)**,
+  provisional 1 (SPCX, revalidate_by 2026-07-04). `gap-registry coverage_holes` empty.
+- WebSearch strong Fri: VIX 18.89 +1.4% / Nasdaq 5th down day (Yahoo/CNBC); onsemi→Synaptics $7B all-stock
+  (SEC 8-K/425, StockTitan/Yahoo/TipRanks); SK Hynix $29.4B Nasdaq IPO ~July 10 (Bloomberg/SiliconANGLE/CNBC);
+  MSFT Xbox price hike / memory costs double by 2027 (Benzinga); oil < ~$71 (TradingEconomics/CNBC); US-Iran
+  60-day license (CNBC/Al Jazeera).
+- WebSearch weak: generic "biggest gainers/losers" still screen-level (INHD/CAST micro-cap noise; biotech
+  MRNA/SLS/ACAD movers without surfaced catalysts) — per-name reconstruction stays the path (~20 sessions).
 - **Promotion analysis (`news_manual.md §9`):**
-  - **Tier A:** SNDK reached session 3 of the post-skip rebuild (memory cohort, MU-validated)
-    → **PROMOTED** (technology). WDC/STX/CRDO thematic/sympathy only — not yet 3 consecutive.
-  - **Tier B:** **QCOM PROMOTED** under #5 (Tier-1 customer win — Meta named anchor for
-    Dragonfly C1000, verifiable). No other qualifier (no NEW M&A target, FDA binary, clean
-    beat+raise+5% NEW name, or 3-bank cluster). 1 of 2 single-event slots used.
-  - **Decision: 2 promotions (QCOM, SNDK). Universe 23 → 25.**
-- **`gap-registry coverage_holes` empty (confirmed)** — vol-regime + index-rebalance +
-  input-cost + capital-allocation are ACTIVATION/assignment/taxonomy gaps, not registry holes.
-- Previous notes (still held): "CPI/PCE/import-price <month> <year>" query format works;
-  per-name reconstruction beats generic gainers/losers; major-M&A → target per-name search
-  is cleanest.
+  - **Tier A:** No candidate reached a clean 3-consecutive-catalyst run (WDC/STX/CRDO thematic/sympathy only;
+    flow does not refresh the catalyst clock). **No Tier-A promotion.**
+  - **Tier B:** **SYNA PROMOTED** under #1 (confirmed M&A target — onsemi $7B all-stock, definitive
+    agreement + SEC filings, verifiable). 1 of 2 single-event slots used. No other qualifier (no NEW FDA
+    binary, beat+raise+5% new name, 3-bank cluster, or Tier-1 customer win). SK Hynix is an IPO filing — not
+    one of the 5 Tier-B triggers and no US-traded ticker yet → watch, not promote.
+  - **Decision: 1 promotion (SYNA). Universe 25 → 26.**
+- **`gap-registry coverage_holes` empty (confirmed)** — m_a_arbitrage, vol-regime, index-rebalance,
+  input-cost, capital-allocation, management-change are ACTIVATION/assignment/taxonomy gaps, not registry holes.
+- Previous notes (still held): "CPI/PCE/import-price <month> <year>" query format works; per-name
+  reconstruction beats generic gainers/losers; major-M&A → target per-name search is cleanest.

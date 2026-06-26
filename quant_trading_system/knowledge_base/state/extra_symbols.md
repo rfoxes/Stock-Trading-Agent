@@ -59,3 +59,6 @@ QCOM
 
 # Added 2026-06-25 (news, promote-candidate): Tier-A 3-session recurrence: memory/NAND supercycle now hard-validated by MU record print; SNDK +16% in cohort (WDC/STX), ~600% YTD, Defiance DRAM ETF launch, sustained sell-side cohort framing
 SNDK
+
+# Added 2026-06-26 (news, promote-candidate): Tier-B #1 confirmed M&A target: onsemi (ON) to acquire Synaptics in $7B all-stock deal (1.350 ON/sh, 19% premium), definitive agreement + SEC 8-K/425 filed 2026-06-25, close mid-2027. Live merger-arb instance for the m_a_arbitrage activation gap.
+SYNA
