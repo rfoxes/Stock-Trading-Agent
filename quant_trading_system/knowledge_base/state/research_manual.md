@@ -341,3 +341,20 @@ over the IEX-only feed; consider 0.90 as a future calibration.")
   Before treating a coverage_hole as a real capability gap, check whether
   an existing (esp. options) strategy just needs a `gap_types:` tag.
   Tagging options is safe — `triage_symbol` filters to `type==equity`.
+
+- **2026-07-07: re-triaging a provisional AUTO-EXTENDS `revalidate_by`, so
+  the doctrine's "escalate once the deadline passes" trigger never fires on
+  a permanently-blocked symbol. Judge escalation by the STRUCTURAL block,
+  not the file's live deadline.** Confirmed for all 3 provisionals this run:
+  each mandatory `cli triage-symbol <SYM>` re-stamped `revalidate_by` (SPCX
+  7/04→7/21, QCOM 7/10→7/21, SYNA 7/10→7/21), pushing the deadline past next
+  Saturday every time. A symbol whose gap_type has no *backtestable*
+  responder (SPCX: options-only, no chain data; QCOM: `event_driven_catalyst`
+  fires on a non-replayable news signal → 0 trades always; SYNA:
+  `pairs_cointegration` needs the short-leg modeled → 0 trades on
+  single-symbol sim) can NEVER clear baseline via triage — it is not "needs
+  more time," it is a permanent block. **Rule:** escalate such a symbol on
+  the *structural* ground the first time you identify the block, keep it
+  quarantined, and record the ORIGINAL deadline in the log so the lapse is
+  auditable regardless of the auto-bumped value. Never auto-remove; never
+  let it trade unvalidated.
