@@ -35,6 +35,14 @@ strategies:
     is an AI-server cohort name; sector-rotation-momentum matches the rotational regime
     that''s been live (tech-to-financials Thu, AI-cohort rotation broadly). First-pass
     without head-to-head.'
+- id: equity_momentum_macd_histogram
+  symbols:
+  - META
+  - MSFT
+  - SNDK
+  since: '2026-06-26'
+  reason: 'triage-symbol 2026-06-26: equity_momentum_macd_histogram beat 3 other candidate(s)
+    on SNDK with Sharpe 2.254 (vs baseline 0.50)'
 - id: equity_trend_following_ema_cross
   symbols:
   - AAPL
@@ -49,8 +57,8 @@ strategies:
   - SPY
   - TSLA
   - TSM
-  since: '2026-06-20'
-  reason: "PROVISIONAL/UNVALIDATED triage 2026-06-20: every candidate backtest errored\
+  since: '2026-07-07'
+  reason: "PROVISIONAL/UNVALIDATED triage 2026-07-07: every candidate backtest errored\
     \ / no price history \u2014 cannot rank Attached best-available equity_trend_following_ema_cross\
     \ for coverage; QUARANTINED from execution until Saturday research validates (clears\
     \ baseline 0.50) or escalates."
@@ -60,25 +68,17 @@ strategies:
   - MU
   - ORCL
   - QCOM
-  since: '2026-06-26'
-  reason: "PROVISIONAL/UNVALIDATED triage 2026-06-26: top candidate 'equity_event_driven_catalyst'\
+  since: '2026-07-07'
+  reason: "PROVISIONAL/UNVALIDATED triage 2026-07-07: top candidate 'equity_event_driven_catalyst'\
     \ has Sharpe 0.000 < baseline 0.500. No library strategy is good enough on this\
     \ symbol \u2014 log for Saturday research to build a new template. Attached best-available\
     \ equity_event_driven_catalyst for coverage; QUARANTINED from execution until\
     \ Saturday research validates (clears baseline 0.50) or escalates."
-- id: equity_momentum_macd_histogram
-  symbols:
-  - META
-  - MSFT
-  - SNDK
-  since: '2026-06-26'
-  reason: 'triage-symbol 2026-06-26: equity_momentum_macd_histogram beat 3 other candidate(s)
-    on SNDK with Sharpe 2.254 (vs baseline 0.50)'
 - id: equity_pairs_trading_cointegration
   symbols:
   - SYNA
-  since: '2026-06-26'
-  reason: "PROVISIONAL/UNVALIDATED triage 2026-06-26: top candidate 'equity_pairs_trading_cointegration'\
+  since: '2026-07-07'
+  reason: "PROVISIONAL/UNVALIDATED triage 2026-07-07: top candidate 'equity_pairs_trading_cointegration'\
     \ has Sharpe 0.000 < baseline 0.500. No library strategy is good enough on this\
     \ symbol \u2014 log for Saturday research to build a new template. Attached best-available\
     \ equity_pairs_trading_cointegration for coverage; QUARANTINED from execution\

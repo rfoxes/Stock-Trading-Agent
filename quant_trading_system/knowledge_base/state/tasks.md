@@ -1,196 +1,120 @@
 # Tasks for the next run
 
-This file is the focused to-do list for the next run. **The next trading session is Mon 2026-07-06.**
-Yesterday's Claude wrote a 7/3 version anticipating the holiday; today's run **actually fired on the holiday
-Fri 7/3** (market closed, no session) and confirmed nothing drifted. This is the refreshed list for Mon 7/6.
-Saturday research (revalidating provisionals, incl. the SPCX 7/04 deadline) runs in between. Replace it
+**⚠️ THE HARNESS IS FROZEN pending operator confirmation of a BROKER-STATE WIPE detected 2026-07-07.** Read
+`last_handoff.md` in full before doing anything. The paper account came back FLAT on 7/7 (all four longs gone,
+cash unchanged, equity −$31.6k, no `trade_closed` events, provisional claims re-stamped to today) — a suspected
+Alpaca paper-account reset, NOT strategy exits. Last run did NOT execute, did NOT log-closed. Replace this file
 (don't append) when you write the next version.
 
 ---
 
 ## STANDING POLICY (P0, do not ignore) — MANDATORY-ATTACH DOCTRINE (2026-06-16)
 
-**Every symbol in the universe MUST have a strategy attached — none is ever left strategy-less.** See
-`manual.md` "P0 — EVERY SYMBOL ALGORITHMICALLY EVALUATED RULE". Two grades:
-- **(a) VALIDATED claim** — a library strategy cleared baseline Sharpe (0.5) in a `cli triage-symbol`
-  backtest. Trades normally.
-- **(b) PROVISIONAL claim** — nothing cleared baseline (or no price history), so triage attached the
-  best-available strategy as an UNVALIDATED claim, recorded in `state/provisional_claims.md` with a
-  `revalidate_by` deadline and **QUARANTINED from execution** (`cli execute` auto-skips). Never trades until
-  Saturday research validates.
-
-After triage, `unclaimed_count` should be **0**. Run `cli triage-symbol <SYM> [--gap-type X]` for any NEW
-unclaimed symbol. Character-match shortcuts and direct YAML edits to `active_strategies.md` are FORBIDDEN.
-Never use `cli add-active` to bypass triage.
+Every universe symbol MUST have a strategy attached (see `manual.md` P0 rule). Two grades: **(a) VALIDATED**
+(cleared baseline Sharpe 0.5 in triage — trades) / **(b) PROVISIONAL** (nothing cleared / no price history —
+best-available attached, recorded in `provisional_claims.md`, QUARANTINED from execution until Saturday
+research validates). After triage `unclaimed_count` should be **0**. Run `cli triage-symbol <SYM>
+[--gap-type X]` for any NEW unclaimed symbol. Character-match shortcuts and direct YAML edits to
+`active_strategies.md` are FORBIDDEN. Never use `cli add-active` to bypass triage.
 
 ---
 
 ## ⚠️ READ FIRST: BARE `python3` IS STILL BROKEN — USE THE VENV
 
-**Homebrew `/opt/homebrew/bin/python3` is 3.14.5 and lacks the harness deps.** Bare `python3 -m
-quant_trading_system.cli ...` fails with `No module named 'requests'`. Confirmed still broken 7/3.
-**RUN EVERYTHING VIA THE VENV:**
-
+Homebrew `/opt/homebrew/bin/python3` is 3.14.5 and lacks harness deps. Run EVERYTHING via:
 ```
 /Users/rfoxes/Stock-Trading-Agent/.venv/bin/python3 -m quant_trading_system.cli <cmd>
 ```
+The `.venv` (Python 3.13.13) has all deps and reaches the live broker cleanly.
 
-The `.venv` (Python 3.13.13) has all deps and reaches the live broker cleanly. NOT a "stop on
-ModuleNotFoundError" situation — complete the run via the venv and document the drift.
+## ⚠️ READ SECOND: THE 7/7 BROKER-STATE WIPE — DO NOT RESUME BLIND
 
-## ⚠️ READ SECOND: DATE-CHECK THE NEWS BRIEF + CHECK MARKET STATUS
+On 7/7 the account was FLAT: `positions: []`, equity = cash = **$71,809.59** (cash unchanged to the penny from
+7/6), all four longs (AVGO 26 / META 16 / MU 7 / ORCL 38, ~$31.6k MV) gone with **no cash credit** and **no
+`trade_closed` journal events**. Provisional claims re-stamped `provisional_since: 2026-07-07`,
+`revalidate_by 2026-07-21`. Leading hypothesis: **Alpaca paper-account reset / environment reinitialization.**
+Last run FROZE (no execute, no log-closed) pending operator confirmation.
 
-The **7/3 brief was FRESH** (a purpose-built holiday brief, header `2026-07-03`) — the pipeline held for a 4th
-straight session (6/30, 7/1, 7/2, 7/3) but it's been flaky historically (misses 6/22, 6/25, 6/29). **Always
-check `news_brief.md`'s `# News brief for <date>` header matches the run date BEFORE trusting it.** Next run is
-**Mon 7/6** — the brief should be dated 2026-07-06. If it doesn't match, treat the brief as ABSENT (proceed on
-realized price) and re-flag the news pipeline. **Also run `cli market-status` early** — 7/3 taught us the task
-can fire on a NYSE holiday; if `is_open: false`, do a read-only snapshot and do NOT execute. Monday 7/6 should
-be `is_open: true`.
+**Your first job: determine whether the operator has confirmed the cause.**
+- **If the operator confirms the flat book is the NEW baseline** (reset intended / accepted): treat $71,809.59
+  cash / 0 positions as the starting book. Do a normal snapshot, P0 check, then `cli execute` (the account is
+  clean, strategies will evaluate against a flat book and may open fresh entries — that's fine). Do NOT
+  `log-closed` the four old positions — they weren't sold; there's no realized P&L to attribute.
+- **If the operator confirms the positions should be RESTORED / it was a glitch**: do NOT execute; wait for the
+  restore. The last-good book + marks are in `last_handoff.md` "Last known-good book" for reconstruction.
+- **If there is NO operator word yet AND the account is still flat/anomalous**: stay FROZEN. Do a read-only
+  snapshot, confirm state, re-flag the operator, do NOT execute, do NOT log-closed. Document and stop.
+- **If the account has visibly changed again** (positions restored, or a different equity): re-assess from the
+  fresh broker state; reconcile only what the broker + journal jointly support.
 
-## Status as of last update (2026-07-03 HOLIDAY run — market CLOSED, no session, no execute)
+## To do next run
 
-- **Market was CLOSED (Independence Day observed).** `market-status` → `is_open: false`,
-  `next_open 2026-07-06 09:30 ET`. **`cli execute` deliberately NOT run** — no session to trade into. Not a
-  "fired 0 intents" day; execute was never called. Decision: no-execute holiday deferral.
-- **Book frozen — no fills/closes over the holiday.** Cash $71,809.59 (= 7/2's $71,809.60, penny rounding).
-  All four 7/2 longs present at identical quantities. No reconciliation needed.
-- **P0 = 0 unclaimed.** No new universe member, no promotions (holiday brief made none). `list-active` →
-  universe 26, claimed 26, unclaimed 0, provisional 3 (QCOM, SPCX, SYNA). Nothing to triage.
-- **Account: equity $102,666.87; cash $71,809.59; buying power $373,638.74.** (−$99.11 vs 7/2 — just marks
-  settling to the official 7/2 close, no trades.)
-- **Positions (4 longs, marked to 7/2 close):** AVGO 26 (**−4.46%**, −$437.32), META 16 (**−3.70%**, −$358.01),
-  MU 7 (**−0.75%**, −$51.38 — trailing stop still NOT fired), ORCL 38 (**−20.88%**, −$1,406.25 — fresh worst).
-- **Regime: bull, conf 0.73, ADX 22.84, realized_vol 0.1783.**
-- **Infra:** `cli open-orders` CLEAN (no live order). Parser bug did not bite.
-- **News brief FRESH (7/3 holiday), NO MATERIAL NEWS.** Purpose-built to refresh the date so Monday doesn't
-  fall back to the stale 7/2 brief. All 7/2 carry-forwards unchanged (no session altered them).
-
-## To do next run (Mon 7/6)
-
-1. **Read last_handoff.md and news_brief.md FIRST.** Use the venv (warning #1). **Date-check the brief** —
-   should read `2026-07-06` (warning #2). **Run `cli market-status`** — should be `is_open: true` Monday.
-   **Watch the weekend gap** — 3+ calendar days of news (incl. any weekend developments) hit Monday's open at
-   once, on top of the 7/2 close the book is currently marked to.
-
-2. **Snapshot + reconcile.** `positions`, `account`, `open-orders`, `regime`. No pending order exists (open-
-   orders clean 7/3). If any long is gone Monday, `log-closed` it to the owning strategy. Otherwise no
-   reconcile needed. Book currently: AVGO 26, META 16, MU 7, ORCL 38.
-
-3. **P0 check.** `cli list-active`. Expect `unclaimed_count: 0`. **Re-check `provisional_count`** — SPCX's
-   deadline (**2026-07-04**) passed over the weekend; if Saturday research revalidated it, provisional_count
-   may drop to 2 (QCOM + SYNA, both 7/10). If SPCX still shows provisional, it stays execution-quarantined.
-   If any NEW symbol shows unclaimed, run `cli triage-symbol <SYM> [--gap-type <type>]`. Do NOT `add-active`.
-
-4. **Position watch (no discretionary action either direction — algorithmic-only mandate):**
-   - **META — filled 7/2 at avg $605.28, marked −3.70% into the 7/2 close.** Rule-owned by macd_histogram
-     (entry AND exit). A small early drawdown on a momentum entry is normal. No discretionary trim; let the
-     rule govern.
-   - **MU — −0.75%, trailing stop still NOT fired.** DRAM-antitrust overhang + post-print IV crush (no rule
-     reads either). Watch whether the continued give-back finally trips the trailing stop; reconcile any
-     rule-driven exit. Do NOT sell to "lock in" — forbidden.
-   - **ORCL — −20.88% (−$1,406), fresh worst.** Restructuring (21k cuts) has no algorithmic responder;
-     event_driven_catalyst (claims ORCL provisionally) models earnings only. Held; most-elevated Saturday
-     item. No action.
-   - **AVGO — −4.46%; no rule fired.** Correct do-nothing on the continued semi weakness.
-   - **Others (ARM/INTC/MRVL, MSFT/SNDK, CSCO, HPE, DELL) + trend-following's large-cap sleeve
-     (AAPL/AMZN/GOOGL/JPM/NVDA/SPY/QQQ/TSLA/TSM/CBRS/NUVL)** — watch their gates; no trade = correct if unmet.
-     **JPM earnings Tue 7/14 (inside the 14-day options window by Monday), TSLA earnings 7/22, INTC 7/23** —
-     all price-claimed (responder NONE; earnings-window assignment gap).
-
-5. **Run `cli execute` (via venv) — only if market is open.** SPCX/QCOM/SYNA appear under
-   `provisional_quarantined`/`skipped` (unless Saturday validated SPCX). React to realized price only: if a
-   rule fires, execute; if none fires, do-nothing is correct. Do NOT discretionarily de-risk or take profits.
-
+1. **Read `last_handoff.md` + `news_brief.md` FIRST** (venv). **Date-check the brief** — must match the run
+   date; if not, treat as ABSENT and re-flag the pipeline. **Run `cli market-status`** and note the run TIME —
+   7/7 fired off-cycle at 09:09 mid-session; the canonical run is ~4 PM PT post-close. If firing off-cycle,
+   weight that in the execute decision.
+2. **Snapshot:** `account`, `positions`, `open-orders`, `regime`. **Compare equity AND cash to the 7/6
+   last-good ($103,459.08 / $71,809.59) and the 7/7 flat ($71,809.59 / $71,809.59).** If positions reappear
+   with cash moved, that's a real change — reconcile against the journal. If still flat, see the wipe playbook
+   above.
+3. **P0 check:** `cli list-active`. Expect `unclaimed_count: 0`, `provisional_count: 3` (QCOM/SPCX/SYNA, all
+   `revalidate_by 2026-07-21`). Triage any NEW unclaimed symbol; do NOT `add-active`.
+4. **Reconciliation — ONLY what's supported.** Use `cli log-closed <id> <symbol> <pnl>` ONLY for positions the
+   broker shows gone AND that have a real basis (a `trade_closed` event or a cash move consistent with a sale).
+   The four 7/7-vanished names have neither — do NOT log-closed them unless the operator directs a specific
+   reconciliation.
+5. **Execute (venv) — gated on the wipe playbook.** If the operator has cleared the flat book as baseline (or
+   the account is confirmed healthy), run `cli execute`. Provisionals (QCOM/SPCX/SYNA) appear under
+   `provisional_quarantined`/`skipped`. If still frozen, do NOT execute.
 6. **Library gaps — see list below (Saturday research owns them).**
+7. **`cli git-sync --agent trader --message "..."` (venv) as last action.**
 
-7. **Run `cli git-sync --agent trader --message "..."` (via venv) as last action.**
+## Position watch (only relevant IF positions are restored)
 
-## Library gaps + research items (carry to research_tasks.md Sat 7/4)
+If the operator restores the 7/6 book, the prior watch items resume: **META** (macd_histogram-owned, entry avg
+$605.28); **MU** (trailing stop had NOT fired at −0.73%; DRAM-antitrust overhang); **ORCL** (−18.69%,
+restructuring drawdown, no algorithmic responder — top Saturday item); **AVGO** (Broadcom-Apple-2031 positive,
+responder NONE). If the flat book stands, these are moot until strategies re-enter organically.
 
-- **THREE provisional/quarantined validations (TOP PRIORITY):**
-  - **SPCX** (trend-following, deadline **2026-07-04 — THIS SATURDAY**, needs ≥60 bars). Carry: Nasdaq-100 add
-    **Tue 7/7** (~$4.3B forced passive buying), FCC satellite-licensing vote 7/22, elevated single-name IV,
-    broke IPO price. Price history still thin (only joins the index 7/7) — may not clear baseline yet. Likely
-    wants a vol-selling options responder.
-  - **QCOM** (event-driven, deadline **2026-07-10**). Top candidate Sharpe 0.0.
-  - **SYNA** (pairs-cointegration, deadline **2026-07-10**). **Live merger-arb:** onsemi $7B all-stock
-    (1.350 ON/sh, ~19% premium, close mid-2027). Textbook long SYNA / short ON. The activation instance for
-    the standing m_a_arbitrage gap — validate the pairs setup.
-- **Delivery / earnings-window assignment — TSLA (Q2 deliveries 480k printed 7/2, +25%; earnings 7/22) +
-  JPM (earnings Tue 7/14, INSIDE the 14-day options window by Mon 7/6) + INTC (7/23).** The earnings-window
-  responder (equity_event_driven_catalyst) does not claim TSLA, JPM, or INTC (all trend-following /
-  price-driven). Assign the earnings-window strategy to scheduled-catalyst names via head-to-head. gap_type:
-  earnings_window — responder: NONE (assignment).
-- **Regulatory / antitrust ruling on a universe name — GOOGL (EU €4.1B Android fine UPHELD/final 7/2;
-  + Wed Klarna ~$1.97B / Yelp carry) + META (India WhatsApp query; 29-state addiction suit carry).** Three
-  adverse antitrust developments in three sessions on GOOGL. No active rule reads a court/agency ruling. Build
-  a regulatory/litigation event-window overlay for large-caps (pairs with MU DRAM + AAPL SCOTUS carries).
-  gap_type: event_catalyst — responder: NONE.
-- **Business-model / product-line launch — NVDA (startup cloud + rev-share) + AMZN (own AI chips; AWS $1B
-  unit carry) + META (AI cloud, carry).** Multi-front cloud/own-silicon push. No rule reads a strategic
-  business-line/product disclosure. Consider a strategic-announcement sub-trigger in an event-window overlay.
-  gap_type: event_catalyst — responder: NONE.
-- **Pricing / margin disclosure — AAPL (~55% hardware price hikes).** No rule reads a pricing-power /
-  input-cost-pass-through disclosure. Pairs with the input-cost/margin-compression carry. gap_type:
-  event_catalyst — responder: NONE.
-- **Restructuring / workforce-reduction — MSFT (thousands, carry) + ORCL (21k, carry; held name −20.88% and
-  fresh worst).** Claimed by price-driven strategies; unmodeled. Recurring big-tech event class. Build a
-  restructuring event-window; decide whether a generic price-based stop should co-cover event-driven's held
-  names (ORCL is the live pain case). gap_type: event_catalyst — responder: NONE / partial.
-- **Capital-allocation / capital-return — JPM ($50B buyback + dividend eff 7/1) + MU ($250M Trump Accounts,
-  carry).** No rule reads a buyback/dividend/pricing disclosure. gap_type: event_catalyst — responder: NONE.
-- **Short-interest / positioning disclosure — NVDA/TSLA (Burry AI-bear thesis "extends beyond," carry).** No
-  rule reads a 13F/short disclosure. gap_type: event_catalyst — responder: NONE.
-- **Index-rebalance / forced-flow window — SPCX→Nasdaq-100 (Tue 7/7, ~$4.3B); SK Hynix Nasdaq listing (~7/10).**
-  No rule reads an index-rebalance schedule. Open Q: index-inclusion as a 6th Tier-B promotion trigger?
-  gap_type: event_catalyst — responder: NONE.
-- **Litigation / antitrust on a held name — MU (DRAM price-fixing class action, N.D. Cal., carry).** MU's
-  provisional/quarantined claim models earnings windows only. gap_type: event_catalyst — responder: NONE.
-- **Input-cost / margin-compression carry (AAPL memory pass-through → 55% hikes; Cook "extreme memory
-  shortage"; SNDK Chinese-supply risk).** Price-claimed; no rule reads a cost/margin shock. Build an
-  event-window overlay co-claiming large-caps for cost/margin events. gap_type: event_catalyst — responder: NONE.
-- **Macro-event-window category (June NFP +57k big miss / dovish; Fed on hold; May core PCE 3.4%;
-  US–Mexico–Canada trade-deal review window opened).** No canonical gap_type covers a scheduled macro/policy
-  print or regime; no rule lets the trader pre-position (correct under the mandate, but the soft-signal handle
-  is missing). gap_type: NEW_CATEGORY_NEEDED — responder: NONE.
-- **Vol-regime activation** (VIX ~16.6, index IV-rank below the >50 threshold; MU post-print IV crush =
-  short-vol setup; SPCX event-IV into 7/7; TSLA event-IV into 7/22; JPM into 7/14). volatility_regime is
-  declared (iron_condor_high_iv, calendar_spread, jade_lizard, long_straddle_earnings) but none active / none
-  claims a universe symbol. Activate one vol strategy with a claim (MU IV crush textbook short-vol; doubles as
-  SPCX candidate). gap_type: volatility_regime — responder: NONE (active); activation pending.
-- **Validate the first-pass + provisional assignments via head-to-head:**
-  - `equity_breakout_volume_confirmation` vs `equity_trend_following_ema_cross` on ARM, MRVL, INTC
-  - `equity_mean_reversion_bollinger` vs `equity_trend_following_ema_cross` on CSCO
-  - `equity_rsi_divergence` vs `equity_trend_following_ema_cross` on HPE
-  - `equity_event_driven_catalyst` vs `equity_trend_following_ema_cross` on AVGO, MU, ORCL
-  - `equity_sector_rotation_momentum` vs `equity_trend_following_ema_cross` on DELL
-  - `equity_momentum_macd_histogram` vs `equity_trend_following_ema_cross` on META, MSFT (SNDK already
-    validated for macd, Sharpe 2.254 — no head-to-head needed; META now has a LIVE macd long, avg $605.28)
-  - trend-following placeholders → AAPL, AMZN, CBRS, GOOGL, JPM, NUVL, NVDA, QQQ, SPY, TSLA, TSM
-    (CBRS → event-driven; TSLA/JPM/INTC → event-driven for the earnings/delivery windows)
-  - QCOM provisional (event-driven) + SYNA provisional (pairs-cointegration) → validate or escalate
+## Library gaps + research items (carry to research_tasks.md — Saturday)
+
+Same open gap set as 7/6 (the 7/6 brief was NOTABLE with several NEW instances). All `responder: NONE` —
+informational, not tradable under the mandate:
+- **Provisional/quarantined validations (TOP PRIORITY):** SPCX (trend-following; joined Nasdaq-100 7/7 but
+  still quarantined; `revalidate_by 2026-07-21`), QCOM (event-driven, 7/21), SYNA (pairs-cointegration, 7/21 —
+  LIVE onsemi $7B all-stock merger-arb, long SYNA / short ON at 1.350). Deadlines all reset to 7/21 by the 7/7
+  state re-bootstrap.
+- **Customer/supply-agreement event window** — MU Micron-Ford + Micron-GM SCAs; AVGO Broadcom-Apple-2031.
+  event_driven_catalyst models earnings windows, not supply/partnership disclosures.
+- **Product/roadmap-slip sub-trigger** — NVDA Kyber NVL144 delay; MRVL competitive-window read-through.
+- **Restructuring/workforce-reduction event window** — MSFT (4,800 cuts) + ORCL (carry). No responder.
+- **Pricing/margin-disclosure sub-trigger** — INTC price hikes up to $50 + AAPL ~55% hikes.
+- **Regulatory/antitrust event window** — DST-tariff (GOOGL/META/AMZN/AAPL), UK under-16 ban, GOOGL EU €4.1B
+  (carry). No rule reads a court/agency/trade action.
+- **Index-inclusion/forced-flow (NEW_CATEGORY_NEEDED)** — SPCX→Nasdaq-100 7/7; SK Hynix Nasdaq listing 7/10.
+- **Earnings/delivery-window assignment** — JPM (7/14, window open), TSLA (7/22), INTC (7/23), CBRS (carry);
+  all trend-following-claimed, not event-driven. JPM most urgent.
+- **Capital-allocation event window** — JPM $50B buyback (consummated); MU Trump-Accounts (carry).
+- **Vol-regime activation** — MU post-print IV crush; SPCX/JPM/TSLA event-IV. Vol structures exist
+  (iron_condor_high_iv, etc.) but none active / none claims a universe symbol.
+- **Validate first-pass + provisional assignments via head-to-head** (carry): breakout vs trend on
+  ARM/MRVL/INTC; bollinger vs trend on CSCO; rsi vs trend on HPE; event-driven vs trend on AVGO/MU/ORCL;
+  sector-rotation vs trend on DELL; macd vs trend on META/MSFT; trend placeholders → AAPL/AMZN/CBRS/GOOGL/JPM/
+  NUVL/NVDA/QQQ/SPY/TSLA/TSM.
 
 ## Open questions for the operator
 
-1. **[HIGH] Repair the scheduled-task interpreter.** Bare `python3` → Homebrew 3.14.5 (no deps). Repoint the
-   Cowork task / daily_prompt to `.venv/bin/python3`, or reinstall deps into 3.14, or recreate the venv.
-   Persisting across many runs.
-2. **[MEDIUM] Trader task fired on the 7/3 NYSE holiday.** Ran cleanly as read-only assess-and-stop
-   (market-status guarded the execute step), but ideally short-circuit on `is_open: false` — or confirm the
-   M-F schedule is intended to fire on holidays. Not harmful, just wasteful.
-3. **[HIGH] News pipeline flaky — a purpose-built holiday brief fired FRESH 7/3 (4th straight: 6/30, 7/1, 7/2,
-   7/3) but missed 6/22 + 6/25 + 6/29.** Add a health-check / alert on news-agent run failure so a
-   missed/stale brief is visible. Plus the `_load_news_brief()` staleness guard (Q4).
-4. **`_load_news_brief()` staleness guard** — parses `date_in_file` but never compares to today. Reject/
-   down-weight a brief whose date != today.
-5. **[REOPENED] `cli open-orders` parser bug** — errors `'dict' object has no attribute 'id'` when a live open
-   order exists (did NOT bite 7/2 or 7/3 — no order; bit on META 7/1, QQQ 6/30, SPY 6/26). Returns clean JSON
-   only when no open orders. Fix the order-serialization path; the trader can't inspect live orders.
-6. **THREE provisional/quarantined claims** — Sat research owns validation: SPCX (**7/04 — THIS SATURDAY,
-   deadline passes before Mon 7/6**), QCOM + SYNA (7/10). Do NOT character-match / hand-promote.
-7. **MU round-tripped its whole gain (+17.43% peak → −0.75%); trailing stop still NOT fired.** DRAM-antitrust
-   overhang. Watch for the give-back scenario where the trailing stop finally engages; reconcile any
-   rule-driven exit. No discretionary action.
-8. **ORCL −20.88% (−$1,406) — held name in a real drawdown with no algorithmic handle.** Restructuring-event
-   gap is no longer academic; elevate for Saturday.
+1. **[P0, BLOCKING] Confirm the 7/7 broker-state wipe.** Was the Alpaca paper account/positions reset? Is the
+   flat $71,809.59 book the new baseline, or should the four longs be restored? The harness is frozen until you
+   answer. Details + last-good marks in `last_handoff.md`.
+2. **[HIGH] Scheduled task fired off-cycle at 09:09 PT mid-session (7/7).** Combined with the 7/3 holiday
+   firing, the trigger is misbehaving. Confirm intended schedule; confirm whether a canonical 4 PM run also
+   fires.
+3. **[HIGH] Repair the interpreter** — bare `python3` = Homebrew 3.14.5 (no deps). Repoint task/daily_prompt to
+   `.venv/bin/python3` or reinstall deps.
+4. **[HIGH] News pipeline** — 7/7 brief absent at run time (header `2026-07-06`). Add a health-check/alert +
+   the `_load_news_brief()` staleness guard.
+5. **[REOPENED] `cli open-orders` parser bug** — `'dict' object has no attribute 'id'` when a live order
+   exists (did NOT bite 7/7 — no order).
+6. **THREE provisional/quarantined claims** — QCOM/SPCX/SYNA, all `revalidate_by 2026-07-21`. Saturday research
+   owns validation. Do NOT hand-promote.

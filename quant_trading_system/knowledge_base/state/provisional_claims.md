@@ -5,8 +5,8 @@ provisional:
   gap_type: event_catalyst
   sharpe: 0.0
   baseline_sharpe: 0.5
-  provisional_since: '2026-06-26'
-  revalidate_by: '2026-07-10'
+  provisional_since: '2026-07-07'
+  revalidate_by: '2026-07-21'
   reason: "top candidate 'equity_event_driven_catalyst' has Sharpe 0.000 < baseline\
     \ 0.500. No library strategy is good enough on this symbol \u2014 log for Saturday\
     \ research to build a new template."
@@ -15,16 +15,16 @@ provisional:
   gap_type: volatility_regime
   sharpe: null
   baseline_sharpe: 0.5
-  provisional_since: '2026-06-20'
-  revalidate_by: '2026-07-04'
+  provisional_since: '2026-07-07'
+  revalidate_by: '2026-07-21'
   reason: "every candidate backtest errored / no price history \u2014 cannot rank"
 - symbol: SYNA
   strategy_id: equity_pairs_trading_cointegration
   gap_type: pairs_arbitrage
   sharpe: 0.0
   baseline_sharpe: 0.5
-  provisional_since: '2026-06-26'
-  revalidate_by: '2026-07-10'
+  provisional_since: '2026-07-07'
+  revalidate_by: '2026-07-21'
   reason: "top candidate 'equity_pairs_trading_cointegration' has Sharpe 0.000 < baseline\
     \ 0.500. No library strategy is good enough on this symbol \u2014 log for Saturday\
     \ research to build a new template."
