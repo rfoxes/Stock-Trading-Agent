@@ -1512,6 +1512,11 @@ def triage_symbol(
                 continue
             if sf.type != "equity":
                 continue
+            # Skip passive fallback strategies (e.g. equity_watch_only). They
+            # never trade, so they are the mandatory-attach fallback, never a
+            # ranked competitor against real trading strategies.
+            if (sf.frontmatter or {}).get("role") == "watch":
+                continue
             candidates.append(sf.id)
         if not candidates:
             return _err("no equity strategies available to triage")

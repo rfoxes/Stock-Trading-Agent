@@ -31,6 +31,33 @@ behind `cli triage-symbol --no-provisional` for diagnostics.) The
 strategy ever trades. No exceptions, no character-match shortcuts. This
 rule is permanent and applies to every future run.
 
+**Grade (b) is now the WATCH grade (operator directive 2026-07-08).** The
+mandatory-attach fallback for a no-edge / no-price-history symbol is the
+passive `equity_watch_only` strategy (`memory.DEFAULT_FALLBACK_STRATEGY`),
+which NEVER trades — its `evaluate()` returns `[]`. So a symbol with no
+validated edge is attached to watch_only, an honest "we are watching this,
+not trading it" state, rather than having a real trading strategy laid on
+it with no backtest behind it. **Watching is a legitimate RESTING state,
+not a failure** — the name stays under full news coverage, and Saturday
+research upgrades it to a trading strategy only if/when it finds a
+backtestable edge (triage / head-to-head). Notes:
+- `equity_watch_only` carries `role: watch` and is EXCLUDED from being
+  scored as a triage candidate — it is the fallback, never a competitor.
+- A below-baseline *trading* candidate (a real strategy that scored but
+  missed Sharpe 0.5) is still attached as a provisional trading claim so
+  research keeps the "closest candidate" hint; only the no-rankable-
+  candidate / no-history case defaults to watch_only. Both are
+  execution-quarantined; neither trades.
+
+**News → universe → strategy, universally (operator directive 2026-07-08).**
+Every stock the daily news agent *materially reports on* is promoted into
+the universe on first appearance (news_manual §9 "Tier 0" — subject of a
+news item, not an incidental cross-mention), and P0 mandatory-attach then
+guarantees it a strategy: VALIDATED if a library strategy clears baseline,
+otherwise WATCH. Net effect: "every symbol the news reports on is in the
+universe and has a strategy; that strategy can just be to keep watch." The
+trader still never hand-claims — triage attaches; Sharpe decides.
+
 **The end of character-match (2026-06-10 refinement).** Earlier versions
 of this rule allowed first-pass character-match claims ("AVGO has
 earnings, give it to event_driven_catalyst") to satisfy the zero-

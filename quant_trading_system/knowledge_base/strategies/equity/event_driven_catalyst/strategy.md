@@ -56,17 +56,28 @@ only if there are positive single-name catalysts (in practice rare).
 
 ## Exit Rules
 
+All exits are enforced by **re-evaluation every session**, not by a resting
+broker order: entries submit a plain market buy (no attached stop), so
+`evaluate()` itself re-checks each held position on every run and emits the
+sell when a rule trips. Each held name emits at most one sell per run;
+priority is negative-news → hard stop → time stop.
+
 - **Negative news exit:** if the news brief contains negative markers
   (guidance cut, downgrade, lawsuit, regulatory action, recall, warning,
   fraud, restate, going concern, bankruptcy) for a held symbol, exit at
   next session's open. Catalyst-driven exits take precedence over all other
   signals.
-- **Hard stop:** exit if price ≤ entry × (1 − 2×ATR/entry) — the stop set
-  at entry.
-- **Time stop:** exit after 7 calendar days regardless of P&L. The catalyst
-  edge decays fast; do not turn this into a long-term hold.
+- **Hard stop:** exit if current price ≤ entry − 2×ATR(14). ATR is
+  re-computed from current bars each run (a moving 2×ATR stop), so no
+  entry-time state needs to be persisted. Skipped (not fatal) if bars are
+  unavailable — a data gap must never block the time stop.
+- **Time stop:** exit after `max_hold_days` (7) calendar days regardless of
+  P&L. The catalyst edge decays fast; do not turn this into a long-term hold.
+  Position age is derived from the journal (the entry is the earliest
+  `order_submitted` buy after the most recent `trade_closed` for the symbol);
+  if the entry can't be located, the time stop does not fire.
 - **Take profit:** none explicit — let the strategy ride to the time stop
-  unless the news flips negative.
+  unless the news flips negative or the hard stop trips.
 
 ## Risk Management
 

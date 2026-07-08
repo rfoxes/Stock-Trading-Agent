@@ -5,6 +5,48 @@ false`, `next_open 2026-07-08 09:30 ET`. **✅ THE MORNING WIPE SELF-RESTORED �
 a normal session.** This is the "real 4 PM post-close run" the 09:09 handoff said could execute if the account
 re-confirmed clean. It did. Ran everything via the venv.)
 
+## 🔧 2026-07-08 INTERACTIVE OPERATOR SESSION — three durable changes (committed)
+
+After the 7/7 automated run, the operator opened an interactive session and directed three changes. All are
+live in the working tree and committed via git-sync. Tomorrow's run inherits them.
+
+**1. Fixed `equity_event_driven_catalyst`: its documented exits are now actually enforced.** Investigation
+(prompted by "why does ORCL sit at −20% unmanaged?") found the strategy implemented only its *negative-news*
+exit; the **hard ATR stop** and **7-day time stop** it documents were dead letters — the stop was passed as
+`stop_loss_pct` on the entry intent but the LIVE submission path ignores that field (only the backtester at
+`strategy_backtest.py:395` consumes it), so no resting broker stop ever existed, and `max_hold_days` appeared in
+zero Python. The backtester DID honor the stop, so the strategy's simulated stats flattered it and hid the live
+gap. Fix: `evaluate()` now re-derives and re-checks both stops on every held position each run (there is no
+resting order — the strategy is the stop). `.md` and `.py` synced. **The next `cli execute` will therefore sell
+AVGO (time), MU (time), ORCL (hard) — verified by dry-run: 3 intents where there were 0. Expected, not an
+anomaly.** Operator kept `max_hold_days: 7` ("that's fine"); calibration is a research item. On the "7 days is
+arbitrary" question: the *concept* (catalyst alpha is time-concentrated; force turnover; don't let an
+event-trade drift into a permanent hold) is principled — it's the discipline whose ABSENCE let ORCL ride to
+−20%; the specific *value* 7 is an uncalibrated default and a fair thing to backtest.
+
+**2. New `equity_watch_only` strategy + it's the mandatory-attach fallback.** Passive by design (`evaluate()` →
+`[]`, never trades), `role: watch`, excluded from triage candidate scoring. `memory.DEFAULT_FALLBACK_STRATEGY`
+now points to it, so a no-edge / no-history symbol is attached to watch_only ("watching, not trading") instead
+of a real trading strategy laid on with no backtest. Watching is now an explicit, legitimate RESTING grade.
+
+**3. News → universe → strategy, universally (operator directive).** news_manual §9 "Tier 0": the news agent
+promotes EVERY stock it *materially reports on* (subject of an item, not an incidental cross-mention) on first
+appearance — the 3-session recurrence gate is demoted to a prioritization hint. Mandatory-attach then guarantees
+each a strategy (VALIDATED or WATCH). Directive recorded in `manual.md` P0 and `news_manual.md` §9. Rationale
+(operator verbatim): "everytime news reports on a stock, bring it into the universe and give it a strategy —
+that can just be to keep watch, doesn't have to be buy or sell."
+
+Verification done this session: both edited strategies pass `validate-strategy`; `list-active` and
+`list-strategies` load cleanly (harness not broken); the watch fallback wiring confirmed by a no-side-effect
+check (fallback constant, `role: watch` exclusion, `evaluate()`→`[]`). Existing provisional claims
+(QCOM/SPCX/SYNA) are untouched — the fallback change only affects FUTURE attaches.
+
+**Execution decision:** the AVGO/MU/ORCL exits were NOT fired in this session — they'll go out on the next
+scheduled post-close `cli execute` (same fill timing since the market is closed now). If that run somehow does
+NOT fire, run `cli execute` manually to place them.
+
+---
+
 ## ✅ TL;DR — THE 7/7 09:09 "WIPE" WAS TRANSIENT; BOOK RESTORED; EXECUTE RAN CLEAN
 
 The account that came back FLAT at 09:09 this morning (all four longs gone, cash unchanged) **self-restored by

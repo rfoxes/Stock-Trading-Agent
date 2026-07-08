@@ -94,9 +94,14 @@ PROVISIONAL_CLAIMS_FILE = STATE_DIR / "provisional_claims.md"      # mandatory-a
 # no data / no responder), the mandatory-attach doctrine (operator directive
 # 2026-06-16) still attaches a *provisional* best-available strategy so that
 # every universe symbol has a strategy. This is the fallback when there is no
-# rankable candidate at all (e.g. a brand-new IPO with no price history): the
-# most generic price-driven strategy in the library.
-DEFAULT_FALLBACK_STRATEGY = "equity_trend_following_ema_cross"
+# rankable candidate at all (e.g. a brand-new IPO with no price history).
+#
+# Operator directive 2026-07-08 ("every symbol gets a strategy; it can just be
+# to watch"): the fallback is now the passive `equity_watch_only` strategy,
+# which never trades. A newly-news-promoted symbol with no backtestable history
+# thus lands in an honest "watching, not trading" state rather than having a
+# real price-driven strategy laid on it with no validated edge.
+DEFAULT_FALLBACK_STRATEGY = "equity_watch_only"
 HANDOFF_FILE = STATE_DIR / "last_handoff.md"
 SUMMARY_FILE = STATE_DIR / "summary.md"
 

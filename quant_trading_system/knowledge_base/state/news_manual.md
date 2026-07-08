@@ -336,10 +336,36 @@ move on. Full-article fetching is reserved for the Saturday research agent.
    `state/extra_symbols.md`, writes the sector to
    `state/symbol_sectors.md`, and creates the `news/stocks/<SYMBOL>/`
    folder. Strategies will not automatically claim the new symbol — the
-   research agent (or a head-to-head call) does that — but the universe
-   coverage is the first step.
+   trader's `cli triage-symbol` attaches one (see below), and the
+   research agent validates it — but the universe coverage is the first
+   step.
 
-   **Tier A — 3-session recurrence (the default rule).** For every
+   **Tier 0 — news-subject inclusion (OPERATOR DIRECTIVE 2026-07-08, the
+   primary rule; supersedes the recurrence gate for INCLUSION).** Every
+   stock the news *materially reports on* today gets promoted into the
+   universe on first appearance — no 3-session wait. "Materially reports
+   on" = the stock is the **subject** of a news item (it has its own
+   coverage line / a catalyst attributed to it), NOT an incidental
+   cross-mention (a competitor named in passing, a sympathy/cohort name,
+   an index or macro reference). When in doubt, include it — inclusion is
+   cheap and reversible: the trader's mandatory-attach triage will give a
+   no-edge name the passive **`equity_watch_only`** strategy (coverage
+   without trading), so a promoted name never trades until research finds
+   it a real edge. The rationale (operator): "everytime news reports on a
+   stock, bring it into the universe and give it a strategy — that can
+   just be to keep watch, doesn't have to be buy or sell."
+
+   This does NOT uncap trading. Promotion = universe coverage + a watch
+   attachment only. Whether a name graduates to a *trading* strategy is
+   still decided downstream by Sharpe (trader triage → Saturday research
+   head-to-head), never by the news agent.
+
+   **Tier A — 3-session recurrence (now a PRIORITIZATION signal, not the
+   inclusion gate).** Under Tier 0 every news-subject is already in the
+   universe on day one, so recurrence no longer gates inclusion. Keep
+   tracking recurrence counts in `news_tasks.md` anyway — a name recurring
+   3+ sessions is a strong hint to the research agent that it deserves a
+   *trading* strategy (not just watch). For every
    candidate flagged in "Candidates for the universe" for **3+ consecutive
    sessions** in `news_tasks.md`'s carry-forwards, promote it. This is
    the noise-filter for general thematic recurrence (cohort framing,
@@ -372,10 +398,14 @@ move on. Full-article fetching is reserved for the Saturday research agent.
 
    **Caps and discipline:**
 
-   - **Daily cap: 2 single-event promotions per news run.** Recurrence
-     promotions (Tier A) are uncapped — those have already passed the
-     3-session filter. If more than 2 single-event qualifiers appear in
-     one session, promote the 2 strongest and carry the rest forward.
+   - **Tier-0 news-subject inclusion is UNCAPPED** (operator directive
+     2026-07-08) — promote every stock the news materially reports on;
+     the watch attachment makes over-inclusion harmless. The legacy
+     "2 single-event promotions per run" cap is retired for inclusion; it
+     only ever existed to throttle *trading-candidate* churn, which Tier 0
+     no longer creates (new names default to watch, not trade). Still
+     apply the "materially reports on" subject test to keep incidental
+     cross-mentions out.
    - **Sunset suggestion.** Any auto-promoted symbol with **0 news
      items across 30 consecutive sessions AND no active position** should
      be logged in `news_tasks.md` open-questions for the operator to

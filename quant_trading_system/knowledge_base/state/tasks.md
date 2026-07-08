@@ -8,6 +8,31 @@ un-freeze rationale. Replace this file (don't append) when you write the next ve
 
 ---
 
+## ⚠️ CODE CHANGES LANDED 2026-07-08 (interactive operator session) — READ BEFORE EXECUTE
+
+Three durable changes were made and committed mid-week. Full detail in `last_handoff.md`; the operative points:
+
+1. **`equity_event_driven_catalyst` now ENFORCES its exits** (previously only the negative-news exit ran; the
+   documented hard stop + 7-day time stop were never wired to live execution). `evaluate()` now re-checks each
+   held position every run: negative-news → hard ATR stop (`price ≤ entry − 2×ATR(14)`, ATR from current bars)
+   → time stop (`max_hold_days`, default 7; age from the journal). **CONSEQUENCE: the next `cli execute` will
+   emit SELLS for AVGO (time stop, held 22d), MU (time stop, 30d), and ORCL (hard stop, −20%)** — a ~$21k /
+   ~1.9%-of-equity liquidation. This is EXPECTED and correct (these are 3–4× past the 7-day catalyst horizon),
+   NOT an anomaly — do not freeze on it. The daily-loss gate sits ~1.96% vs the 2.0% cap, so the last/largest
+   sell (ORCL) may reject and defer a day (intended graduated exit). Verified via dry-run 2026-07-08.
+   `max_hold_days: 7` kept per operator ("that's fine"); calibrating it is a Saturday-research item.
+2. **New `equity_watch_only` strategy** (passive; `evaluate()` → `[]`, never trades) is now the mandatory-attach
+   fallback (`memory.DEFAULT_FALLBACK_STRATEGY`). A no-edge / no-price-history symbol is attached to watch_only
+   ("watching, not trading") instead of a real trading strategy. It has `role: watch` and is excluded from
+   triage candidate scoring. Below-baseline *trading* candidates still attach as provisional trading claims.
+3. **News → universe → strategy, universally (operator directive).** news_manual §9 "Tier 0": the news agent now
+   promotes EVERY stock it *materially reports on* (subject of an item, not an incidental cross-mention) into the
+   universe on first appearance — no 3-session wait. Mandatory-attach then gives each a strategy (VALIDATED or
+   WATCH). Expect the universe to grow faster; new names default to watch and won't trade until research finds an
+   edge. Both manuals (`manual.md` P0, `news_manual.md` §9) carry the directive.
+
+---
+
 ## STANDING POLICY (P0, do not ignore) — MANDATORY-ATTACH DOCTRINE (2026-06-16)
 
 Every universe symbol MUST have a strategy attached (see `manual.md` P0 rule). Two grades: **(a) VALIDATED**
