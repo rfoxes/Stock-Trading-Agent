@@ -1,24 +1,5 @@
 ---
 strategies:
-- id: equity_breakout_volume_confirmation
-  symbols:
-  - ARM
-  - INTC
-  - MRVL
-  since: '2026-06-04'
-  reason: "Operator directive 2026-06-04: every universe symbol must be claimed. Volatile\
-    \ chip names \u2014 breakout-confirmation suits MRVL (recent Jensen-anointment\
-    \ momentum) and ARM (growth chip). First-pass assignment without head-to-head\
-    \ per operator override; research agent should validate. INTC added 2026-06-09\
-    \ per P0 zero-unclaimed rule (volatile chip with Google-foundry news catalyst)."
-- id: equity_mean_reversion_bollinger
-  symbols:
-  - CSCO
-  since: '2026-06-04'
-  reason: "Operator directive 2026-06-04: every universe symbol must be claimed. CSCO\
-    \ is a lower-vol large-cap with 11 PT raises in a week (extended) \u2014 Bollinger\
-    \ mean reversion is a defensible first-pass match. Research agent should validate\
-    \ via head-to-head."
 - id: equity_rsi_divergence
   symbols:
   - HPE
@@ -62,31 +43,42 @@ strategies:
     \ / no price history \u2014 cannot rank Attached best-available equity_trend_following_ema_cross\
     \ for coverage; QUARANTINED from execution until Saturday research validates (clears\
     \ baseline 0.50) or escalates."
-- id: equity_pairs_trading_cointegration
-  symbols:
-  - IRDM
-  - SYNA
-  since: '2026-07-08'
-  reason: "PROVISIONAL/UNVALIDATED triage 2026-07-08: top candidate 'equity_pairs_trading_cointegration'\
-    \ has Sharpe 0.000 < baseline 0.500. No library strategy is good enough on this\
-    \ symbol \u2014 log for Saturday research to build a new template. Attached best-available\
-    \ equity_pairs_trading_cointegration for coverage; QUARANTINED from execution\
-    \ until Saturday research validates (clears baseline 0.50) or escalates."
 - id: equity_event_driven_catalyst
   symbols:
   - AVGO
-  - BE
   - MU
   - ORCL
   - QCOM
-  - RKLB
+  since: '2026-07-08'
+  reason: 'research 2026-07-08: released SMCI/RKLB/BE to validated equity claims (unrestricted
+    triage winners clear baseline 0.5 on >=5 trades); event_driven_catalyst retains
+    actively-managed AVGO/MU/ORCL (resting exits) + QCOM provisional (held, thin 3-trade
+    sample)'
+- id: equity_pairs_trading_cointegration
+  symbols:
+  - SYNA
+  since: '2026-07-08'
+  reason: 'research 2026-07-08: released IRDM to validated breakout claim (triage
+    winner breakout_volume_confirmation Sharpe 0.832 on 9 trades >= baseline); pairs
+    retains SYNA provisional (held, thin 4-trade sample)'
+- id: equity_mean_reversion_bollinger
+  symbols:
+  - CSCO
   - SMCI
   since: '2026-07-08'
-  reason: "PROVISIONAL/UNVALIDATED triage 2026-07-08: top candidate 'equity_event_driven_catalyst'\
-    \ has Sharpe 0.000 < baseline 0.500. No library strategy is good enough on this\
-    \ symbol \u2014 log for Saturday research to build a new template. Attached best-available\
-    \ equity_event_driven_catalyst for coverage; QUARANTINED from execution until\
-    \ Saturday research validates (clears baseline 0.50) or escalates."
+  reason: 'triage-symbol 2026-07-08: equity_mean_reversion_bollinger beat 10 other
+    candidate(s) on SMCI with Sharpe 0.814 (vs baseline 0.50)'
+- id: equity_breakout_volume_confirmation
+  symbols:
+  - ARM
+  - BE
+  - INTC
+  - IRDM
+  - MRVL
+  - RKLB
+  since: '2026-07-08'
+  reason: 'triage-symbol 2026-07-08: equity_breakout_volume_confirmation beat 10 other
+    candidate(s) on IRDM with Sharpe 0.832 (vs baseline 0.50)'
 ---
 
 Active strategy set. Each entry owns its declared symbols exclusively. Conflicts are resolved by head-to-head backtest at the research layer, never at runtime.

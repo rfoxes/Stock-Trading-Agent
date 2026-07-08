@@ -7,129 +7,117 @@ Brief is fine. Full narrative belongs in the weekly log.
 
 ---
 
-## Status as of the last update (2026-07-07)
+## Status as of the last update (2026-07-08)
 
-- **RUN VIA `.venv/bin/python3`, NOT bare `python3`.** Homebrew 3.14.5 still lacks
-  harness deps; bare `python3 -m quant_trading_system.cli ...` fails
-  `No module named 'requests'`. Working interpreter: `.venv/bin/python3` (3.13.13).
-  Many runs on the venv. Operator hasn't repointed the tasks. (Open Q#1.)
-- **This run covered the ~2.5-week gap since 6/20** (6/27 Saturday produced no log;
-  this was the delayed 7/04 run executing 7/07 post-holiday).
-- **Library size:** 19 strategies (11 equity, 8 options). All `active`. 0 archived.
-  `gap-registry coverage_holes: []`.
-- **Adds/updates/archives this run: 0 / 0 / 0 (correct no-op).** Every gap is
-  overlay/assignment/taxonomy/options-not-backtestable — none `propose-strategy`-shaped.
-  See `research_log/2026-07-07.md`.
-- **Archive sweep:** all 8 active-set equity strategies → KEEP. trend_following
-  HEALTHY (rolling Sharpe 6.25, PSR 0.87, 10 trades). event_driven_catalyst STILL
-  `rolling_sharpe null` / 0 trades in window even after MU's 6/24 print (un-adjudicable).
-- **Head-to-head:** none run (degenerate first-pass validations, Open Q#3). Active
-  set UNCHANGED.
-- **Web research:** PEAD (SUE) and index-rebalance both researched, both foregone
-  REJECT (cross-sectional / low-freq vs single-symbol backtester + 20-trade floor).
-  Not implemented. Log §"Web research".
-- **PROVISIONAL claims (PRIORITY ZERO) — all 3 re-triaged, none cleared, all still
-  quarantined:**
-  - **SPCX** (trend_following, `volatility_regime`): 16 bars now (was 5), still `<60`
-    → un-backtestable; gap_type is options-only (no chain data). Orig. deadline
-    **2026-07-04 LAPSED** → **ESCALATED (Open Q#7)**. Re-triage auto-bumped
-    `revalidate_by` → 2026-07-21. Won't accrue 60 bars until ~September.
-  - **QCOM** (event_driven, `event_catalyst`): Sharpe 0.0 / 0 trades — responder is
-    un-backtestable, can NEVER clear baseline via triage. Orig. deadline 7/10;
-    re-triage auto-bumped → 7/21.
-  - **SYNA** (pairs_cointegration, `pairs_arbitrage`): Sharpe 0.0 / 0 trades — needs
-    the short-ON leg modeled; single-symbol sim = 0 trades forever. Orig. deadline
-    7/10; re-triage auto-bumped → 7/21.
+- **RUN VIA `.venv/bin/python3`.** Bare `python3` = Homebrew 3.14.5, no deps (`No module named
+  'requests'`). Working interpreter: `.venv/bin/python3` (3.13.13). Operator hasn't repointed. (Open Q#1.)
+- **This run fired Wednesday 7/8, off-cycle** (schedule-timing issue). Ran the full workflow anyway.
+- **Library:** 20 strategies (12 equity incl. `equity_watch_only`, 8 options). All `active`. 0 archived.
+  `gap-registry coverage_holes: []`. **Adds/updates/archives this run: 0 / 0 / 0** (correct no-op on
+  membership; no novel candidate is backtestable on the daily/single-symbol/next-open engine). See
+  `research_log/2026-07-08.md`.
+- **BIG CHANGE — provisional_count 7 → 3.** 4 provisionals CONVERTED to validated via UNRESTRICTED triage
+  (last week's "structurally un-validatable" was a gap-type-filter artifact — see manual feedback 2026-07-08):
+  - **SMCI** → `equity_mean_reversion_bollinger` (0.814 / 5 trades) — trades Monday.
+  - **RKLB** → `equity_breakout_volume_confirmation` (1.059 / 9 trades) — trades Monday.
+  - **BE**   → `equity_breakout_volume_confirmation` (1.483 / 6 trades) — trades Monday.
+  - **IRDM** → `equity_breakout_volume_confirmation` (0.832 / 9 trades) — trades Monday.
+  Incumbents shrunk to preserve live claims: `event_driven_catalyst` → {AVGO,MU,ORCL,QCOM};
+  `pairs_cointegration` → {SYNA}. Provisional markers cleared via `memory.clear_provisional_claim` (harness
+  doesn't auto-clear cross-strategy claims — Open Q#8).
+- **Archive sweep:** all 8 active-set equity strategies → KEEP. trend_following HEALTHY (rolling Sharpe 6.25,
+  PSR 0.87, 10 trades). event_driven_catalyst still 0 trades in window (will gain evidence once 7/8 exits log).
+- **Web research:** PEAD (needs EPS-surprise fundamentals + quarterly < 20-trade floor) and generic
+  Quantpedia breakout/momentum (redundant or intraday) — both foregone. Overnight-drift assessed and rejected
+  (collapses to 1-day momentum on a next-open-fill engine). No battery run. Log §"Web research".
+- **git-sync infra:** `.git-sync-queue/` has only Jun-1 test files → LaunchAgent healthy.
+
+## PROVISIONAL claims remaining — 3 (PRIORITY ZERO next Saturday)
+
+- **QCOM** (event_driven_catalyst, event_catalyst): HELD. Unrestricted triage → `mean_reversion_bollinger`
+  0.817 but **only 3 trades** (<5 → fluke-prone). `revalidate_by 2026-07-21` (NOT auto-extended — scored with
+  `--no-claim`). **Not** structurally un-validatable anymore — just thin.
+- **SYNA** (pairs_cointegration, pairs_arbitrage): HELD. Unrestricted triage → `rsi_divergence` 0.731 but
+  **only 4 trades** (<5). `revalidate_by 2026-07-21` (not auto-extended). Thin, not blocked.
+- **SPCX** (trend_following, volatility_regime): ESCALATED (structural). 17 bars < 60 → un-backtestable until
+  ~September (IPO bar accrual). `revalidate_by 2026-07-21` (not auto-extended). Keep quarantined. Open Q#7.
 
 ## To do this Saturday
 
-1. **PRIORITY ZERO — re-triage all 3 provisionals, but escalation logic first.**
-   `cli triage-symbol SPCX --gap-type volatility_regime`, `... QCOM --gap-type
-   event_catalyst`, `... SYNA --gap-type pairs_arbitrage`. **BEFORE re-triaging,
-   note that re-triage AUTO-EXTENDS `revalidate_by` (masks the lapse — Open Q#7).**
-   Judge escalation by the STRUCTURAL block, not the file's live deadline:
-   - **SPCX:** check bar count via `cli simulate equity_trend_following_ema_cross
-     --symbol SPCX` — needs ≥60 (had 16 on 7/07). Will not clear until ~Sept.
-     Keep ESCALATED, keep quarantined. Do NOT auto-remove.
-   - **QCOM & SYNA:** their orig. 7/10 deadline has now passed AND they are
-     structurally un-validatable (un-backtestable responders). **Both are now
-     hard-escalation-due — keep under Open Q#7, keep quarantined.**
-   All three: never let trade unvalidated, never auto-remove.
+1. **PRIORITY ZERO — re-run UNRESTRICTED `--no-claim` triage on all 3 remaining provisionals.**
+   `cli triage-symbol QCOM --no-claim`, `... SYNA --no-claim`, `... SPCX --no-claim`. (Use `--no-claim` so you
+   don't auto-extend `revalidate_by` for the ones you hold — manual feedback 2026-07-08.)
+   - **QCOM / SYNA:** if the winner now shows **≥5 trades** and clears baseline 0.5 → CONVERT: `add-active
+     <incumbent> --replace --symbols <kept-only>` to release the symbol (event_driven keeps AVGO,MU,ORCL;
+     pairs keeps nothing else — it'd become empty, so instead just release SYNA and let pairs hold whatever
+     remains, or archive-consider pairs if it ends with 0 symbols), then `cli triage-symbol <SYM>` (auto-claim)
+     + verify `provisional_count` dropped (else `memory.clear_provisional_claim('<SYM>')`). If still <5 trades,
+     HOLD again. If their **original 2026-07-21** deadline has passed and still <5 trades, escalate as
+     "borderline: clears baseline on <5 trades — accept thin sample or relax num_trades? (operator)".
+   - **SPCX:** check `cli simulate equity_trend_following_ema_cross --symbol SPCX` bar count; needs ≥60 (had 17
+     on 7/8). Keep ESCALATED + quarantined until it accrues 60 bars (~Sept). Do NOT auto-remove.
+   - NB: if you release SYNA from `pairs_cointegration` and it becomes the strategy's ONLY claim removed, pairs
+     may end with an empty claim list — decide whether to leave it claimless (fine, it's a library strategy) or
+     note it. Don't archive it (still `active`, un-backtestable, no journal evidence → archive battery = KEEP).
 
-2. **Confirm interpreter + git-sync infra.** If bare `python3 ... list-active` still
-   errors `No module named 'requests'`, use `.venv/bin/python3` and re-flag Q#1.
-   Check `.git-sync-queue/` for marker pile-up (only Jun-1 test files on 7/07 →
-   LaunchAgent OK).
+2. **Confirm interpreter + git-sync infra.** Bare `python3 ... list-active` should still error
+   `No module named 'requests'` → use `.venv/bin/python3`, re-flag Q#1. Check `.git-sync-queue/` for pile-up.
 
-3. **Archive sweep.** Re-run `cli evaluate-archive` on all 8 active-set equity
-   strategies. All KEEP on 7/07.
+3. **Archive sweep.** Re-run `cli evaluate-archive` on all 8 active-set equity strategies. All KEEP on 7/8.
+   **Watch event_driven_catalyst:** once the 7/8 AVGO/MU/ORCL exits are logged (log-closed by the trader), it
+   gains lifetime trading evidence and becomes archive-evaluable — check its rolling Sharpe/PSR then.
+   Also newly-evaluable soon: mean_reversion_bollinger (SMCI) + breakout_volume_confirmation (RKLB/BE/IRDM)
+   once they trade.
 
-4. **Re-tag check (optional).** Verify `gap-registry coverage_holes: []` still holds.
-   If the operator added/removed strategies, re-apply the options `gap_types` tagging
-   from `research_log/2026-06-16.md` §1.
+4. **Re-tag check (optional).** Verify `gap-registry coverage_holes: []` still holds; re-apply options
+   `gap_types` tagging from `research_log/2026-06-16.md` §1 if the operator added/removed strategies.
 
-5. **Do NOT run head-to-head first-pass validations** (ARM/MRVL/INTC/CSCO/HPE/DELL/
-   META/MSFT/AVGO/MU/ORCL) — degenerate 0-trade tiebreak (Open Q#3). Record, hold.
-   MSFT & ARM remain NEGATIVE-fit claims (macd −0.274/13tr on MSFT; breakout
-   −1.154/12tr on ARM) — best candidates for a dedicated responder once the
-   num_trades floor lands. Hold.
+5. **Do NOT run head-to-head first-pass validations** (ARM/MRVL/INTC/CSCO/HPE/DELL/META/MSFT/SNDK + trend
+   placeholders) — degenerate 0-trade tiebreak (Open Q#3). Record, hold. MSFT & ARM remain NEGATIVE-fit
+   claims — best candidates for a dedicated responder once the num_trades floor lands. Hold.
 
-6. **If the operator ships any of the structural fixes below,** the whole gap
-   backlog unblocks at once (num_trades floor → PEAD/index-rebalance/FOMC become
-   testable; news-replay fixture → event_driven adjudicable; options-chain fixture →
-   vol strategies + SPCX testable). Re-attempt the relevant candidates that day.
+6. **If the operator ships any structural fix,** the backlog unblocks: num_trades floor → PEAD/index-rebalance
+   testable; news-replay fixture → event_driven adjudicable + QCOM's gap_type responder validatable; options-chain
+   fixture → vol strategies + SPCX testable; clear-provisional-on-claim fix (Q#8) → no more manual marker clearing.
 
 ## Open questions for the operator (unanswered — escalating)
 
-1. **[HIGH] Repoint scheduled tasks/prompts to `.venv/bin/python3`** (or reinstall
-   harness deps into Homebrew 3.14, or pin Python). Bare `python3` dead for the
-   harness since 6/11. Affects trader, news, AND research tasks. The
-   `weekly_research_prompt.md` "no virtualenv" line is stale.
+1. **[HIGH] Repoint scheduled tasks/prompts to `.venv/bin/python3`** (or reinstall harness deps / pin Python).
+   Bare `python3` dead for the harness since 6/11. `weekly_research_prompt.md` "no virtualenv" line is stale.
 
-2. **`num_trades ≥ 20` floor (5th+ week).** Unreachable on single-symbol simulate
-   (max ~16 on META/macd). Blocks every realistic ADD candidate, incl. PEAD
-   (quarterly, cross-sectional), index-rebalance (0–1/symbol), FOMC (~8/yr),
-   VIX-regime flips. Suggested: (b) multi-symbol aggregation in `simulate`, or
-   (a) lower floor to ~10.
+2. **[num_trades ≥ 20 floor]** Blocks every realistic `evaluate-add` candidate (PEAD quarterly, index-rebalance
+   0–1/symbol). NB: triage's baseline check is Sharpe-only (validated SMCI on 5 trades), so the 20-floor bites
+   only the addition battery, not claims. Suggested: multi-symbol aggregation in `simulate`, or lower to ~10.
 
-3. **Head-to-head degenerate 0-trade tiebreak (4th+ week).** A 0-trade strategy
-   "wins" on Sharpe=0 / smaller-DD vs any negative-Sharpe active trader; a 1-trade
-   strategy wins on a fluke. Invalidates all outstanding first-pass-claim
-   validations. Suggested: "both < ~5 trades ⇒ winner: null."
+3. **[head-to-head 0-trade tiebreak]** A 0-trade strategy "wins" on Sharpe=0 / smaller-DD vs any negative-Sharpe
+   trader; noise on any `event_driven_catalyst` symbol. Suggested: "both < ~5 trades ⇒ winner: null."
 
-4. **Event/overlay architecture (5th+ week) — SINGLE BIGGEST GAP-CLEARING BLOCKER.**
-   Nearly every recurring library gap (event_catalyst on price-claimed names:
-   regulatory/antitrust, restructuring, capital-return, pricing/margin,
-   product-line, short-interest, litigation; earnings-window assignment;
-   index-rebalance/forced-flow; macro/FOMC) is an *overlay primitive*, *claim-set
-   broadening*, or *new category* — NOT a standalone `propose-strategy` addition.
-   Needs an architectural decision or these stay open forever.
+4. **[event/overlay architecture — SINGLE BIGGEST GAP-CLEARING BLOCKER]** Nearly every recurring gap
+   (customer-win, competitor read-through, regulatory/antitrust, product-launch, earnings-window assignment,
+   index-rebalance/forced-flow, macro/FOMC) is an overlay primitive / claim-broadening / new category — NOT a
+   standalone `propose-strategy` addition. Needs an architectural decision or these stay open forever.
 
-5. **`event_driven_catalyst` un-backtestable.** Enters on a non-replayable
-   `news_brief` signal → 0 trades in every sim; `rolling_sharpe null` even after
-   MU's 6/24 print. Needs a backtest news-replay fixture, or it can never be
-   adjudicated by any battery / head-to-head — and QCOM (its provisional) can never
-   validate.
+5. **[event_driven_catalyst + pairs_cointegration un-backtestable]** event_driven enters on a non-replayable
+   `news_brief` signal → 0 trades in every sim; pairs needs the short leg modeled → 0 trades on single-symbol
+   sim. Neither can be adjudicated by any battery/head-to-head. Needs a news-replay fixture and a
+   pairs-spread/second-leg model. (Consequence: their gap_types' *sole* responder can't validate; provisionals
+   whose gap_type points only at these can only be cleared by unrestricted triage to a different family.)
 
-6. **`_load_news_brief()` staleness guard** (trader-logged code fix). A stale brief is
-   fed to strategies as live signal (no `date_in_file == today` check).
+6. **[fallback-threshold, minor]** 0-trade Sharpe-0.0 backtest attaches a below-baseline *trading* provisional
+   rather than `equity_watch_only`. Partly mooted (unrestricted triage found real responders for all 4 new
+   names 7/8), but still an open policy call: should a degenerate 0-trade score route to watch_only?
 
-7. **[ESCALATED — all 3 provisionals structurally un-validatable + auto-extending
-   deadline masks the lapse.]** The doctrine's "escalate once `revalidate_by` passes"
-   never fires because each mandatory `cli triage-symbol` RE-STAMPS `revalidate_by`
-   (7/07: SPCX 7/04→7/21; QCOM 7/10→7/21; SYNA 7/10→7/21). All three are permanently
-   un-validatable by the current machinery:
-   - **SPCX:** needs ~60 trading bars (~Sept, IPO) before *any* equity backtest, AND
-     gap_type `volatility_regime` has only options responders (no chain data).
-   - **QCOM:** sole responder `event_driven_catalyst` is un-backtestable (0 trades
-     always) → Sharpe pinned at 0.0.
-   - **SYNA:** sole responder `pairs_cointegration` needs the short-ON leg; single-
-     symbol sim = 0 trades → Sharpe pinned at 0.0.
-   Operator decision needed, per symbol: (a) build the missing backtest fixture
-   (options-chain for SPCX/vol; news-replay for QCOM; pairs-spread/second-leg for
-   SYNA); (b) set a FIXED, non-auto-extending deadline (e.g. SPCX ~Sept for bar
-   accrual) so escalation actually fires; (c) reassign the symbol to an
-   equity-backtestable gap_type; or (d) remove from universe (operator's call —
-   research never auto-removes). Until then all three correctly stay quarantined
-   (never trade) but will never validate. **Fix the auto-extension masking first —
-   it hides every future lapse.**
+7. **[ESCALATED — SPCX only remaining structural provisional]** 17 bars < 60 → un-backtestable until ~Sept.
+   Per-symbol operator options: (a) set a FIXED, non-auto-extending ~Sept deadline for bar accrual so
+   escalation actually fires; (b) reassign SPCX to an equity-backtestable gap_type; or (c) remove from universe
+   (operator's call — research never auto-removes). Until then it correctly stays quarantined (never trades).
+   NOTE: `--no-claim` scoring now avoids the auto-extension that masked the lapse (manual feedback 2026-07-08).
+
+8. **[NEW, MEDIUM] Cross-strategy validated claim doesn't clear the provisional marker.**
+   `agent_tools.triage_symbol`'s `verdict:"claimed"` path clears library-gap but not provisional markers, so a
+   symbol validly re-claimed by a *different* strategy stays execution-quarantined until
+   `memory.clear_provisional_claim(sym)` is called by hand. Fix: clear any provisional marker for the claimed
+   symbol in the claim path, regardless of which strategy previously held it. (Worked around manually 7/8.)
+
+9. **[_load_news_brief() staleness guard]** (trader-logged) A stale brief can be fed to strategies as live
+   signal — no `date_in_file == today` check.

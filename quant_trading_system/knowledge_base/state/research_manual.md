@@ -358,3 +358,54 @@ over the IEX-only feed; consider 0.90 as a future calibration.")
   quarantined, and record the ORIGINAL deadline in the log so the lapse is
   auditable regardless of the auto-bumped value. Never auto-remove; never
   let it trade unvalidated.
+
+- **2026-07-08: revalidate provisionals with UNRESTRICTED `triage-symbol
+  <SYM> --no-claim`, not the gap-type-restricted form. A "structurally
+  un-validatable" verdict is usually an artifact of the gap_type filter, not
+  a real block.** The trader creates provisionals with `triage-symbol <SYM>
+  --gap-type <news-tag>`, which restricts candidates to that gap_type's
+  registered responder — and `event_catalyst`'s only responder is the
+  un-backtestable `event_driven_catalyst`, `pairs_arbitrage`'s only one is the
+  un-backtestable `pairs_cointegration`. Both pin Sharpe at 0.0 *by
+  construction*, which looks like a permanent block. Dropping `--gap-type`
+  scores every active+testing equity strategy: on liquid names with real price
+  history, ordinary momentum/mean-reversion/breakout strategies backtest fine
+  and clear baseline. This run, 4 of the 5 event/pairs provisionals thought
+  "un-validatable" on 7/07 (SMCI→mean_reversion 0.814/5tr, RKLB→breakout
+  1.059/9tr, BE→breakout 1.483/6tr, IRDM→breakout 0.832/9tr) were converted to
+  VALIDATED. Lesson: run unrestricted `--no-claim` triage on every provisional
+  BEFORE concluding it is structurally blocked.
+
+- **2026-07-08: when the incumbent is an un-backtestable provisional (0
+  trades, Sharpe 0.0), apply the 2026-06-16 "≥5 trades" guard to the
+  CHALLENGER, not to both.** The 2026-06-16 rule ("apply a reassignment only
+  when BOTH strategies have ≥5 trades") guards against a *silent* strategy
+  unseating a *real active trader* (coverage-degrading). Converting a
+  quarantined, non-trading provisional to a real trading claim is the inverse —
+  coverage-IMPROVING, and exactly what PRIORITY ZERO mandates. Requiring the
+  incumbent to have ≥5 trades is self-defeating here (un-backtestable
+  incumbents ALWAYS have 0), which would make every event/pairs provisional
+  un-convertible forever. So: **convert when the challenger clears baseline AND
+  has ≥5 trades; hold (record verdict, stay provisional) when it clears but on
+  <5 trades** (a 3–4-trade Sharpe is fluke-prone). Mechanism (since
+  `remove-active` is wholesale per-strategy): `add-active <incumbent> --replace
+  --symbols <kept-only>` to release just the contested symbol while preserving
+  the incumbent's other (possibly actively-traded) claims, then `triage-symbol
+  <SYM>` to claim the validated winner.
+
+- **2026-07-08: a cross-strategy validated claim does NOT auto-clear the
+  provisional marker — call `memory.clear_provisional_claim(sym)` yourself.**
+  `agent_tools.triage_symbol`'s `verdict:"claimed"` path clears library-gap but
+  not provisional markers, so a symbol validly re-claimed by a *different*
+  strategy stays execution-quarantined despite being validated (silently
+  defeating the conversion). After a cross-strategy claim, verify
+  `provisional_count` dropped and, if not, call `clear_provisional_claim` (the
+  manual sanctions this "if you claimed via a different path"). Reported to the
+  operator as a harness fix.
+
+- **2026-07-08: to HOLD or ESCALATE a provisional without auto-extending its
+  deadline, score it with `--no-claim`.** The 7/07 auto-extension problem only
+  fires on the *auto-claim* path (which refreshes `revalidate_by`). Using
+  `triage-symbol <SYM> --no-claim` scores/ranks without touching the file, so
+  the ORIGINAL `revalidate_by` is preserved and a genuine lapse stays visible.
+  Used this run to keep QCOM/SYNA/SPCX at their real deadlines.
