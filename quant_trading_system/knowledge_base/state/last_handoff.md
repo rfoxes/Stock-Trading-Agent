@@ -1,5 +1,19 @@
 # Handoff to tomorrow's Claude
 
+---
+## 🔁 DOUBLE-FIRE ADDENDUM — 2026-07-08 ~16:51 PT (a SECOND fire of the same session; NO action taken)
+
+**The scheduled task fired again ~49 min after the canonical 16:03 run — a same-day double-fire (the exact HIGH-priority risk flagged below).** `market-status` returned `now_iso 2026-07-08T16:51 PT`, `is_open false`, `next_open 2026-07-09 09:30 ET`. Everything below this addendum is the canonical 16:03 run's narrative and is STILL AUTHORITATIVE for the 7/9 run — I preserved it deliberately. What I (the 16:51 fire) found and did:
+
+- **Diagnosed it as a double-fire, not a wipe, not a new session.** Broker fully intact & consistent with the 16:03 state: 4 longs at exact prior avg-entries (AVGO 26 @377.27 / META 16 @605.28 / MU 7 @982.90 / ORCL 38 @177.28), cash **$71,809.59 to the penny**, equity ~$103,634 (only marks moved). `open-orders` still errors with the parser bug (a live order exists).
+- **Confirmed the 3 resting sells are intact and NOT duplicated.** Queried `get_open_orders()` client-direct (bypassing the buggy formatter): exactly **3** orders — AVGO 26 `6178bab6`, MU 7 `7b191764`, ORCL 38 `c7f552d2` — all `created_at 2026-07-08T23:04:17Z` (=16:04 PT, the 16:03 run), status `accepted`, TIF `day`. No dupes; quantities exactly match the held lots.
+- **Took NO trading action. Did NOT run `cli execute`.** `event_driven_catalyst.evaluate()` keys off `ctx.positions`, not resting broker orders ("THE STRATEGY IS THE STOP... no resting broker stop order") — a second execute would re-emit the SAME AVGO/MU/ORCL sells → at the 7/9 open both sets fill → net SHORT 26 AVGO / 7 MU / 38 ORCL. Refusing to re-execute prevented that oversell. Also did NOT log-closed (nothing filled) and did NOT re-triage (`unclaimed_count 0`).
+- **State advanced by an intervening `[research 2026-07-08]` run (between the two trader fires).** Research VALIDATED 4 of the 7 provisionals — **SMCI→`equity_mean_reversion_bollinger`** (Sharpe 0.814), **RKLB/BE/IRDM→`equity_breakout_volume_confirmation`** (IRDM Sharpe 0.832). So **`provisional_count` is now 3** (QCOM/SPCX/SYNA, `revalidate_by 2026-07-21`), NOT 7. The tasks.md "expect provisional 7" note is superseded — see the corrected tasks.md.
+- **7/9 plan is UNCHANGED:** reconcile the AVGO/MU/ORCL fills via `log-closed equity_event_driven_catalyst` (event_driven_catalyst still owns those 3 with resting exits). Full instructions preserved in tasks.md + below.
+- **Operator escalation:** the schedule double-fired AGAIN (7/7 and now 7/8). This is now a confirmed recurring defect on order-submitting days — the single-trigger config MUST be fixed before a double-fire lands on a day where the second run could act. Added a durable double-fire-detection doctrine to manual.md "Recent feedback".
+
+---
+
 (Run on the **2026-07-08 clock** — canonical post-close run, snapshot read **2026-07-08 ~16:03 PT**, `is_open:
 false`, `next_open 2026-07-09 09:30 ET`. Ran everything via the venv. **This was a REAL TRADING DAY:** the newly-
 enforced `equity_event_driven_catalyst` exits fired — 3 sells SUBMITTED (AVGO/MU/ORCL). They are resting unfilled

@@ -1,5 +1,11 @@
 # Tasks for the next run
 
+**🔁 NOTE: 7/8 DOUBLE-FIRED (16:03 canonical + 16:51 second fire). The 16:51 fire took NO action** — confirmed the
+3 resting sells intact (not duplicated), did NOT re-execute (would have re-emitted the sells → short book), did NOT
+log-closed. This 7/9 plan is unchanged and authoritative. **Also: `[research 2026-07-08]` ran between the two fires
+and VALIDATED 4 provisionals** — SMCI→mean_reversion_bollinger, RKLB/BE/IRDM→breakout_volume_confirmation. So
+**`provisional_count` is now 3 (QCOM/SPCX/SYNA), NOT 7** — the step-4 expectation below is corrected accordingly.
+
 **⚠️ 3 EXITS SUBMITTED 7/8, FILLING AT THE 7/9 OPEN — RECONCILE THEM, DO NOT FREEZE.** The fixed
 `equity_event_driven_catalyst` fired its now-enforced exits: SELLS for **AVGO 26** (time stop), **MU 7** (time
 stop), **ORCL 38** (hard ATR stop). They were submitted but rest unfilled (market was closed) and should fill at
@@ -38,9 +44,11 @@ FORBIDDEN. Never use `cli add-active` to bypass triage.
    - `log-closed equity_event_driven_catalyst ORCL -0.204`   (~$141 vs entry $177.28)
    Only log the ones that ACTUALLY closed. **Self-healing:** if a sell expired overnight and a position is still
    open, execute will simply re-emit it — no manual action; just reconcile whatever filled.
-4. **P0 check:** `cli list-active`. Expect `unclaimed_count 0`, `provisional_count 7` (QCOM/SPCX/SYNA
-   `revalidate_by 2026-07-21`; SMCI/RKLB/IRDM/BE `revalidate_by 2026-07-22`). Triage any NEW unclaimed symbol; do
-   NOT `add-active`. (SK Hynix's US ADR listing is due **7/10** — if the news agent promotes it, it'll need triage.)
+4. **P0 check:** `cli list-active`. Expect `unclaimed_count 0`, `provisional_count 3` (QCOM/SPCX/SYNA
+   `revalidate_by 2026-07-21`). **SMCI/RKLB/IRDM/BE were VALIDATED by `[research 2026-07-08]`** and are no longer
+   quarantined: SMCI→`equity_mean_reversion_bollinger`, RKLB/BE/IRDM→`equity_breakout_volume_confirmation`. Triage
+   any NEW unclaimed symbol; do NOT `add-active`. (SK Hynix's US ADR listing is due **7/10** — if the news agent
+   promotes it, it'll need triage.)
 5. **Execute (venv).** `cli execute` per standard workflow. event_driven_catalyst now has only META-less held names
    left (AVGO/MU/ORCL exited); it may fire nothing. Provisionals stay quarantined/skipped.
 6. **Library gaps — see list below (Saturday research owns them).**
@@ -63,11 +71,12 @@ SOLD. Distinguish "cash unchanged + vanished" (wipe → freeze) from "cash up + 
 ## Library gaps + research items (carry to research_tasks.md — Saturday)
 
 All `responder: NONE` — informational, not tradable under the mandate. From the 7/8 NOTABLE brief:
-- **Provisional/quarantined validations (TOP PRIORITY):** now **7** — QCOM (event-driven), SPCX (trend-following;
-  Nasdaq-100 + FCC 100k-sat filing, still quarantined), SYNA (pairs; onsemi merger-arb), plus NEW 7/8:
-  **SMCI** (event-driven, edge-AI appliance), **RKLB** (event-driven, $8B Iridium M&A), **IRDM** (pairs; the
-  RKLB/IRDM merger-arb target @ $54/sh — a genuine live pair worth a real cointegration look), **BE** (event-
-  driven, Hunterbrook short report). QCOM/SPCX/SYNA `revalidate_by 2026-07-21`; SMCI/RKLB/IRDM/BE `2026-07-22`.
+- **Provisional/quarantined validations (TOP PRIORITY):** now **3** — QCOM (event-driven), SPCX (trend-following;
+  Nasdaq-100 + FCC 100k-sat filing, escalated/still quarantined), SYNA (pairs; onsemi merger-arb), all
+  `revalidate_by 2026-07-21`. **SMCI/RKLB/IRDM/BE already VALIDATED by `[research 2026-07-08]`** (SMCI→
+  mean_reversion_bollinger; RKLB/BE/IRDM→breakout_volume_confirmation via unrestricted triage ≥0.5 Sharpe on ≥5
+  trades) — no longer provisional. IRDM's breakout claim supersedes the pairs/merger-arb hypothesis for now, but the
+  RKLB/IRDM ($54/sh) and SYNA/onsemi pairs are still worth a cointegration look if breakout decays.
 - **event_driven_catalyst exit CALIBRATION (was: implementation — now DONE/enforced).** The exit side is now
   wired and fired live (AVGO/MU/ORCL 7/8). Remaining research: is `max_hold_days: 7` right? Backtest the time-stop
   horizon + the 2×ATR hard-stop multiple. Also: the strategy models only a name's OWN earnings window — no re-entry
@@ -107,5 +116,10 @@ All `responder: NONE` — informational, not tradable under the mandate. From th
    exists. Bit 7/8 (3 live sells). Doesn't block trading; blinds the open-orders view until fills clear.
 4. **[MEDIUM] News-pipeline staleness guard** — `_load_news_brief()` never compares `date_in_file` to today.
 5. **[MEDIUM, NEW] Fallback threshold** — 0-trade Sharpe-0.0 → trading-provisional vs watch_only (see gaps list).
-6. **SEVEN provisional/quarantined claims** — QCOM/SPCX/SYNA (`2026-07-21`), SMCI/RKLB/IRDM/BE (`2026-07-22`).
-   Saturday research owns validation. Do NOT hand-promote.
+6. **THREE provisional/quarantined claims** — QCOM/SPCX/SYNA (`revalidate_by 2026-07-21`). (SMCI/RKLB/IRDM/BE were
+   validated by `[research 2026-07-08]` — no longer provisional.) Saturday research owns the remaining 3. Do NOT
+   hand-promote.
+7. **[HIGH — timing, URGENT] Schedule double-fired AGAIN (7/8: 16:03 + 16:51).** Now confirmed on consecutive
+   relevant days (7/7 and 7/8). A double-fire on an order-submitting day is dangerous — the second fire will
+   re-emit resting exits into a short book if it runs `cli execute`. The 16:51 fire correctly took no action, but
+   the single-trigger config MUST be fixed. See the double-fire doctrine now in manual.md "Recent feedback".
