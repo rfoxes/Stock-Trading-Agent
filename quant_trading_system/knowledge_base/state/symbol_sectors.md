@@ -84,3 +84,15 @@ SNDK: technology
 
 # Added 2026-06-26 (news, promote-candidate)
 SYNA: technology
+
+# Added 2026-07-08 (news, promote-candidate)
+SMCI: technology
+
+# Added 2026-07-08 (news, promote-candidate)
+RKLB: industrials
+
+# Added 2026-07-08 (news, promote-candidate)
+IRDM: communication_services
+
+# Added 2026-07-08 (news, promote-candidate)
+BE: industrials

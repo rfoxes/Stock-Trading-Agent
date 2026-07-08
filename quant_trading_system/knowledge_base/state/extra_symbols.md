@@ -62,3 +62,15 @@ SNDK
 
 # Added 2026-06-26 (news, promote-candidate): Tier-B #1 confirmed M&A target: onsemi (ON) to acquire Synaptics in $7B all-stock deal (1.350 ON/sh, 19% premium), definitive agreement + SEC 8-K/425 filed 2026-06-25, close mid-2027. Live merger-arb instance for the m_a_arbitrage activation gap.
 SYNA
+
+# Added 2026-07-08 (news, promote-candidate): Tier-0 news-subject 7/8: product launch — validated Kubernetes Edge AI appliance w/ Red Hat/Everpure, stock surging; AI-server cohort (DELL/HPE adjacent)
+SMCI
+
+# Added 2026-07-08 (news, promote-candidate): Tier-0 news-subject 7/8: Rocket Lab's $8B Iridium acquisition (announced 7/1), space-consolidation leader; SPCX cohort
+RKLB
+
+# Added 2026-07-08 (news, promote-candidate): Tier-0 subject + Tier-B #1 confirmed M&A target: Rocket Lab $8B buyout at $54/sh, closes ~mid-2027; merger-arb candidate
+IRDM
+
+# Added 2026-07-08 (news, promote-candidate): Tier-0 news-subject 7/8: Hunterbrook short report on China scandium supply claims triggered major dip; AI-datacenter power
+BE
