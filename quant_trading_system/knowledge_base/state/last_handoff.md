@@ -1,188 +1,169 @@
 # Handoff to tomorrow's Claude
 
-(Run on the **2026-07-07 clock** — canonical post-close run, snapshot read **2026-07-07 ~16:03 PT**, `is_open:
-false`, `next_open 2026-07-08 09:30 ET`. **✅ THE MORNING WIPE SELF-RESTORED — the harness is UN-FROZEN and ran
-a normal session.** This is the "real 4 PM post-close run" the 09:09 handoff said could execute if the account
-re-confirmed clean. It did. Ran everything via the venv.)
+(Run on the **2026-07-08 clock** — canonical post-close run, snapshot read **2026-07-08 ~16:03 PT**, `is_open:
+false`, `next_open 2026-07-09 09:30 ET`. Ran everything via the venv. **This was a REAL TRADING DAY:** the newly-
+enforced `equity_event_driven_catalyst` exits fired — 3 sells SUBMITTED (AVGO/MU/ORCL). They are resting unfilled
+because the market is closed; they will fill at the **7/9 open**. Nothing has closed *yet* — do NOT log-closed
+today; tomorrow's run reconciles the fills.)
 
-## 🔧 2026-07-08 INTERACTIVE OPERATOR SESSION — three durable changes (committed)
+## ✅ TL;DR — 3 EXITS SUBMITTED (AVGO/MU/ORCL), RESTING FOR 7/9 OPEN; BOOK OTHERWISE CONTINUOUS
 
-After the 7/7 automated run, the operator opened an interactive session and directed three changes. All are
-live in the working tree and committed via git-sync. Tomorrow's run inherits them.
+The book came in **continuous with the 7/7 baseline** (all 4 longs at exact prior avg-entries, cash $71,809.59 to
+the penny, equity ~$103,532 — up on marks, AVGO flipped GREEN on the Apple deal). Not a wipe. I ran the standard
+workflow. `cli execute` fired the `equity_event_driven_catalyst` exits that the 7/8 operator fix wired up:
 
-**1. Fixed `equity_event_driven_catalyst`: its documented exits are now actually enforced.** Investigation
-(prompted by "why does ORCL sit at −20% unmanaged?") found the strategy implemented only its *negative-news*
-exit; the **hard ATR stop** and **7-day time stop** it documents were dead letters — the stop was passed as
-`stop_loss_pct` on the entry intent but the LIVE submission path ignores that field (only the backtester at
-`strategy_backtest.py:395` consumes it), so no resting broker stop ever existed, and `max_hold_days` appeared in
-zero Python. The backtester DID honor the stop, so the strategy's simulated stats flattered it and hid the live
-gap. Fix: `evaluate()` now re-derives and re-checks both stops on every held position each run (there is no
-resting order — the strategy is the stop). `.md` and `.py` synced. **The next `cli execute` will therefore sell
-AVGO (time), MU (time), ORCL (hard) — verified by dry-run: 3 intents where there were 0. Expected, not an
-anomaly.** Operator kept `max_hold_days: 7` ("that's fine"); calibration is a research item. On the "7 days is
-arbitrary" question: the *concept* (catalyst alpha is time-concentrated; force turnover; don't let an
-event-trade drift into a permanent hold) is principled — it's the discipline whose ABSENCE let ORCL ride to
-−20%; the specific *value* 7 is an uncalibrated default and a fair thing to backtest.
+- **AVGO** sell 26 — order `6178bab6-d949-4287-9029-4e38854be722` — **time stop** (bought 6/16, held 22d ≫ 7).
+- **MU** sell 7 — order `7b191764-1447-4556-bfa7-9d054efa32d8` — **time stop** (bought 6/8, held 30d).
+- **ORCL** sell 38 — order `c7f552d2-ad69-494f-a56c-fdb38ba532dd` — **hard ATR stop** (−20.5%; also past 7d).
 
-**2. New `equity_watch_only` strategy + it's the mandatory-attach fallback.** Passive by design (`evaluate()` →
-`[]`, never trades), `role: watch`, excluded from triage candidate scoring. `memory.DEFAULT_FALLBACK_STRATEGY`
-now points to it, so a no-edge / no-history symbol is attached to watch_only ("watching, not trading") instead
-of a real trading strategy laid on with no backtest. Watching is now an explicit, legitimate RESTING grade.
+`submitted_count 3, rejected_count 0, error_count 0`. All 3 passed every SafetyGate check incl. `daily_loss`.
+**Why the daily-loss gate did NOT reject ORCL** (the 7/8 handoff feared ~1.96% would): the gate measures per-order
+*proposed realized loss* + cumulative session realized (the 2026-05-28 RESCOPE), NOT portfolio unrealized. AVGO
+sold at a **profit** (+2.84%, Apple $30B deal) → zero-loss path, doesn't count. Booked loss = MU (~−$259) + ORCL
+(~−$1,379) = ~−$1,638 = **1.58% of equity < 2.0% cap**. So all three cleared. (The old ~1.96% estimate double-
+counted AVGO as a loser using stale 7/7 marks.)
 
-**3. News → universe → strategy, universally (operator directive).** news_manual §9 "Tier 0": the news agent
-promotes EVERY stock it *materially reports on* (subject of an item, not an incidental cross-mention) on first
-appearance — the 3-session recurrence gate is demoted to a prioritization hint. Mandatory-attach then guarantees
-each a strategy (VALIDATED or WATCH). Directive recorded in `manual.md` P0 and `news_manual.md` §9. Rationale
-(operator verbatim): "everytime news reports on a stock, bring it into the universe and give it a strategy —
-that can just be to keep watch, doesn't have to be buy or sell."
+**These are the strategy's discipline, executed correctly — NOT an anomaly, do NOT freeze on the vanished
+positions tomorrow.** AVGO's time stop fired *despite* today's positive Apple-Broadcom catalyst — that is exactly
+the intended behavior (catalyst alpha is time-concentrated; force turnover after `max_hold_days: 7`). The news
+brief flagged AVGO's positive event as informational only; I did NOT override the algorithmic exit (forbidden).
 
-Verification done this session: both edited strategies pass `validate-strategy`; `list-active` and
-`list-strategies` load cleanly (harness not broken); the watch fallback wiring confirmed by a no-side-effect
-check (fallback constant, `role: watch` exclusion, `evaluate()`→`[]`). Existing provisional claims
-(QCOM/SPCX/SYNA) are untouched — the fallback change only affects FUTURE attaches.
+## ⚠️ FOR TOMORROW'S RUN — RECONCILE THE FILLS, DON'T FREEZE
 
-**Execution decision:** the AVGO/MU/ORCL exits were NOT fired in this session — they'll go out on the next
-scheduled post-close `cli execute` (same fill timing since the market is closed now). If that run somehow does
-NOT fire, run `cli execute` manually to place them.
+At the 7/9 open the 3 resting sells should fill. Tomorrow you will see **positions = [META only]** and **cash risen
+by ~$22,080** (AVGO ~$10,095 + MU ~$6,629 + ORCL ~$5,358 gross proceeds). **THIS IS A LEGITIMATE CLOSE, NOT A
+WIPE.** The wipe tell is cash *unchanged* while positions vanish; here cash *RISES by ~proceeds* → these are real
+fills. **Reconcile each via `cli log-closed equity_event_driven_catalyst <SYM> <pnl_fraction>`** using the ACTUAL
+fill prices (approx, from today's marks — replace with real fills):
+- `log-closed equity_event_driven_catalyst AVGO +0.028`  (sold ~$388 vs entry $377.27)
+- `log-closed equity_event_driven_catalyst MU -0.0375`   (sold ~$946 vs entry $982.90)
+- `log-closed equity_event_driven_catalyst ORCL -0.204`  (sold ~$141 vs entry $177.28)
 
----
+**Self-healing note:** the fixed `evaluate()` re-checks the stops live every run. If a resting order somehow
+expired overnight (e.g. day-TIF vs the closed session) and the position is still open at your snapshot, execute
+will simply RE-EMIT the sell — no manual action needed. Either way the positions exit; just reconcile whatever
+actually filled.
 
-## ✅ TL;DR — THE 7/7 09:09 "WIPE" WAS TRANSIENT; BOOK RESTORED; EXECUTE RAN CLEAN
+## Snapshot (7/8 ~16:03 PT, via venv)
 
-The account that came back FLAT at 09:09 this morning (all four longs gone, cash unchanged) **self-restored by
-the post-close run.** At 16:03 PT the four longs are **back at their exact prior qty and avg-entry**, cash is
-still $71,809.59 to the penny, equity is back to **$103,098.75**. The news agent independently observed the same
-restoration ~30 min earlier ($103,106.76). I re-snapshotted, confirmed broker↔journal consistency (no phantom
-closes), lifted the freeze on that evidence, and ran the standard workflow. **`cli execute` ran: 0 intents, 0
-submitted, 0 rejected, 0 errors — a clean do-nothing day on the restored book.** No `log-closed` (nothing
-actually closed). No triage (P0 already satisfied). No strategy edits.
+- **`market-status`:** `is_open false`, `now 2026-07-08T16:02 PT`, `next_open 2026-07-09 09:30 ET`. Canonical
+  post-close slot ✓.
+- **Account (pre-execute):** equity **$103,532.47**, cash **$71,809.59** (unchanged from 7/7 → nothing closed
+  overnight), buying_power $376,062.42, day_trade_count 0. Post-execute account $103,544.90, cash still
+  $71,809.59 (sells unfilled, market closed).
+- **Positions (all 4 continuous, exact prior avg-entries):**
+  - **AVGO 26** — avg $377.27, cur $388.25, **+2.91% GREEN** (Apple $30B Broadcom deal). Sell submitted (time stop).
+  - **META 16** — avg $605.28, cur $603.35, **−0.32%** (macd_histogram-owned; rides its MACD exit; not sold).
+  - **MU 7** — avg $982.90, cur $947.03, **−3.65%** (recovered from −6% on Samsung up-cycle read). Sell submitted (time stop).
+  - **ORCL 38** — avg $177.28, cur $141.00, **−20.46%** — book's worst. Sell submitted (hard ATR stop).
+- **Open orders:** the 3 sells are live/resting. `cli open-orders` **ERRORS** (`'dict' object has no attribute
+  'id'` — the reopened parser bug, which bites precisely when a live order exists). Order IDs captured from the
+  execute output above.
+- **Regime:** bull, conf 0.72, ADX 22.17, realized_vol 0.1793 (unchanged all day).
+- **`list-active`:** universe **30** (was 26; +SMCI/RKLB/IRDM/BE promoted by the news agent under Tier-0),
+  claimed **30**, `unclaimed_count 0`, `provisional_count 7`.
+- **News brief:** header `2026-07-08` = today ✓ (fresh). Assessment **NOTABLE** (Apple-Broadcom $30B + Samsung
+  $59B up-cycle vs hawkish June FOMC minutes + Iran-ceasefire-"over" oil spike + EU DMA Apple loss). NOT
+  halt-worthy (no FOMC *decision*; AVGO's held-name catalyst was *positive*; equities didn't gap >2%). I did NOT
+  skip execute — NOTABLE does not gate.
 
-**Why un-freezing was correct (evidence, not a hunch):**
-1. **Positions restored to the penny.** AVGO 26 @ $377.27, META 16 @ $605.28, MU 7 @ $982.90, ORCL 38 @ $177.28
-   — identical qty AND avg-entry to the 7/6 last-good book. A reset that dropped and re-created positions would
-   not reproduce exact average entry prices; these are the same lots.
-2. **Broker ↔ journal consistent.** `recent-trades` for both position-owning strategies shows only the original
-   BUYS (event_driven_catalyst: MU 6/8, ORCL 6/10, AVGO 6/16; macd_histogram: META 7/1) — **zero `trade_closed`
-   events** during the glitch window. The only close on record is a stale 6/8 META round-trip that predates the
-   current position. The morning glitch left NO journal artifacts.
-3. **Canonical post-close run + fresh brief.** 16:03 PT (the proper slot, not the 09:09 off-cycle firing), and
-   the 7/7 news brief is correctly dated today (written ~30 min pre-run).
+## P0 triage (mandatory-attach) — 4 new symbols claimed, all quarantined
 
-Doctrine written up: `manual.md` "Recent feedback" now carries the **un-freeze condition** completing the
-morning's freeze bullet. (Freeze on an unexplained flat book; resume on a re-confirmed consistent one — both
-evidence-driven.)
+The news agent promoted **SMCI, RKLB, IRDM, BE** into the universe (Tier-0: every materially-reported stock). All
+landed unclaimed. I ran `cli triage-symbol` on each with the news-tagged gap_type. **Every one scored Sharpe 0.0
+(degenerate 0-trade backtest) → attached as a PROVISIONAL trading claim, execution-quarantined, `revalidate_by
+2026-07-22`:**
+- **SMCI** → `equity_event_driven_catalyst` (gap_type event_catalyst)
+- **RKLB** → `equity_event_driven_catalyst` (gap_type event_catalyst)
+- **IRDM** → `equity_pairs_trading_cointegration` (gap_type pairs_arbitrage — live RKLB/IRDM merger-arb, $54/sh)
+- **BE**   → `equity_event_driven_catalyst` (gap_type event_catalyst)
 
-## Snapshot (7/7 ~16:03 PT, via venv)
+**Nuance for research:** the news brief *expected* `equity_watch_only` for these no-edge names, but the harness
+attached below-baseline **trading** candidates instead — because each produced a *rankable* score (0.0) rather
+than a hard no-price-history error, so the code treats it as a "closest candidate" provisional (per manual.md P0:
+"a below-baseline trading candidate is still attached as a provisional trading claim so research keeps the closest-
+candidate hint; only the no-rankable-candidate / no-history case defaults to watch_only"). A Sharpe of 0.0 from
+**0 trades** is arguably indistinguishable from "no signal" and should perhaps route to watch_only — flag as a
+minor fallback-threshold question for the operator/research. Either way all 4 are execution-quarantined; none
+trades. Result: `provisional_count 7` (QCOM/SPCX/SYNA `revalidate_by 2026-07-21` + SMCI/RKLB/IRDM/BE
+`revalidate_by 2026-07-22`).
 
-- **`market-status`:** `is_open: false`, `now 2026-07-07T16:03 PT`, `next_open 2026-07-08 09:30 ET`. Canonical
-  post-close slot ✓ (contrast the morning run's 09:09 mid-session firing).
-- **Account:** equity **$103,098.75**, cash **$71,809.59** (unchanged, as expected — positions were never
-  sold), buying_power $374,848.01, portfolio_value $103,098.75, day_trade_count 0.
-- **Positions (all four RESTORED):**
-  - **AVGO 26** — avg $377.27, cur $369.01, unreal **−2.19%** (−$214.76).
-  - **META 16** — avg $605.28, cur $615.60, unreal **+1.71% (+$165.19), GREEN** (Muse Image launch + upgrade).
-  - **MU 7** — avg $982.90, cur $923.50, unreal **−6.04%** (−$415.80) — deepened on the Samsung-driven chip rout.
-  - **ORCL 38** — avg $177.28, cur $141.60, unreal **−20.13%** (−$1,355.71) — still the book's worst.
-- **Open orders:** none.
-- **Regime:** bull, conf 0.72, ADX 22.17, realized_vol 0.1793 (unchanged — the classifier was never affected).
-- **`list-active`:** universe **26**, claimed **26**, `unclaimed_count: 0`, `provisional_count: 3`
-  (QCOM/SPCX/SYNA, all `revalidate_by 2026-07-21`). 8 strategies active.
-- **`cli execute`:** `submitted_count 0`, `rejected_count 0`, `error_count 0`; every non-quarantined strategy
-  fired 0 intents. `provisional_quarantined: [QCOM, SPCX, SYNA]`; `skipped`: SPCX (trend-following), QCOM
-  (event_driven_catalyst), SYNA (pairs) — all `provisional_unvalidated_claim (execution-quarantined)`.
-- **News brief:** header `2026-07-07` = today ✓ (fresh). Assessment **NOTABLE** (chip rout + Hormuz oil spike),
-  NOT halt-worthy. 0 promotions, universe stays 26.
+`cli execute` correctly skipped all 7 provisionals: `provisional_quarantined: [BE, IRDM, QCOM, RKLB, SMCI, SPCX,
+SYNA]`. AVGO/MU/ORCL are event_driven_catalyst's NON-quarantined claims (only QCOM is quarantined under it) →
+symbol-level quarantine confirmed again; the held names traded.
 
-## Two nuances confirmed this run (for whoever reconciles the provisional state)
+## Summary of what I did today (7/8 post-close)
 
-1. **Provisional quarantine is SYMBOL-level, not strategy-level.** Execute skipped ONLY QCOM/SPCX/SYNA. So
-   `equity_event_driven_catalyst` DID evaluate its held names AVGO/MU/ORCL (returned 0 intents — they ride their
-   rules) and `equity_trend_following_ema_cross` DID evaluate its 11 non-SPCX symbols. Only the 3 structured
-   `provisional_claims` symbols are quarantined. **The claim-REASON prose is misleading** — the 7/7 re-bootstrap
-   stamped a QCOM-specific "PROVISIONAL/QUARANTINED" string onto the *whole* event_driven_catalyst claim (which
-   includes the 3 traded held names). The structured `provisional_claims` field (the real source of truth) is
-   correct. This is cosmetic prose drift, not a trading bug — but a `list-active` reader could misread it. Flag
-   for reconciliation via re-triage, NOT a hand-edit (direct YAML edits to `active_strategies.md` are forbidden).
-2. **ORCL −20% is a strategy-LOGIC gap, not "no responder."** event_driven_catalyst DOES own and evaluate ORCL;
-   the problem is its `evaluate()` never generates the exit it documents at entry. The 6/10 entry reasoning
-   states "Stop @ 175.11 ... 7-day time stop applies," but the order submitted was a plain **market buy with
-   `stop_price: null`** — no broker-side stop was ever placed, and evaluate() doesn't produce a stop/time-stop
-   exit intent. So both the price stop (breached long ago) and the 7-day time stop (27 days elapsed) are dead
-   letters. Precise diagnosis for Saturday research: **event_driven_catalyst implements entry but not exit.**
-
-## Summary of what I did today (7/7 post-close)
-
-1. **Read context** — daily_prompt.md, manual.md, tasks.md (the 7/7-morning FROZEN version), last_handoff.md
-   (the 09:09 wipe report), news_brief.md. **Date-checked the brief — header `2026-07-07` = today → FRESH** (the
-   news agent's own broker-state note pre-flagged that the wipe looked transient/self-restored).
+1. **Read context** — daily_prompt.md, manual.md, tasks.md, last_handoff.md, news_brief.md. Date-checked the
+   brief: header `2026-07-08` = today → FRESH.
 2. **Confirmed interpreter** — `.venv/bin/python3` throughout (bare `python3` still Homebrew 3.14.5, no deps).
-3. **`market-status`** — 16:03 PT canonical post-close (not the morning off-cycle firing).
-4. **Broker snapshot** — account/positions/open-orders/regime. **Found the four longs RESTORED** to exact prior
-   qty/avg-entry, cash unchanged, equity back to ~$103,099.
-5. **P0 check** — `list-active`: unclaimed 0, provisional 3. No new unclaimed symbol; no triage needed.
-6. **Verified broker↔journal consistency** — `recent-trades` on both position-owning strategies: only original
-   buys, **zero phantom `trade_closed` events**. Confirmed nothing to reconcile / no `log-closed`.
-7. **Lifted the freeze on evidence** (restored book + consistent journal + canonical post-close + fresh brief).
-8. **`cli execute`** — ran clean: 0 intents / 0 submitted / 0 rejected / 0 errors; QCOM/SPCX/SYNA quarantined.
-9. **Wrote up the un-freeze doctrine** in `manual.md` "Recent feedback"; updated tasks.md + this handoff;
-   git-sync last.
+3. **`market-status`** — 16:02 PT canonical post-close.
+4. **Broker snapshot** — account/positions/open-orders/regime. Book continuous with 7/7 baseline (4 longs, exact
+   avg-entries, cash to the penny). NOT a wipe → proceeded.
+5. **P0 triage** — `list-active` showed unclaimed 4 (SMCI/RKLB/IRDM/BE, newly promoted). Ran `triage-symbol` on
+   each with news gap_types → all provisional/quarantined. Re-checked: `unclaimed_count 0`, `provisional_count 7`.
+6. **Reconciliation** — nothing had closed (cash unchanged, all 4 present); NO log-closed run.
+7. **`cli execute`** — 3 sells submitted (AVGO/MU/ORCL) from the fixed event_driven_catalyst exits; 0 rejected,
+   0 errors; 7 provisionals quarantined/skipped. Verified positions (still 4 open, unfilled) + account (cash
+   unchanged) post-execute. Confirmed the open-orders parser bug bites when a live order exists.
+8. **Decision: KEEP** — no rotations, no strategy edits (the exit fix landed in the 7/8 operator session; today
+   was its first live execution). Logged library gaps for Saturday research. git-sync last.
 
 ## Observations and reasoning
 
-- **The exact-avg-entry match is the decisive un-freeze tell.** A true reset that re-created positions would
-  not reproduce fractional average entry prices ($605.275625, $177.276579) to the digit. These are the original
-  lots re-appearing — the morning read was a transient broker/data glitch, not a durable state change. Combined
-  with cash unchanged and zero close events, the book is provably the same book.
-- **Un-freezing on evidence (not operator word) was the right call and is now doctrine.** The morning freeze was
-  correct given an unexplained flat book. But the freeze isn't a wait-for-human latch — it's a wait-for-a-
-  consistent-state latch. Once the state re-confirmed consistent (positions back, journal clean, canonical run,
-  fresh brief), continuing to sit frozen would have been its own error (missing a legitimate trading session for
-  no reason). Symmetric evidence in, symmetric decision out.
-- **Nothing to reconcile — and that's the point.** The temptation on a "positions reappeared" day is to log
-  *something*. But the journal never recorded closes, so there are no closes to attribute. Reconcile only what
-  broker AND journal jointly support; here they jointly support "4 longs open, untouched."
-- **The clean 0-intent execute is the mandate working, not inaction to fix.** NOTABLE tape (chip rout + oil),
-  but every held name is `responder: NONE` (informational) and no strategy's entry/exit rule fired. Manufacturing
-  action from a two-sided news cluster would be curve-fitting. The strategies looked and passed; that's correct.
-- **ORCL is the one genuine standing problem, and it's a code gap, not a market call.** −20% unmanaged because
-  event_driven_catalyst has no exit implementation. I did NOT hand-exit it (forbidden) and did NOT rush a
-  same-day strategy.py edit on a recovery day without a backtest. It's the top Saturday research item, now with
-  a sharpened diagnosis (implement the exit side: price stop + 7-day time stop as real exit intents).
+- **The exits are the mandate working, not a problem to fix.** Three positions 3–4× past the 7-day catalyst
+  horizon got force-exited on schedule. ORCL's −20% (the standing "unmanaged" casualty of the old missing-exit
+  bug) is finally being closed by the now-enforced hard stop. This is precisely the discipline whose absence let
+  ORCL ride to −20%.
+- **AVGO exiting green is the discipline, not a miss.** It's tempting to see "sell AVGO the day it pops +2.8% on a
+  $30B deal" as leaving money on the table. But event_driven_catalyst is a *time-boxed* catalyst strategy: the
+  6/16 entry catalyst is 22 days stale; the Apple deal is a NEW catalyst the strategy doesn't model as a re-entry
+  signal (that's a logged library gap — customer-win overlay). Overriding the time stop to hold for the new news
+  would be discretionary trading, which is forbidden. The rule ran; I let it run.
+- **The daily-loss gate behaved per the RESCOPE, not the old portfolio-stress model.** Worth re-confirming for the
+  record: a profitable exit (AVGO) never counts against the cap; only booked losses (MU+ORCL) accrue; 1.58% < 2%
+  so nothing throttled. If AVGO had been red today, the cumulative might have crossed 2% and deferred ORCL a day
+  — but it wasn't, so all three went.
+- **Book was continuous — no wipe.** Cash to the penny + exact avg-entries = same lots as 7/7. The 7/7 morning
+  glitch did not recur. Standard workflow, no freeze.
+- **The 4 new Tier-0 promotions are coverage, not conviction.** SMCI/RKLB/IRDM/BE are in the universe under the
+  "news reports on it → it gets a strategy (can be watch)" directive. All quarantined; Saturday research decides
+  if any earns a real trading strategy (IRDM/RKLB is a genuine live merger-arb pair worth a real look).
 
 ## Final state at session end
 
-- **Positions:** AVGO 26 / META 16 / MU 7 / ORCL 38 (all restored). **Open orders:** none.
-- **Account:** equity $103,098.75, cash $71,809.59, buying_power $374,848.01, day_trade_count 0.
-- **Active set:** 8 strategies × 26/26 claimed (`unclaimed_count == 0`); 3 PROVISIONAL (QCOM/SPCX/SYNA,
-  `revalidate_by 2026-07-21`, execution-quarantined).
+- **Positions (unfilled sells resting):** AVGO 26 / META 16 / MU 7 / ORCL 38 still open; AVGO/MU/ORCL have
+  resting SELL orders that fill at the 7/9 open.
+- **Open orders:** 3 live sells (AVGO `6178bab6` / MU `7b191764` / ORCL `c7f552d2`). `cli open-orders` errors
+  (parser bug) while they're live.
+- **Account:** equity ~$103,545, cash $71,809.59 (unchanged — sells unfilled), day_trade_count 0.
+- **Active set:** 8 strategies × 30/30 claimed (`unclaimed_count 0`); **7 PROVISIONAL** (QCOM/SPCX/SYNA
+  `revalidate_by 2026-07-21`; SMCI/RKLB/IRDM/BE `revalidate_by 2026-07-22`), all execution-quarantined.
 - **Regime:** bull, conf 0.72, ADX 22.17, realized_vol 0.1793.
-- **Code changes:** none. **Strategy changes:** none. **Manual:** appended one durable "Recent feedback" bullet
-  (broker-wipe UN-FREEZE condition). **`cli execute`: RAN, 0 intents.** **`cli log-closed`: correctly NOT run.**
+- **Code/strategy/manual changes:** none this run. **`cli execute`: RAN, 3 sells submitted.** **`log-closed`:
+  correctly NOT run (nothing filled yet).**
 
 ## Open issues for the operator
 
-1. **[RESOLVED — FYI] The 7/7 09:09 broker-state wipe was TRANSIENT and self-restored by post-close.** No action
-   needed on the account (four longs back at exact prior lots, cash intact, equity ~$103,099). If you can still
-   confirm on the Alpaca dashboard what caused the 09:09 flat read (paper-account flicker?), it would help
-   harden the pipeline, but the harness has resumed normal operation.
-2. **[HIGH — timing, STILL OPEN] The schedule is firing off-cycle.** 7/7 fired at 09:09 mid-session AND at the
-   canonical ~16:03 post-close (this run) — two firings in one day; plus the 7/3 holiday firing. Confirm the
-   intended trigger; the double-fire risks acting twice on one session. (Today it was benign — the morning run
-   froze and this one executed clean — but it should be one canonical post-close run/day.)
+1. **[EXPECTED — not an issue] 3 exits submitted, fill at 7/9 open.** AVGO/MU/ORCL will vanish tomorrow with cash
+   +~$22k. That's the fixed event_driven_catalyst working. Tomorrow reconciles via log-closed.
+2. **[HIGH — timing, STILL OPEN] Schedule firing off-cycle.** 7/7 double-fired (09:09 + 16:03) and 7/3 (holiday).
+   Today (7/8) fired once at the canonical ~16:02 post-close ✓ — but confirm the intended single-trigger config so
+   a double-fire never acts twice on one session (especially dangerous on a day that submits real orders).
 3. **[HIGH, UNRESOLVED] Bare `python3` broken (Homebrew 3.14.5, no deps).** Everything runs via
    `/Users/rfoxes/Stock-Trading-Agent/.venv/bin/python3`. Repoint the task/daily_prompt or reinstall deps.
-4. **[MEDIUM] News-pipeline staleness guard.** Today's brief was fresh, but `_load_news_brief()` still never
-   compares `date_in_file` to today — a stale brief would feed as live signal. Saturday item.
-5. **[MEDIUM] Provisional claim-REASON prose is misleading** (see nuance #1 above) — the whole
-   event_driven_catalyst / trend_following claim reasons read "QUARANTINED" but only QCOM/SPCX/SYNA actually are.
-   Reconcile via re-triage, not a hand-edit.
-6. **[REOPENED] `cli open-orders` parser bug** — `'dict' object has no attribute 'id'` when a live order exists
-   (did NOT bite this run — no order).
-7. **THREE provisional/quarantined claims** — QCOM/SPCX/SYNA, all `revalidate_by 2026-07-21`. Saturday research
-   owns validation. SPCX joined the Nasdaq-100 7/7 but stays quarantined. Do NOT hand-promote.
+4. **[REOPENED, now BITING] `cli open-orders` parser bug** — `'dict' object has no attribute 'id'` whenever a
+   live order exists. It bit today (3 live sells) and will keep erroring until the fills clear. Doesn't block
+   trading (execute output carries the order data) but blinds the CLI open-orders view. Worth a real fix.
+5. **[MEDIUM] News-pipeline staleness guard** — `_load_news_brief()` still never compares `date_in_file` to today.
+6. **[MEDIUM] Fallback-threshold question (NEW)** — a Sharpe-0.0-from-0-trades backtest attaches a below-baseline
+   *trading* provisional rather than routing to `equity_watch_only`. Should a degenerate 0-trade score count as a
+   "rankable candidate" or as "no signal → watch_only"? Minor; affects SMCI/RKLB/IRDM/BE grade labels only.
+7. **SEVEN provisional/quarantined claims** — QCOM/SPCX/SYNA (`revalidate_by 2026-07-21`) + SMCI/RKLB/IRDM/BE
+   (`revalidate_by 2026-07-22`). Saturday research owns validation. Do NOT hand-promote.
 
 ## Git-sync status
 
-Ran `cli git-sync --agent trader --message "..."` (via venv) as last action. State files changed
-(last_handoff.md, tasks.md, manual.md). git-sync queues a JSON marker to `.git-sync-queue/`; the operator's
-launchd LaunchAgent (`com.harness.gitrunner`) runs the actual push. Expect `{"ok": true, "queued": ...}`.
+Ran `cli git-sync --agent trader --message "..."` (via venv) as the last action. State files changed
+(last_handoff.md, tasks.md). git-sync queues a JSON marker to `.git-sync-queue/`; the operator's launchd
+LaunchAgent (`com.harness.gitrunner`) runs the actual push. Expect `{"ok": true, "queued": ...}`.

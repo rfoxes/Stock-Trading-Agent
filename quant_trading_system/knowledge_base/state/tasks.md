@@ -1,136 +1,111 @@
 # Tasks for the next run
 
-**✅ THE HARNESS IS UN-FROZEN. Normal operation resumed 2026-07-07 post-close.** The 7/7 09:09 "broker-state
-wipe" was TRANSIENT — the four longs (AVGO 26 / META 16 / MU 7 / ORCL 38) self-restored to their exact prior
-qty/avg-entry by the 16:03 post-close run, cash intact ($71,809.59), equity back to ~$103,099. `cli execute`
-RAN clean (0 intents). Nothing was reconciled (nothing actually closed). Read `last_handoff.md` for the full
-un-freeze rationale. Replace this file (don't append) when you write the next version.
+**⚠️ 3 EXITS SUBMITTED 7/8, FILLING AT THE 7/9 OPEN — RECONCILE THEM, DO NOT FREEZE.** The fixed
+`equity_event_driven_catalyst` fired its now-enforced exits: SELLS for **AVGO 26** (time stop), **MU 7** (time
+stop), **ORCL 38** (hard ATR stop). They were submitted but rest unfilled (market was closed) and should fill at
+the 7/9 open. Read `last_handoff.md` for the full narrative. Replace this file (don't append) when you write the
+next version.
 
----
-
-## ⚠️ CODE CHANGES LANDED 2026-07-08 (interactive operator session) — READ BEFORE EXECUTE
-
-Three durable changes were made and committed mid-week. Full detail in `last_handoff.md`; the operative points:
-
-1. **`equity_event_driven_catalyst` now ENFORCES its exits** (previously only the negative-news exit ran; the
-   documented hard stop + 7-day time stop were never wired to live execution). `evaluate()` now re-checks each
-   held position every run: negative-news → hard ATR stop (`price ≤ entry − 2×ATR(14)`, ATR from current bars)
-   → time stop (`max_hold_days`, default 7; age from the journal). **CONSEQUENCE: the next `cli execute` will
-   emit SELLS for AVGO (time stop, held 22d), MU (time stop, 30d), and ORCL (hard stop, −20%)** — a ~$21k /
-   ~1.9%-of-equity liquidation. This is EXPECTED and correct (these are 3–4× past the 7-day catalyst horizon),
-   NOT an anomaly — do not freeze on it. The daily-loss gate sits ~1.96% vs the 2.0% cap, so the last/largest
-   sell (ORCL) may reject and defer a day (intended graduated exit). Verified via dry-run 2026-07-08.
-   `max_hold_days: 7` kept per operator ("that's fine"); calibrating it is a Saturday-research item.
-2. **New `equity_watch_only` strategy** (passive; `evaluate()` → `[]`, never trades) is now the mandatory-attach
-   fallback (`memory.DEFAULT_FALLBACK_STRATEGY`). A no-edge / no-price-history symbol is attached to watch_only
-   ("watching, not trading") instead of a real trading strategy. It has `role: watch` and is excluded from
-   triage candidate scoring. Below-baseline *trading* candidates still attach as provisional trading claims.
-3. **News → universe → strategy, universally (operator directive).** news_manual §9 "Tier 0": the news agent now
-   promotes EVERY stock it *materially reports on* (subject of an item, not an incidental cross-mention) into the
-   universe on first appearance — no 3-session wait. Mandatory-attach then gives each a strategy (VALIDATED or
-   WATCH). Expect the universe to grow faster; new names default to watch and won't trade until research finds an
-   edge. Both manuals (`manual.md` P0, `news_manual.md` §9) carry the directive.
-
----
-
-## STANDING POLICY (P0, do not ignore) — MANDATORY-ATTACH DOCTRINE (2026-06-16)
-
-Every universe symbol MUST have a strategy attached (see `manual.md` P0 rule). Two grades: **(a) VALIDATED**
-(cleared baseline Sharpe 0.5 in triage — trades) / **(b) PROVISIONAL** (nothing cleared / no price history —
-best-available attached, recorded in `provisional_claims.md`, QUARANTINED from execution until Saturday
-research validates). After triage `unclaimed_count` should be **0**. Run `cli triage-symbol <SYM>
-[--gap-type X]` for any NEW unclaimed symbol. Character-match shortcuts and direct YAML edits to
-`active_strategies.md` are FORBIDDEN. Never use `cli add-active` to bypass triage.
-
-## ⚠️ READ FIRST: BARE `python3` IS STILL BROKEN — USE THE VENV
-
-Homebrew `/opt/homebrew/bin/python3` is 3.14.5 and lacks harness deps. Run EVERYTHING via:
+## ⚠️ READ FIRST — RUN EVERYTHING VIA THE VENV
 ```
 /Users/rfoxes/Stock-Trading-Agent/.venv/bin/python3 -m quant_trading_system.cli <cmd>
 ```
-The `.venv` (Python 3.13.13) has all deps and reaches the live broker cleanly.
+Bare `python3` = Homebrew 3.14.5, no deps. The `.venv` (3.13.13) has deps + reaches the live broker.
 
-## Wipe playbook (KEEP for reference — un-freeze doctrine now in manual.md "Recent feedback")
+## STANDING POLICY (P0) — MANDATORY-ATTACH DOCTRINE
+Every universe symbol MUST have a strategy (manual.md P0). Grades: **(a) VALIDATED** (cleared baseline Sharpe 0.5
+in triage — trades) / **(b) PROVISIONAL** (nothing cleared / no history — best-available attached, QUARANTINED
+until Saturday research validates). After triage `unclaimed_count` should be **0**. Run `cli triage-symbol <SYM>
+[--gap-type X]` for any NEW unclaimed symbol. Character-match / direct YAML edits to `active_strategies.md` are
+FORBIDDEN. Never use `cli add-active` to bypass triage.
 
-If a future run finds the account FLAT again (positions gone, cash unchanged, no `trade_closed` events): that's
-the wipe signature → FREEZE (no execute, no log-closed), record last-good marks, flag operator. **BUT** the
-7/7 case proved these can be transient: **un-freeze on evidence** if a later snapshot shows (1) positions
-restored to their prior qty/avg-entry, (2) `recent-trades` shows NO phantom `trade_closed` events, and (3) it's
-a canonical post-close run with a fresh, correctly-dated brief. Then reconcile nothing and resume. Full doctrine:
-`manual.md` "Recent feedback" (freeze + un-freeze bullets).
+## To do next run (7/9)
 
-## To do next run (standard workflow — no special handling expected)
-
-1. **Read `last_handoff.md` + `news_brief.md` FIRST** (venv). **Date-check the brief** — must match the run
-   date; if not, treat as ABSENT and re-flag the pipeline. **Run `cli market-status`** and note the run TIME —
-   the canonical run is ~4 PM PT post-close. If firing off-cycle (the schedule has double-fired — 7/7 fired at
-   both 09:09 and 16:03), weight that in the execute decision (see operator item #2 in last_handoff).
-2. **Snapshot:** `account`, `positions`, `open-orders`, `regime`. **Baseline to compare against:** equity
-   ~$103,099 / cash $71,809.59 with the 4 longs (AVGO/META/MU/ORCL) open. If the book matches, it's continuity —
-   proceed. If FLAT again, apply the wipe playbook above.
-3. **P0 check:** `cli list-active`. Expect `unclaimed_count: 0`, `provisional_count: 3` (QCOM/SPCX/SYNA, all
-   `revalidate_by 2026-07-21`). Triage any NEW unclaimed symbol; do NOT `add-active`.
-4. **Reconciliation — ONLY what broker + journal jointly support.** Use `cli log-closed <id> <symbol> <pnl>`
-   ONLY for a position the broker shows gone AND that has a real basis (a `trade_closed` event or a cash move
-   consistent with a sale). No fabrication.
-5. **Execute (venv).** Account is healthy — run `cli execute` per standard workflow. Provisionals
-   (QCOM/SPCX/SYNA) appear under `provisional_quarantined`/`skipped` (symbol-level quarantine — the rest of each
-   strategy's claims trade normally).
+1. **Read `last_handoff.md` + `news_brief.md` FIRST** (venv). **Date-check the brief** — must match the run date;
+   if not, treat as ABSENT and note the gap. **Run `cli market-status`**; note the run TIME (canonical ~4 PM PT
+   post-close). If the schedule double-fires again, weight that in the execute decision.
+2. **Snapshot:** `account`, `positions`, `open-orders`, `regime`.
+   - **Expected book after the 7/9 open fills:** positions = **META 16 ONLY**; cash risen ~$22,080 to **~$93,891**;
+     equity roughly unchanged (~$103k, moved only by META's mark + fill slippage). **This is a LEGITIMATE CLOSE
+     (cash RISES by ~proceeds), NOT a wipe** (wipe = cash unchanged while positions vanish). Do NOT freeze.
+   - `open-orders` will likely still ERROR with `'dict' object has no attribute 'id'` if any sell is still live
+     (the reopened parser bug bites when a live order exists). Once all 3 fill, the error should clear.
+3. **RECONCILE THE FILLS (the day's key task).** For each of AVGO/MU/ORCL that the broker now shows GONE, run
+   `cli log-closed equity_event_driven_catalyst <SYM> <pnl_fraction>` using the **ACTUAL fill price** from Alpaca
+   (approx targets below from 7/8 marks — REPLACE with real fills):
+   - `log-closed equity_event_driven_catalyst AVGO +0.028`   (~$388 vs entry $377.27 — a WIN)
+   - `log-closed equity_event_driven_catalyst MU   -0.0375`  (~$946 vs entry $982.90)
+   - `log-closed equity_event_driven_catalyst ORCL -0.204`   (~$141 vs entry $177.28)
+   Only log the ones that ACTUALLY closed. **Self-healing:** if a sell expired overnight and a position is still
+   open, execute will simply re-emit it — no manual action; just reconcile whatever filled.
+4. **P0 check:** `cli list-active`. Expect `unclaimed_count 0`, `provisional_count 7` (QCOM/SPCX/SYNA
+   `revalidate_by 2026-07-21`; SMCI/RKLB/IRDM/BE `revalidate_by 2026-07-22`). Triage any NEW unclaimed symbol; do
+   NOT `add-active`. (SK Hynix's US ADR listing is due **7/10** — if the news agent promotes it, it'll need triage.)
+5. **Execute (venv).** `cli execute` per standard workflow. event_driven_catalyst now has only META-less held names
+   left (AVGO/MU/ORCL exited); it may fire nothing. Provisionals stay quarantined/skipped.
 6. **Library gaps — see list below (Saturday research owns them).**
 7. **`cli git-sync --agent trader --message "..."` (venv) as last action.**
 
-## Position watch
+## Wipe playbook (KEEP for reference — full doctrine in manual.md "Recent feedback")
+If a future run finds the account FLAT with **cash UNCHANGED** and **no `trade_closed` events** → wipe signature →
+FREEZE (no execute, no log-closed), record last-good marks, flag operator. **Un-freeze on evidence** if a later
+snapshot shows positions restored to prior qty/avg-entry + no phantom closes + canonical post-close + fresh brief.
+**NOTE: the 7/9 fills are NOT this** — cash will RISE (real proceeds), positions gone because they legitimately
+SOLD. Distinguish "cash unchanged + vanished" (wipe → freeze) from "cash up + vanished" (fills → reconcile).
 
-- **ORCL (−20.13%, avg $177.28, cur $141.60) — TOP concern, but it's a CODE gap, not a market call.**
-  event_driven_catalyst owns and evaluates ORCL but its `evaluate()` has **no exit implementation** — the 6/10
-  entry documented "Stop @ 175.11 / 7-day time stop" yet submitted a plain market buy (`stop_price: null`) and
-  never generates an exit intent, so both stops are dead letters. Do NOT hand-exit (forbidden). Top Saturday
-  research item: implement the exit side. Meanwhile the position rides unmanaged.
-- **MU (−6.04%, avg $982.90):** deepened on the Samsung-driven chip rout (competitor read-through; the memory
-  pricing cycle looks fundamentally intact). event_driven_catalyst-owned, no exit fired.
-- **META (+1.71%, avg $605.28, macd_histogram-owned):** GREEN — Muse Image launch + upgrade. Rides its MACD exit.
-- **AVGO (−2.19%, avg $377.27):** no fresh single-name event; rode the chip pullback. event_driven_catalyst.
+## Position watch (after the 7/9 fills)
+
+- **META (+/− small, avg $605.28) — the only remaining long.** `equity_momentum_macd_histogram`-owned; rides its
+  MACD exit. DMA regulatory read-through is an overhang, not a shock; no responder (informational).
+- **AVGO / MU / ORCL — EXITED 7/9** by event_driven_catalyst (time/time/hard-stop). Reconcile via log-closed
+  (step 3). ORCL's −20% finally closed — the old missing-exit bug is fixed and enforced.
 
 ## Library gaps + research items (carry to research_tasks.md — Saturday)
 
-All `responder: NONE` — informational, not tradable under the mandate. Same open set as the 7/7 NOTABLE brief:
-- **Provisional/quarantined validations (TOP PRIORITY):** SPCX (trend-following; joined Nasdaq-100 7/7 but still
-  quarantined), QCOM (event-driven), SYNA (pairs-cointegration; LIVE onsemi $7B all-stock merger-arb, long SYNA
-  / short ON at 1.350). All `revalidate_by 2026-07-21`.
-- **event_driven_catalyst EXIT IMPLEMENTATION (new, sharpened):** the strategy implements entry but not exit —
-  no price-stop or time-stop exit intents are ever generated (ORCL −20% is the live casualty). Highest-value fix.
-- **Competitor-earnings / sector read-through overlay** — Samsung Q2 → MU/SNDK/MRVL/INTC/ARM chip rout. No rule
-  reads a competitor's print as a signal on our names.
-- **Capital-allocation / debt-raise event window** — AMZN ≥$25B AI-capex bond sale; JPM $50B buyback (carry);
-  MU Micron-Ford/GM SCAs. No responder.
-- **Product-launch / competitive-threat window** — META Muse Image; NVDA DeepSeek-chip threat + Kyber roadmap
-  rebuttal. No responder.
-- **Index-inclusion / forced-flow (NEW_CATEGORY_NEEDED, index_rebalance)** — SPCX→Nasdaq-100 7/7 (fell ~7%
-  despite ~$4.3B inflow); SK Hynix US listing ~7/10. Taxonomy has no index_rebalance type.
-- **Earnings/delivery-window assignment** — JPM (7/14, window OPEN, most urgent), TSLA (7/22), INTC (7/23), AMZN
-  (7/30), CBRS (carry). All trend-following-claimed, not event-driven.
-- **Regulatory/antitrust window** — DST-tariff (GOOGL/META/AMZN/AAPL), UK under-16 ban, Meta addiction
-  litigation, SEC quarterly-reporting shake-up. No rule reads a court/agency/trade action.
-- **Pricing/margin + restructuring sub-triggers (carry)** — INTC price hikes; MSFT 4,800 cuts. No responder.
-- **Vol-regime activation** — MU/SNDK single-name IV; the oil-driven index-vol tail from Hormuz. Vol structures
-  exist (iron_condor_high_iv, etc.) but none active / none claims a universe symbol.
-- **Provisional claim-REASON prose reconciliation** — the 7/7 re-bootstrap stamped a QCOM-specific
-  "QUARANTINED" string onto the whole event_driven_catalyst / trend_following claims, but only QCOM/SPCX/SYNA
-  are actually quarantined (execute confirmed symbol-level). Reconcile the prose via re-triage, NOT a hand-edit.
+All `responder: NONE` — informational, not tradable under the mandate. From the 7/8 NOTABLE brief:
+- **Provisional/quarantined validations (TOP PRIORITY):** now **7** — QCOM (event-driven), SPCX (trend-following;
+  Nasdaq-100 + FCC 100k-sat filing, still quarantined), SYNA (pairs; onsemi merger-arb), plus NEW 7/8:
+  **SMCI** (event-driven, edge-AI appliance), **RKLB** (event-driven, $8B Iridium M&A), **IRDM** (pairs; the
+  RKLB/IRDM merger-arb target @ $54/sh — a genuine live pair worth a real cointegration look), **BE** (event-
+  driven, Hunterbrook short report). QCOM/SPCX/SYNA `revalidate_by 2026-07-21`; SMCI/RKLB/IRDM/BE `2026-07-22`.
+- **event_driven_catalyst exit CALIBRATION (was: implementation — now DONE/enforced).** The exit side is now
+  wired and fired live (AVGO/MU/ORCL 7/8). Remaining research: is `max_hold_days: 7` right? Backtest the time-stop
+  horizon + the 2×ATR hard-stop multiple. Also: the strategy models only a name's OWN earnings window — no re-entry
+  on a NEW catalyst (AVGO's Apple $30B deal fired the exit while a fresh bull catalyst landed same day).
+- **Customer-win / capital-allocation overlay (NEW instance) — Apple↔AVGO/AAPL $30B Broadcom deal.** No rule reads
+  an anchor-customer / supply-commitment win. Positive catalyst on a held name the library can't act on.
+- **Competitor-earnings / sector read-through — Samsung $59B guide (bullish MU/SNDK/TSM) + China CXMT threat
+  (bearish MU/SNDK, NEW).** event_driven_catalyst models only a name's own window, not a peer print.
+- **Regulatory / antitrust window — EU DMA App Store ruling (AAPL/GOOGL/META, concrete action); SEC reporting
+  shake-up; BE Hunterbrook short report.** No rule reads a court/agency/activist-short action.
+- **Index-inclusion / forced-flow (NEW_CATEGORY_NEEDED, index_rebalance)** — SPCX Nasdaq-100 + FCC filing; **SK
+  Hynix $29B Nasdaq ADR listing due 7/10**. Taxonomy has no index_rebalance type — recurring, argues for a 6th
+  Tier-B trigger / forced-flow overlay.
+- **M&A-arb activation — RKLB/IRDM ($54/sh confirmed, NOW in universe) + SYNA/onsemi (carry).** pairs_cointegration
+  declares pairs_arbitrage; IRDM/SYNA both provisional. Validate the RKLB/IRDM and SYNA/ON pairs via head-to-head.
+- **Earnings/delivery-window assignment — JPM (7/14, window OPEN, most urgent), TSLA (7/22), INTC (7/23), AMZN
+  (7/30).** All trend-following-claimed, not event-driven.
+- **Product-launch / competitive-threat — SMCI edge-AI appliance; OpenAI GPT-Live vs MSFT; NVDA Vera Rubin
+  supply.** No rule reads a product launch / partner-competitor product event.
+- **Vol-regime activation — single-name event-IV (JPM/TSLA/INTC/AMZN, SK-Hynix listing) + oil-driven index-vol
+  tail (Iran).** Structures exist (iron_condor_high_iv, long_straddle_earnings) but none active / none claims a
+  universe symbol.
+- **Fallback-threshold question (NEW, minor)** — SMCI/RKLB/IRDM/BE each triaged to a below-baseline TRADING
+  provisional (Sharpe 0.0 from 0 trades) rather than `equity_watch_only`, because a 0.0 score reads as "rankable
+  candidate" not "no signal." Decide whether a 0-trade degenerate backtest should route to watch_only instead.
 - **Validate first-pass + provisional assignments via head-to-head** (carry): breakout vs trend on ARM/MRVL/INTC;
-  bollinger vs trend on CSCO; rsi vs trend on HPE; event-driven vs trend on AVGO/MU/ORCL; sector-rotation vs
-  trend on DELL; macd vs trend on META/MSFT; trend placeholders → AAPL/AMZN/CBRS/GOOGL/JPM/NUVL/NVDA/QQQ/SPY/
-  TSLA/TSM.
+  bollinger vs trend on CSCO; rsi vs trend on HPE; sector-rotation vs trend on DELL; macd on META/MSFT/SNDK; trend
+  placeholders → AAPL/AMZN/CBRS/GOOGL/JPM/NUVL/NVDA/QQQ/SPY/TSLA/TSM.
 
 ## Open questions for the operator
 
-1. **[timing, HIGH] The schedule double-fired on 7/7** (09:09 mid-session + 16:03 post-close) and fired on the
-   7/3 holiday. Confirm the intended trigger; ensure exactly one canonical ~4 PM post-close run per trading day.
+1. **[timing, HIGH] Confirm the single-trigger schedule** — 7/7 double-fired (09:09 + 16:03), 7/3 fired on a
+   holiday. 7/8 fired once at the canonical ~16:02 ✓. A double-fire on an order-submitting day is the real risk.
 2. **[HIGH] Repair the interpreter** — bare `python3` = Homebrew 3.14.5 (no deps). Repoint task/daily_prompt to
    `.venv/bin/python3` or reinstall deps.
-3. **[MEDIUM] News-pipeline staleness guard** — `_load_news_brief()` never compares `date_in_file` to today.
-4. **[FYI] 7/7 09:09 flat read was transient/self-restored** — if convenient, confirm on the Alpaca dashboard
-   what caused the momentary flat account, to harden the pipeline. No account action needed.
-5. **[REOPENED] `cli open-orders` parser bug** — `'dict' object has no attribute 'id'` when a live order exists.
-6. **THREE provisional/quarantined claims** — QCOM/SPCX/SYNA, all `revalidate_by 2026-07-21`. Saturday research
-   owns validation. Do NOT hand-promote.
+3. **[REOPENED, BITING] `cli open-orders` parser bug** — `'dict' object has no attribute 'id'` when a live order
+   exists. Bit 7/8 (3 live sells). Doesn't block trading; blinds the open-orders view until fills clear.
+4. **[MEDIUM] News-pipeline staleness guard** — `_load_news_brief()` never compares `date_in_file` to today.
+5. **[MEDIUM, NEW] Fallback threshold** — 0-trade Sharpe-0.0 → trading-provisional vs watch_only (see gaps list).
+6. **SEVEN provisional/quarantined claims** — QCOM/SPCX/SYNA (`2026-07-21`), SMCI/RKLB/IRDM/BE (`2026-07-22`).
+   Saturday research owns validation. Do NOT hand-promote.

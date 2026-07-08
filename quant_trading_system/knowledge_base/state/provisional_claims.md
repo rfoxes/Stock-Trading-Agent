@@ -1,5 +1,25 @@
 ---
 provisional:
+- symbol: BE
+  strategy_id: equity_event_driven_catalyst
+  gap_type: event_catalyst
+  sharpe: 0.0
+  baseline_sharpe: 0.5
+  provisional_since: '2026-07-08'
+  revalidate_by: '2026-07-22'
+  reason: "top candidate 'equity_event_driven_catalyst' has Sharpe 0.000 < baseline\
+    \ 0.500. No library strategy is good enough on this symbol \u2014 log for Saturday\
+    \ research to build a new template."
+- symbol: IRDM
+  strategy_id: equity_pairs_trading_cointegration
+  gap_type: pairs_arbitrage
+  sharpe: 0.0
+  baseline_sharpe: 0.5
+  provisional_since: '2026-07-08'
+  revalidate_by: '2026-07-22'
+  reason: "top candidate 'equity_pairs_trading_cointegration' has Sharpe 0.000 < baseline\
+    \ 0.500. No library strategy is good enough on this symbol \u2014 log for Saturday\
+    \ research to build a new template."
 - symbol: QCOM
   strategy_id: equity_event_driven_catalyst
   gap_type: event_catalyst
@@ -7,6 +27,26 @@ provisional:
   baseline_sharpe: 0.5
   provisional_since: '2026-07-07'
   revalidate_by: '2026-07-21'
+  reason: "top candidate 'equity_event_driven_catalyst' has Sharpe 0.000 < baseline\
+    \ 0.500. No library strategy is good enough on this symbol \u2014 log for Saturday\
+    \ research to build a new template."
+- symbol: RKLB
+  strategy_id: equity_event_driven_catalyst
+  gap_type: event_catalyst
+  sharpe: 0.0
+  baseline_sharpe: 0.5
+  provisional_since: '2026-07-08'
+  revalidate_by: '2026-07-22'
+  reason: "top candidate 'equity_event_driven_catalyst' has Sharpe 0.000 < baseline\
+    \ 0.500. No library strategy is good enough on this symbol \u2014 log for Saturday\
+    \ research to build a new template."
+- symbol: SMCI
+  strategy_id: equity_event_driven_catalyst
+  gap_type: event_catalyst
+  sharpe: 0.0
+  baseline_sharpe: 0.5
+  provisional_since: '2026-07-08'
+  revalidate_by: '2026-07-22'
   reason: "top candidate 'equity_event_driven_catalyst' has Sharpe 0.000 < baseline\
     \ 0.500. No library strategy is good enough on this symbol \u2014 log for Saturday\
     \ research to build a new template."
