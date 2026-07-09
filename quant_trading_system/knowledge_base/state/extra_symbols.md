@@ -74,3 +74,6 @@ IRDM
 
 # Added 2026-07-08 (news, promote-candidate): Tier-0 news-subject 7/8: Hunterbrook short report on China scandium supply claims triggered major dip; AI-datacenter power
 BE
+
+# Added 2026-07-09 (news, promote-candidate): Tier-B #5 Tier-1 customer-win: Anthropic $19B 20-year AI-datacenter lease (Hawesville KY, 401MW), MS PT raise 7/9; AI-infra/datacenter cohort (BE/SMCI-adjacent). US-tradable (NASDAQ:WULF).
+WULF
