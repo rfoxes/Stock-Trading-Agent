@@ -43,17 +43,6 @@ strategies:
     \ / no price history \u2014 cannot rank Attached best-available equity_trend_following_ema_cross\
     \ for coverage; QUARANTINED from execution until Saturday research validates (clears\
     \ baseline 0.50) or escalates."
-- id: equity_event_driven_catalyst
-  symbols:
-  - AVGO
-  - MU
-  - ORCL
-  - QCOM
-  since: '2026-07-08'
-  reason: 'research 2026-07-08: released SMCI/RKLB/BE to validated equity claims (unrestricted
-    triage winners clear baseline 0.5 on >=5 trades); event_driven_catalyst retains
-    actively-managed AVGO/MU/ORCL (resting exits) + QCOM provisional (held, thin 3-trade
-    sample)'
 - id: equity_pairs_trading_cointegration
   symbols:
   - SYNA
@@ -79,6 +68,19 @@ strategies:
   since: '2026-07-08'
   reason: 'triage-symbol 2026-07-08: equity_breakout_volume_confirmation beat 10 other
     candidate(s) on IRDM with Sharpe 0.832 (vs baseline 0.50)'
+- id: equity_event_driven_catalyst
+  symbols:
+  - AVGO
+  - MU
+  - ORCL
+  - QCOM
+  - WULF
+  since: '2026-07-09'
+  reason: "PROVISIONAL/UNVALIDATED triage 2026-07-09: top candidate 'equity_event_driven_catalyst'\
+    \ has Sharpe 0.000 < baseline 0.500. No library strategy is good enough on this\
+    \ symbol \u2014 log for Saturday research to build a new template. Attached best-available\
+    \ equity_event_driven_catalyst for coverage; QUARANTINED from execution until\
+    \ Saturday research validates (clears baseline 0.50) or escalates."
 ---
 
 Active strategy set. Each entry owns its declared symbols exclusively. Conflicts are resolved by head-to-head backtest at the research layer, never at runtime.
