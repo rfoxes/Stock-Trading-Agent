@@ -81,6 +81,14 @@ strategies:
     \ symbol \u2014 log for Saturday research to build a new template. Attached best-available\
     \ equity_event_driven_catalyst for coverage; QUARANTINED from execution until\
     \ Saturday research validates (clears baseline 0.50) or escalates."
+- id: equity_watch_only
+  symbols:
+  - SKHY
+  since: '2026-07-10'
+  reason: "PROVISIONAL/UNVALIDATED triage 2026-07-10: every candidate backtest errored\
+    \ / no price history \u2014 cannot rank Attached best-available equity_watch_only\
+    \ for coverage; QUARANTINED from execution until Saturday research validates (clears\
+    \ baseline 0.50) or escalates."
 ---
 
 Active strategy set. Each entry owns its declared symbols exclusively. Conflicts are resolved by head-to-head backtest at the research layer, never at runtime.

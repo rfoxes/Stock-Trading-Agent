@@ -77,3 +77,6 @@ BE
 
 # Added 2026-07-09 (news, promote-candidate): Tier-B #5 Tier-1 customer-win: Anthropic $19B 20-year AI-datacenter lease (Hawesville KY, 401MW), MS PT raise 7/9; AI-infra/datacenter cohort (BE/SMCI-adjacent). US-tradable (NASDAQ:WULF).
 WULF
+
+# Added 2026-07-10 (news, promote-candidate): Tier-0 news-subject + standing operator/prior-agent directive: SK Hynix $26.5B Nasdaq ADR debut 7/10 (largest-ever foreign US IPO), opened +14-17% over $149 offer, memory cohort. SKHY = permanent regular-way ticker live Mon 7/13 (temp when-issued line SKHYV traded ~$168-170 today; no Alpaca regular-way price history until 7/13).
+SKHY

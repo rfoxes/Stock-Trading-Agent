@@ -10,6 +10,14 @@ provisional:
   reason: "top candidate 'equity_event_driven_catalyst' has Sharpe 0.000 < baseline\
     \ 0.500. No library strategy is good enough on this symbol \u2014 log for Saturday\
     \ research to build a new template."
+- symbol: SKHY
+  strategy_id: equity_watch_only
+  gap_type: event_catalyst
+  sharpe: null
+  baseline_sharpe: 0.5
+  provisional_since: '2026-07-10'
+  revalidate_by: '2026-07-24'
+  reason: "every candidate backtest errored / no price history \u2014 cannot rank"
 - symbol: SPCX
   strategy_id: equity_trend_following_ema_cross
   gap_type: volatility_regime

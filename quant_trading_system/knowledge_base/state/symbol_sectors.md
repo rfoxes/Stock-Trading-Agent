@@ -99,3 +99,6 @@ BE: industrials
 
 # Added 2026-07-09 (news, promote-candidate)
 WULF: technology
+
+# Added 2026-07-10 (news, promote-candidate)
+SKHY: technology
