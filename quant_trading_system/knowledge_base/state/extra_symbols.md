@@ -80,3 +80,6 @@ WULF
 
 # Added 2026-07-10 (news, promote-candidate): Tier-0 news-subject + standing operator/prior-agent directive: SK Hynix $26.5B Nasdaq ADR debut 7/10 (largest-ever foreign US IPO), opened +14-17% over $149 offer, memory cohort. SKHY = permanent regular-way ticker live Mon 7/13 (temp when-issued line SKHYV traded ~$168-170 today; no Alpaca regular-way price history until 7/13).
 SKHY
+
+# Added 2026-07-13 (news, promote-candidate): Tier-0 news-subject (operator directive 2026-07-08): RIVN own coverage line + concrete catalyst = discounted 75M-share public offering (dilutive capital raise) on Mon 7/13; US-tradable (NASDAQ). EV peer to TSLA. Lands unclaimed -> trader triage (watch-grade expected).
+RIVN

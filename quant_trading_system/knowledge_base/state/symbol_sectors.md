@@ -102,3 +102,6 @@ WULF: technology
 
 # Added 2026-07-10 (news, promote-candidate)
 SKHY: technology
+
+# Added 2026-07-13 (news, promote-candidate)
+RIVN: consumer_discretionary
