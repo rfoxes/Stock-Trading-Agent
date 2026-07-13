@@ -499,6 +499,27 @@ nothing useful for 'CPI release' queries; use 'CPI <month> <year>' instead.")
   triage + Saturday research own the strategy claim. (Also: confirm the symbol
   isn't already in — e.g. Cerebras is `CBRS`, in since 2026-06-09 — before
   re-promoting.)
+- **2026-07-10: For IPO/new-listing promotions, promote the PERMANENT
+  regular-way ticker — NOT the temporary when-issued line.** SK Hynix listed
+  7/10 under a when-issued ticker **SKHYV** (that day only; Alpaca quoted it
+  ~$168.6 while the permanent **SKHY** returned "no quote available"). SKHY
+  became the regular-way ticker on 7/13 and is the durable symbol. Promoting
+  the when-issued line would have created a phantom that retires after debut
+  day. Rule: confirm the permanent ticker via WebSearch, promote THAT (even if
+  Alpaca can't quote it yet on debut day — it populates when regular-way
+  trading starts), and note the interim when-issued price as a reference.
+  A brand-new listing has ~no price history, so the trader's triage will
+  route it to a no-history provisional/quarantined claim until bars accrue —
+  expected and harmless per Tier-0.
+- **2026-07-10: A suspended session can complete a news run days late — date
+  the brief to the run's DATA date, not the wall clock, and flag the gap.**
+  The 7/10 run fired at the correct Fri 15:35 PT slot but the sandbox session
+  was suspended over the weekend and finished Mon 7/13. All data (news-fetch,
+  quotes, WebSearch) was 7/10, so the brief stayed dated 7/10 with a prominent
+  run-timing note; re-labeling Friday's data as Monday's would be false. When
+  this happens: keep the data-date, add a staleness warning at the top of the
+  brief, and log it HIGH in open-questions (it's the brief-staleness guard
+  gap manifesting concretely).
 - **2026-06-04: `news_fetch` bug fix — it now uses `compute_universe`,
   not `settings.watchlist`.** Operator additions to `extra_symbols.md`
   flow through automatically. No need to pre-create subdirs.
