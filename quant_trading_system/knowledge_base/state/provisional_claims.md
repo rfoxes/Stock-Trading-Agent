@@ -10,6 +10,16 @@ provisional:
   reason: "top candidate 'equity_event_driven_catalyst' has Sharpe 0.000 < baseline\
     \ 0.500. No library strategy is good enough on this symbol \u2014 log for Saturday\
     \ research to build a new template."
+- symbol: RIVN
+  strategy_id: equity_event_driven_catalyst
+  gap_type: event_catalyst
+  sharpe: 0.0
+  baseline_sharpe: 0.5
+  provisional_since: '2026-07-13'
+  revalidate_by: '2026-07-27'
+  reason: "top candidate 'equity_event_driven_catalyst' has Sharpe 0.000 < baseline\
+    \ 0.500. No library strategy is good enough on this symbol \u2014 log for Saturday\
+    \ research to build a new template."
 - symbol: SKHY
   strategy_id: equity_watch_only
   gap_type: event_catalyst

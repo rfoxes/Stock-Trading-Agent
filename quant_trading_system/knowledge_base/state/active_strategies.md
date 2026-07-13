@@ -68,16 +68,6 @@ strategies:
     \ / no price history \u2014 cannot rank Attached best-available equity_watch_only\
     \ for coverage; QUARANTINED from execution until Saturday research validates (clears\
     \ baseline 0.50) or escalates."
-- id: equity_event_driven_catalyst
-  symbols:
-  - AVGO
-  - MU
-  - ORCL
-  - QCOM
-  since: '2026-07-11'
-  reason: 'research 2026-07-11: released WULF to validated equity_rsi_divergence claim
-    (unrestricted triage winner Sharpe 0.880 on 12 trades >= baseline 0.5); event_driven
-    retains AVGO,MU,ORCL (live reconciled) + QCOM (provisional, held thin)'
 - id: equity_rsi_divergence
   symbols:
   - HPE
@@ -85,6 +75,19 @@ strategies:
   since: '2026-07-11'
   reason: 'triage-symbol 2026-07-11: equity_rsi_divergence beat 10 other candidate(s)
     on WULF with Sharpe 0.880 (vs baseline 0.50)'
+- id: equity_event_driven_catalyst
+  symbols:
+  - AVGO
+  - MU
+  - ORCL
+  - QCOM
+  - RIVN
+  since: '2026-07-13'
+  reason: "PROVISIONAL/UNVALIDATED triage 2026-07-13: top candidate 'equity_event_driven_catalyst'\
+    \ has Sharpe 0.000 < baseline 0.500. No library strategy is good enough on this\
+    \ symbol \u2014 log for Saturday research to build a new template. Attached best-available\
+    \ equity_event_driven_catalyst for coverage; QUARANTINED from execution until\
+    \ Saturday research validates (clears baseline 0.50) or escalates."
 ---
 
 Active strategy set. Each entry owns its declared symbols exclusively. Conflicts are resolved by head-to-head backtest at the research layer, never at runtime.
