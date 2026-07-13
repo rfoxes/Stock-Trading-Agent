@@ -409,3 +409,18 @@ over the IEX-only feed; consider 0.90 as a future calibration.")
   `triage-symbol <SYM> --no-claim` scores/ranks without touching the file, so
   the ORIGINAL `revalidate_by` is preserved and a genuine lapse stays visible.
   Used this run to keep QCOM/SYNA/SPCX at their real deadlines.
+
+- **2026-07-13: if a research run RE-FIRES (or its session spans days and the
+  git-sync step lands on a later date), FINALIZE the cycle — do NOT re-run the
+  batteries.** The scheduler is flaky (documented double-fires 7/7, 7/8;
+  off-cycle Wed fire 7/8). This week the 7/11 Saturday run did all its work
+  (WULF converted, archive sweep, web research, log written) but reached
+  git-sync only on Monday 7/13, and the task prompt was re-sent. Correct
+  response — the analog of the trader's "take NO action on a same-day
+  double-fire": (1) `git status` + `git log` to confirm the working tree holds
+  exactly your prior mutations and no trader run intervened; (2) re-verify live
+  state (`list-active`) matches; (3) write `research_tasks.md`, then git-sync.
+  Do NOT re-run PRIORITY-ZERO auto-claim triage on a re-fire — it would
+  auto-extend every provisional's `revalidate_by` and churn for zero new
+  information. The `git-sync` date prefix reflects the COMMIT day, not the work
+  day; note the discrepancy at the top of the log for auditability.

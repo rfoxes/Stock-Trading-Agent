@@ -1,13 +1,5 @@
 ---
 strategies:
-- id: equity_rsi_divergence
-  symbols:
-  - HPE
-  since: '2026-06-04'
-  reason: "Operator directive 2026-06-04: every universe symbol must be claimed. HPE\
-    \ RSI 87.56 per Thu news brief (historic AI-server rally, overbought) \u2014 RSI\
-    \ divergence is the textbook setup for trend-exhaustion at extreme RSI. Research\
-    \ agent should validate via head-to-head."
 - id: equity_sector_rotation_momentum
   symbols:
   - DELL
@@ -68,19 +60,6 @@ strategies:
   since: '2026-07-08'
   reason: 'triage-symbol 2026-07-08: equity_breakout_volume_confirmation beat 10 other
     candidate(s) on IRDM with Sharpe 0.832 (vs baseline 0.50)'
-- id: equity_event_driven_catalyst
-  symbols:
-  - AVGO
-  - MU
-  - ORCL
-  - QCOM
-  - WULF
-  since: '2026-07-09'
-  reason: "PROVISIONAL/UNVALIDATED triage 2026-07-09: top candidate 'equity_event_driven_catalyst'\
-    \ has Sharpe 0.000 < baseline 0.500. No library strategy is good enough on this\
-    \ symbol \u2014 log for Saturday research to build a new template. Attached best-available\
-    \ equity_event_driven_catalyst for coverage; QUARANTINED from execution until\
-    \ Saturday research validates (clears baseline 0.50) or escalates."
 - id: equity_watch_only
   symbols:
   - SKHY
@@ -89,6 +68,23 @@ strategies:
     \ / no price history \u2014 cannot rank Attached best-available equity_watch_only\
     \ for coverage; QUARANTINED from execution until Saturday research validates (clears\
     \ baseline 0.50) or escalates."
+- id: equity_event_driven_catalyst
+  symbols:
+  - AVGO
+  - MU
+  - ORCL
+  - QCOM
+  since: '2026-07-11'
+  reason: 'research 2026-07-11: released WULF to validated equity_rsi_divergence claim
+    (unrestricted triage winner Sharpe 0.880 on 12 trades >= baseline 0.5); event_driven
+    retains AVGO,MU,ORCL (live reconciled) + QCOM (provisional, held thin)'
+- id: equity_rsi_divergence
+  symbols:
+  - HPE
+  - WULF
+  since: '2026-07-11'
+  reason: 'triage-symbol 2026-07-11: equity_rsi_divergence beat 10 other candidate(s)
+    on WULF with Sharpe 0.880 (vs baseline 0.50)'
 ---
 
 Active strategy set. Each entry owns its declared symbols exclusively. Conflicts are resolved by head-to-head backtest at the research layer, never at runtime.

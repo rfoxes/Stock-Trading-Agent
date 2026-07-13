@@ -1,8 +1,15 @@
 ---
 gaps:
+- symbol: SKHY
+  gap_type: unknown
+  triaged_at: '2026-07-11'
+  reason: "every candidate backtest errored / no price history \u2014 cannot rank"
+  top_strategy: null
+  top_sharpe: null
+  baseline_sharpe: 0.5
 - symbol: SPCX
   gap_type: unknown
-  triaged_at: '2026-07-08'
+  triaged_at: '2026-07-11'
   reason: "every candidate backtest errored / no price history \u2014 cannot rank"
   top_strategy: null
   top_sharpe: null
