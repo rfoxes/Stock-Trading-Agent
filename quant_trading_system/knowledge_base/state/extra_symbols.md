@@ -83,3 +83,6 @@ SKHY
 
 # Added 2026-07-13 (news, promote-candidate): Tier-0 news-subject (operator directive 2026-07-08): RIVN own coverage line + concrete catalyst = discounted 75M-share public offering (dilutive capital raise) on Mon 7/13; US-tradable (NASDAQ). EV peer to TSLA. Lands unclaimed -> trader triage (watch-grade expected).
 RIVN
+
+# Added 2026-07-14 (news, promote-candidate): Tier-0 news-subject: reported best quarter in its history Q2 2026 (EPS $20.98, revenue $20.34B +39% YoY, shares +6.9%), dedicated single-name coverage; also fills recurring financials-breadth gap (JPM had been the only bank).
+GS

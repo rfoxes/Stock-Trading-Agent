@@ -105,3 +105,6 @@ SKHY: technology
 
 # Added 2026-07-13 (news, promote-candidate)
 RIVN: consumer_discretionary
+
+# Added 2026-07-14 (news, promote-candidate)
+GS: financials
