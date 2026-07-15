@@ -86,3 +86,9 @@ RIVN
 
 # Added 2026-07-14 (news, promote-candidate): Tier-0 news-subject: reported best quarter in its history Q2 2026 (EPS $20.98, revenue $20.34B +39% YoY, shares +6.9%), dedicated single-name coverage; also fills recurring financials-breadth gap (JPM had been the only bank).
 GS
+
+# Added 2026-07-15 (news, promote-candidate): Tier-0 news-subject: record Q2 2026 (rev $21.3B vs $20.2B est, EPS $3.46 vs $3.03, stock-trading rev +69% to $6.3B, +15% dividend to $1.15); completes bulge-bracket IB breadth (JPM+GS+MS) — the flagged financials-breadth gap
+MS
+
+# Added 2026-07-15 (news, promote-candidate): Tier-B #1 confirmed M&A target + Tier-0 subject: Reuters reports Stripe/Advent $53B buyout offer at $60.50/sh, PYPL +17% (target, not acquirer); Burry pushback, Polymarket ~79% close odds
+PYPL

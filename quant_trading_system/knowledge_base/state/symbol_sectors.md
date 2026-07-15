@@ -108,3 +108,9 @@ RIVN: consumer_discretionary
 
 # Added 2026-07-14 (news, promote-candidate)
 GS: financials
+
+# Added 2026-07-15 (news, promote-candidate)
+MS: financials
+
+# Added 2026-07-15 (news, promote-candidate)
+PYPL: financials
