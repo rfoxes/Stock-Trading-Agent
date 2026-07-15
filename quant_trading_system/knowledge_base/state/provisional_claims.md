@@ -10,6 +10,26 @@ provisional:
   reason: "top candidate 'equity_event_driven_catalyst' has Sharpe 0.000 < baseline\
     \ 0.500. No library strategy is good enough on this symbol \u2014 log for Saturday\
     \ research to build a new template."
+- symbol: MS
+  strategy_id: equity_event_driven_catalyst
+  gap_type: earnings_window
+  sharpe: 0.0
+  baseline_sharpe: 0.5
+  provisional_since: '2026-07-15'
+  revalidate_by: '2026-07-29'
+  reason: "top candidate 'equity_event_driven_catalyst' has Sharpe 0.000 < baseline\
+    \ 0.500. No library strategy is good enough on this symbol \u2014 log for Saturday\
+    \ research to build a new template."
+- symbol: PYPL
+  strategy_id: equity_event_driven_catalyst
+  gap_type: event_catalyst
+  sharpe: 0.0
+  baseline_sharpe: 0.5
+  provisional_since: '2026-07-15'
+  revalidate_by: '2026-07-29'
+  reason: "top candidate 'equity_event_driven_catalyst' has Sharpe 0.000 < baseline\
+    \ 0.500. No library strategy is good enough on this symbol \u2014 log for Saturday\
+    \ research to build a new template."
 - symbol: QCOM
   strategy_id: equity_event_driven_catalyst
   gap_type: event_catalyst

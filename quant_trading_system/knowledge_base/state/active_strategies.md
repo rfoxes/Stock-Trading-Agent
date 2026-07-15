@@ -79,12 +79,14 @@ strategies:
   symbols:
   - AVGO
   - GS
+  - MS
   - MU
   - ORCL
+  - PYPL
   - QCOM
   - RIVN
-  since: '2026-07-14'
-  reason: "PROVISIONAL/UNVALIDATED triage 2026-07-14: top candidate 'equity_event_driven_catalyst'\
+  since: '2026-07-15'
+  reason: "PROVISIONAL/UNVALIDATED triage 2026-07-15: top candidate 'equity_event_driven_catalyst'\
     \ has Sharpe 0.000 < baseline 0.500. No library strategy is good enough on this\
     \ symbol \u2014 log for Saturday research to build a new template. Attached best-available\
     \ equity_event_driven_catalyst for coverage; QUARANTINED from execution until\
