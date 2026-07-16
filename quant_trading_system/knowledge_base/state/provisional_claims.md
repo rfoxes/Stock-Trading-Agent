@@ -76,6 +76,16 @@ provisional:
   reason: "top candidate 'equity_pairs_trading_cointegration' has Sharpe 0.000 < baseline\
     \ 0.500. No library strategy is good enough on this symbol \u2014 log for Saturday\
     \ research to build a new template."
+- symbol: UNH
+  strategy_id: equity_event_driven_catalyst
+  gap_type: earnings_window
+  sharpe: 0.0
+  baseline_sharpe: 0.5
+  provisional_since: '2026-07-16'
+  revalidate_by: '2026-07-30'
+  reason: "top candidate 'equity_event_driven_catalyst' has Sharpe 0.000 < baseline\
+    \ 0.500. No library strategy is good enough on this symbol \u2014 log for Saturday\
+    \ research to build a new template."
 ---
 
 PROVISIONAL (unvalidated) strategy attachments — Option 3 / mandatory-attach doctrine (2026-06-16). Each symbol here HAS a strategy attached in active_strategies.md for coverage, but is QUARANTINED FROM EXECUTION (run_active_strategies skips it) until Saturday research re-triages it: clearing baseline Sharpe promotes it to a normal validated claim (clear_provisional_claim); a passed `revalidate_by` deadline is escalated to the operator. NEVER trades while listed here.
