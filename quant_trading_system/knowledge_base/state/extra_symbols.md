@@ -92,3 +92,6 @@ MS
 
 # Added 2026-07-15 (news, promote-candidate): Tier-B #1 confirmed M&A target + Tier-0 subject: Reuters reports Stripe/Advent $53B buyout offer at $60.50/sh, PYPL +17% (target, not acquirer); Burry pushback, Polymarket ~79% close odds
 PYPL
+
+# Added 2026-07-16 (news, promote-candidate): Tier-0 news-subject + Tier-B #3 pattern: Q2 blowout adj EPS $6.38 vs $4.91, rev $112B, RAISED FY26 guidance to $19.50-20.00 (from >$18.25), lifted the Dow. Diversifying healthcare name (universe near-empty in healthcare ex-NUVL).
+UNH

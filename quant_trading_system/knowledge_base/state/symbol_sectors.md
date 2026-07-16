@@ -114,3 +114,6 @@ MS: financials
 
 # Added 2026-07-15 (news, promote-candidate)
 PYPL: financials
+
+# Added 2026-07-16 (news, promote-candidate)
+UNH: healthcare
