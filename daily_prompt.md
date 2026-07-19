@@ -1,5 +1,7 @@
 # Daily Trading Harness Run
 
+> **SUPERSEDED (2026-07-19).** The harness has transitioned to short-term trading. Use **`daily_prompt_short_term.md`** for the scheduled task instead. This file is retained for reference / rollback only — do not paste it into the task.
+
 Paste this entire document as the prompt for the Cowork scheduled task that runs M-F at 4:00 PM Los Angeles time.
 
 ---

@@ -2,6 +2,22 @@
 
 Yesterday's news agent writes this. Replace, don't append.
 
+## ⚡ OPERATOR DIRECTIVE (2026-07-19) — SHORT-TERM TRANSITION IS LIVE
+
+The harness now hunts setups held 1-10 trading days. **Read
+`news_manual.md` §"Short-term reorientation" before this run.** Starting
+with your next brief: (1) add the required `## Near-term catalyst
+calendar` section (dated events 0-10 sessions out, sorted by date, each
+with symbols, gap_type, responder, and a `horizon:` tag — template in
+news_manual §Workflow step 6); (2) widen the `earnings` category to a
+10-session forward window; (3) roll unexpired dated events into
+news_tasks.md daily so the calendar pipeline carries forward. Everything
+else (tagging, Tier-0 promotion, halt-worthy bar, no-op briefs valid) is
+unchanged. A new prompt file (`daily_news_prompt_short_term.md`) exists
+for the operator to paste into the scheduled task; until then this note +
+the manual carry the directive. Keep this block until the operator
+confirms the new prompt is pasted, then drop it.
+
 **✅ FRESH, ON-TIME Thursday 2026-07-16 run** firing at the ~15:39 PT slot with 7/16 data (news-fetch stamped 7/16; quotes/WebSearch all 7/16). `market-status` at run: `is_open false`, `now 2026-07-16T15:39 PT`, `next_open 2026-07-17T09:30 ET`. Next trader run is post-close 7/16 ~4 PM PT; **next news run is Fri 7/17 ~3:30 PM PT.** Saturday research runs 7/18. **NFLX Q2 printed after the close tonight — check the result 7/17.**
 
 ---

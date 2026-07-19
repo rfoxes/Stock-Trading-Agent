@@ -110,11 +110,27 @@ python3 -m quant_trading_system.cli account     # hits Alpaca; needs valid creds
 
 **Schedule it:**
 
-1. Open `daily_prompt.md` in this repo and copy its contents.
+1. Open `daily_prompt_short_term.md` in this repo and copy its contents.
 2. In Cowork, create a scheduled task that fires M-F at 4:00 PM in
    `America/Los_Angeles`. Paste the prompt as the task's instruction.
 3. Set the working directory to `/Users/<you>/Stock-Trading-Agent` (or
    ensure the prompt's absolute paths still match).
+
+**Prompt sets — long-hold vs short-term (2026-07-19):** the harness
+transitioned from holding longs to short-term trading (typical intended
+hold 1-10 trading days). Each of the three scheduled tasks (news, trader,
+research) now uses the `*_short_term.md` variant of its prompt
+(`daily_prompt_short_term.md`, `daily_news_prompt_short_term.md`,
+`weekly_research_prompt_short_term.md`); the originals are retained for
+reference/rollback and carry a SUPERSEDED banner. Same template either
+way: trading is grounded in the daily news brief and Saturday research,
+every order traces to a strategy rule, and Sharpe decides claims. The
+durable doctrine lives in the manuals (`state/manual.md` §P1,
+`state/news_manual.md` §"Short-term reorientation",
+`state/research_manual.md` §"Short-horizon mandate"), so the change
+applies even before the scheduled tasks are re-pasted. Note: the
+transition never force-sells existing positions — exits always come from
+the owning strategy's rules.
 
 The laptop must be **awake and on AC power** at 4 PM PST or the run won't
 fire. macOS sleeps by default on battery:

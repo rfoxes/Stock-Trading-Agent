@@ -1,5 +1,21 @@
 # Tasks for the next run
 
+## ⚡ OPERATOR DIRECTIVE (2026-07-19) — SHORT-TERM TRANSITION IS LIVE
+
+The harness has transitioned from holding longs to trading on a shorter
+timeline (typical intended hold 1-10 trading days). **Read `manual.md`
+§"P1 — SHORT-TERM TRADING DOCTRINE" before this run's workflow.** For you:
+(1) do NOT sell META or anything else because of this — exits stay with the
+owning strategy's rules, no calendar liquidations, ever; (2) weight the
+brief's new `## Near-term catalyst calendar` section in meta-decisions;
+(3) expect faster turnover ahead — reconcile every close from ACTUAL fill
+prices; (4) rotation toward short-horizon strategies goes only through
+triage/head-to-head (research owns the migration — log candidates, don't
+re-claim). New prompt files (`daily_prompt_short_term.md` etc.) exist for
+the operator to paste into the scheduled tasks; until that happens, this
+note + the manuals carry the directive. Keep this block in `tasks.md`
+until the operator confirms the new prompts are pasted, then drop it.
+
 **✅ 7/16 COMPLETE (single fire, canonical 16:03, Thursday).** KEEP day on a real-but-orderly risk-off tape. Book
 unchanged (**META only**, cash $94,690.29, no open orders, META **+9.89%** — gave back part of Wed's +12.43% with
 the broad chip de-rate but still green/trending). **Nothing closed → no reconciliation.** News brief **FRESH &

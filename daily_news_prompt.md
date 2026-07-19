@@ -1,5 +1,7 @@
 # Daily News Run (M-F, ~3:30 PM PT)
 
+> **SUPERSEDED (2026-07-19).** The harness has transitioned to short-term trading. Use **`daily_news_prompt_short_term.md`** for the scheduled task instead. This file is retained for reference / rollback only — do not paste it into the task.
+
 Paste this entire document as the prompt for a THIRD Cowork scheduled task that runs every weekday at 3:30 PM Los Angeles time — 30 minutes before the 4:00 PM PT trading run. Three scheduled tasks total: news (M-F 3:30 PM PT), trader (M-F 4:00 PM PT), research (Sat 12:00 PM PT).
 
 ---

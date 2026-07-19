@@ -1,5 +1,7 @@
 # Weekly Research Run (Saturdays)
 
+> **SUPERSEDED (2026-07-19).** The harness has transitioned to short-term trading. Use **`weekly_research_prompt_short_term.md`** for the scheduled task instead. This file is retained for reference / rollback only — do not paste it into the task.
+
 Paste this entire document as the prompt for a SECOND Cowork scheduled task that runs every Saturday at midday Los Angeles time (e.g. 12:00 PT). This is a separate task from the M-F trading run. The two never run simultaneously.
 
 ---

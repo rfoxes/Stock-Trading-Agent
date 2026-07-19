@@ -7,6 +7,35 @@ Brief is fine. Full narrative belongs in the weekly log.
 
 ---
 
+## ⚡ OPERATOR DIRECTIVE (2026-07-19) — SHORT-HORIZON MANDATE IS LIVE
+
+The harness has transitioned to trading on a shorter timeline (typical
+intended hold 1-10 trading days). **Read `research_manual.md`
+§"Short-horizon mandate" before this run.** Priority order is now:
+(1) provisionals, (2) library gaps, (3) NEW short-horizon migration
+workstream, (4) generic candidates. Concretely, starting this Saturday:
+
+- **Migration kickoff:** begin head-to-head challenges of the best
+  short-horizon strategies against `timeframe: position` incumbents'
+  claims — `equity_trend_following_ema_cross` (AAPL/AMZN/CBRS/GOOGL/JPM/
+  NUVL/NVDA/QQQ/SPY/TSLA/TSM), `equity_sector_rotation_momentum` (DELL).
+  A few symbols per Saturday is fine. ALL standing guards apply (≥5
+  trades on the deciding side; no 0-trade degenerate tiebreaks — this is
+  the same Open Q#3 caution as before, so where both sides can't produce
+  ≥5 trades, record-and-hold rather than churn). Incumbents that keep
+  winning keep their claims.
+- **Sourcing:** point web research at short-horizon candidates (holds ≤10
+  sessions, explicit bounded exits — PEAD-in-window, gap continuation,
+  short-term reversal, breakout retests, event-window entries). New
+  strategies must declare `timeframe:` + a time-stop rule.
+- Provisional revalidation and gap-clearing are UNCHANGED and still come
+  first. Batteries and thresholds unchanged; verdicts verbatim.
+
+A new prompt file (`weekly_research_prompt_short_term.md`) exists for the
+operator to paste into the scheduled task; until then this note + the
+manual carry the directive. Keep this block until the operator confirms
+the new prompt is pasted, then drop it.
+
 ## Status as of the last update (2026-07-11, committed 2026-07-13)
 
 - **RUN VIA `.venv/bin/python3`.** Bare `python3` = Homebrew 3.14.5, no deps (`No module named 'requests'`).

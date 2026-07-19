@@ -206,10 +206,62 @@ These show up as:
    the gap is real but no candidate passes the battery, document the
    failure in next week's `research_tasks.md` so the gap is visible.
 
-Generic candidate-evaluation (your old default work) is rank-2 priority,
-below clearing gaps. The library exists to give the trader at least one
-algorithmic response to every reasonable market condition the universe
-could throw at it. Coverage matters more than incremental Sharpe.
+Generic candidate-evaluation (your old default work) is now rank-4
+priority, below clearing gaps and below the short-horizon migration
+workstream (next section). The library exists to give the trader at
+least one algorithmic response to every reasonable market condition the
+universe could throw at it. Coverage matters more than incremental
+Sharpe.
+
+## Short-horizon mandate (operator directive, 2026-07-19)
+
+The harness has transitioned from holding longs to trading on a shorter
+timeline: a typical intended hold of **1-10 trading days** on the
+once-daily post-close cadence (full doctrine: `manual.md` §"P1 —
+SHORT-TERM TRADING DOCTRINE"). Your batteries, thresholds, and
+no-override rules are COMPLETELY UNCHANGED. What changes is where your
+legitimate discretion — what to research, which challenges to run —
+points:
+
+**1. Candidate sourcing prioritizes the short horizon.** Search for and
+implement strategies whose intended hold is ≤ 10 sessions with explicit
+bounded exits: post-earnings-announcement drift traded inside its
+window, gap continuation/fade, short-term reversal, breakout retests,
+momentum bursts, event-window entries, days-scale pairs convergence.
+Long-horizon candidates aren't forbidden, but they are no longer the
+default hunting ground.
+
+**2. New-strategy design guideline.** Every NEW strategy you implement
+must declare `timeframe:` frontmatter (`swing` and/or `intraday` for
+short-horizon work) and an explicit bounded exit horizon in its RULES —
+a time stop (e.g. `max_hold_days` ≤ 10-15) alongside its target/stop
+exits. The time stop is a backtested strategy rule, not a runtime
+override; the batteries validate it like any other rule. Existing
+strategies are NOT retro-edited to add time stops except through the
+normal update path (`<id>_v2` + `cli evaluate-update`).
+
+**3. Migration workstream (rank 3: after provisionals and gaps, before
+generic candidates).** Symbols claimed by `timeframe: position`
+strategies — today that means `equity_trend_following_ema_cross`
+(AAPL/AMZN/CBRS/GOOGL/JPM/NUVL/NVDA/QQQ/SPY/TSLA/TSM + quarantined
+SPCX), `equity_sector_rotation_momentum` (DELL), and
+`equity_pairs_trading_cointegration` (SYNA, quarantined) — get
+head-to-head challenges from the best short-horizon candidate on those
+symbols, a few per Saturday as time allows. ALL standing guards apply
+verbatim: apply a reassignment only on a meaningful sample (≥5 trades
+on the deciding side; never let a 0-trade Sharpe-0 "win" a degenerate
+tiebreak — 2026-06-16 / 2026-07-08 feedback), and apply verdicts
+immediately yourself (never "trader should swap Monday"). **If the
+long-horizon incumbent keeps winning on the merits, it keeps the claim
+— document the verdict and move on.** You may never strip a claim
+because the incumbent is "too slow for the new era"; only tests
+reassign claims.
+
+**4. Long-horizon strategies stay in the library.** They are archived
+only by the archive battery, never by fiat, and they remain eligible
+triage candidates (a symbol whose best backtest is trend-following
+still belongs to trend-following). The mandate biases your research
+attention and challenge queue — it does not bias verdicts.
 
 ## Symbol-claim conflicts: head-to-head is the only adjudicator
 

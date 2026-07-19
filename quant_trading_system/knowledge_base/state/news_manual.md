@@ -263,6 +263,28 @@ move on. Full-article fetching is reserved for the Saturday research agent.
    quiet days; this section can be short or omitted. Cover the 3-4
    sectors most represented in the universe at a minimum.
 
+   ## Near-term catalyst calendar
+   REQUIRED as of 2026-07-19 (short-term reorientation). Every DATED
+   event within the next 0-10 trading sessions that touches the
+   universe or the macro backdrop, one line each, sorted by date:
+   earnings prints (with AMC/BMO timing), FOMC / CPI / PPI / jobs
+   dates, product launch or decision dates, court / regulatory
+   deadlines, ex-dividend dates, lockup expiries, index-rebalance
+   effective dates. Each line carries the date, symbols affected,
+   `gap_type`, `responder` (same tagging rules as above), and a
+   `horizon:` tag — `imminent` (0-1 sessions), `this_week` (2-5),
+   `next_week` (6-10). Example:
+   ```
+   - 2026-07-22 TSLA earnings AMC — gap_type: earnings_window,
+     responder: NONE — library gap, horizon: this_week
+   - 2026-07-28/29 FOMC — gap_type: volatility_regime,
+     responder: NONE — library gap, horizon: next_week
+   ```
+   "No dated catalysts in the window" is valid content on a genuinely
+   empty calendar (rare). This section is the trader's primary
+   short-horizon planning input — keep it accurate and dated, never
+   pad it with undated themes.
+
    ## Candidates for the universe
    Non-watchlist names that had material catalysts today and would be
    worth the operator / Saturday research agent considering for inclusion
@@ -466,6 +488,38 @@ context, specifically:
 
 You do NOT need to make recommendations about which options structures to
 use — that's the trader's call. You just surface the events.
+
+## Short-term reorientation (operator directive, 2026-07-19)
+
+The harness has transitioned from holding longs to trading on a shorter
+timeline: it now hunts setups with a typical intended hold of **1-10
+trading days** (see `manual.md` §"P1 — SHORT-TERM TRADING DOCTRINE").
+Your role, sources, constraints, and tagging duties are unchanged. What
+changes is *emphasis*:
+
+1. **Dated near-term catalysts are your highest-value output.** An event
+   with a date inside the next 0-10 sessions (earnings print, FOMC/CPI/
+   PPI/jobs, product launch date, court/regulatory deadline, ex-div,
+   lockup expiry, index-rebalance effective date) is worth more to the
+   trader than any open-ended thematic narrative. Themes still get a
+   line; dated events get the detail.
+2. **The brief carries a required `## Near-term catalyst calendar`
+   section** (template in §"Workflow" step 6): every dated event in the
+   0-10 session window, sorted by date, each with symbols, `gap_type`,
+   `responder`, and a `horizon:` tag — `imminent` (0-1 sessions),
+   `this_week` (2-5), `next_week` (6-10).
+3. **Carry the calendar forward.** Roll unexpired dated events into
+   `news_tasks.md` every day so tomorrow's agent inherits the pipeline
+   instead of rebuilding it; drop events once they've printed (they
+   become same-day items, not calendar items).
+4. **The `earnings` category widens to a 10-session forward window**
+   (was today/tomorrow) so the calendar has real depth. Event-IV into
+   dated prints (`volatility` / `options_flow` categories) is
+   first-class short-horizon context.
+5. **The bar for significance does NOT drop.** No-op briefs remain
+   valid; a thin or empty calendar on a quiet stretch is a fine output.
+   HALT-WORTHY criteria are unchanged. You still never trade, never
+   gate, never recommend orders no strategy would generate.
 
 ## Recent feedback
 

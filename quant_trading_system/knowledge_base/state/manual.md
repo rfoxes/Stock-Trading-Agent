@@ -129,6 +129,60 @@ No silent drift, no judgment, no override.
 **Never replace this section.** It is the standing policy. Add to it
 only if the operator extends or refines the rule.
 
+## P1 — SHORT-TERM TRADING DOCTRINE (operator directive, 2026-07-19)
+
+**The harness's operating horizon is now SHORT-TERM.** We look for,
+research, and trade setups measured in **days, not weeks-to-months** —
+the swing band: a typical intended hold of **1-10 trading days**, entered
+and managed on the once-daily post-close cadence (orders staged
+post-close, filled next session; positions re-evaluated daily).
+`timeframe: position` (multi-week/month buy-and-hold) is no longer the
+default posture of this harness.
+
+**What this does NOT mean — no calendar liquidations.** Nothing is ever
+sold *because* it has been held too long or because this directive
+landed. Exits come ONLY from the owning strategy's rules (targets,
+stops, signal exits, time stops that are themselves backtested strategy
+rules). Legacy positions and legacy claims by long-horizon strategies
+stand until the standard machinery (head-to-head / triage / batteries)
+reassigns or archives them. Do not hand-close any position on the basis
+of this section.
+
+**What actually changes, and where.** The template is unchanged — news
+grounds the trader, Saturday research grounds the library, every order
+traces to a strategy rule, Sharpe decides every claim. The horizon
+preference is expressed only at the sanctioned discretion points:
+
+- **Research (Saturday)** sources and proposes short-horizon candidates
+  (intended hold ≤ 10 sessions, explicit bounded exits) and runs
+  head-to-head challenges of short-horizon strategies against
+  `position`-timeframe incumbents' claims. Verdicts still apply
+  verbatim; the ≥5-trades / no-degenerate-0-trade-tiebreak guards still
+  apply. See `research_manual.md` §"Short-horizon mandate".
+- **News (M-F)** surfaces dated near-term catalysts (0-10 sessions out)
+  in a required "## Near-term catalyst calendar" brief section with
+  `horizon:` tags — the fuel for short-horizon strategies. See
+  `news_manual.md` §"Short-term reorientation".
+- **Trader (M-F, you)**: nothing new is discretionary. Weight the
+  brief's near-term calendar in your meta-decisions (rotate / pause /
+  hold / gap-log priorities) more heavily than long-arc thematic
+  narratives. Expect faster position turnover: more entries and exits
+  per week makes the daily reconcile step (log-closed at ACTUAL broker
+  fill prices — the 2026-07-09 lesson) more load-bearing than ever.
+  Rotation toward swing/intraday-timeframe strategies happens only
+  through triage / head-to-head — never by feel. When the calendar says
+  a different strategy family should own a symbol (e.g. an
+  earnings-window name sitting on a trend-following claim), that is a
+  research item to log, not a re-claim to perform.
+
+**Sharpe still decides.** If a `position`-timeframe strategy keeps
+beating every short-horizon challenger on a symbol, it keeps the claim.
+The directive changes what gets researched, surfaced, and challenged —
+not who wins tests, and never the safety rails.
+
+**Never replace this section.** Like P0, it is standing policy — extend
+or refine it only on operator direction.
+
 ## What this harness is
 
 A paper-trading orchestrator that wakes once per US trading day (post-close,
