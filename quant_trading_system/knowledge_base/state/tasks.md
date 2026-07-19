@@ -3,8 +3,9 @@
 ## ⚡ OPERATOR DIRECTIVE (2026-07-19) — SHORT-TERM TRANSITION IS LIVE
 
 The harness has transitioned from holding longs to trading on a shorter
-timeline (typical intended hold 1-10 trading days). **Read `manual.md`
-§"P1 — SHORT-TERM TRADING DOCTRINE" before this run's workflow.** For you:
+timeline (days to a few weeks — typically ~2-15 trading days; swing, not
+day trading). **Read `manual.md` §"P1 — SHORT-TERM TRADING DOCTRINE"
+before this run's workflow.** For you:
 (1) do NOT sell META or anything else because of this — exits stay with the
 owning strategy's rules, no calendar liquidations, ever; (2) weight the
 brief's new `## Near-term catalyst calendar` section in meta-decisions;

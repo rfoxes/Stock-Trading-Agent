@@ -492,8 +492,9 @@ use — that's the trader's call. You just surface the events.
 ## Short-term reorientation (operator directive, 2026-07-19)
 
 The harness has transitioned from holding longs to trading on a shorter
-timeline: it now hunts setups with a typical intended hold of **1-10
-trading days** (see `manual.md` §"P1 — SHORT-TERM TRADING DOCTRINE").
+timeline: it now hunts setups held **days to a few weeks — typically
+~2-15 trading days** (swing, not intraday; see `manual.md` §"P1 —
+SHORT-TERM TRADING DOCTRINE").
 Your role, sources, constraints, and tagging duties are unchanged. What
 changes is *emphasis*:
 

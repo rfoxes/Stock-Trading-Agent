@@ -4,8 +4,9 @@ Yesterday's news agent writes this. Replace, don't append.
 
 ## ⚡ OPERATOR DIRECTIVE (2026-07-19) — SHORT-TERM TRANSITION IS LIVE
 
-The harness now hunts setups held 1-10 trading days. **Read
-`news_manual.md` §"Short-term reorientation" before this run.** Starting
+The harness now hunts setups held days to a few weeks (~2-15 trading
+days; swing, not day trading). **Read `news_manual.md` §"Short-term
+reorientation" before this run.** Starting
 with your next brief: (1) add the required `## Near-term catalyst
 calendar` section (dated events 0-10 sessions out, sorted by date, each
 with symbols, gap_type, responder, and a `horizon:` tag — template in

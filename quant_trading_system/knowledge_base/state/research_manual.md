@@ -216,25 +216,30 @@ Sharpe.
 ## Short-horizon mandate (operator directive, 2026-07-19)
 
 The harness has transitioned from holding longs to trading on a shorter
-timeline: a typical intended hold of **1-10 trading days** on the
-once-daily post-close cadence (full doctrine: `manual.md` §"P1 —
-SHORT-TERM TRADING DOCTRINE"). Your batteries, thresholds, and
+timeline: **days to a few weeks — typically ~2-15 trading days** (swing,
+not intraday) on the once-daily post-close cadence (full doctrine:
+`manual.md` §"P1 — SHORT-TERM TRADING DOCTRINE"). Your batteries,
+thresholds, and
 no-override rules are COMPLETELY UNCHANGED. What changes is where your
 legitimate discretion — what to research, which challenges to run —
 points:
 
 **1. Candidate sourcing prioritizes the short horizon.** Search for and
-implement strategies whose intended hold is ≤ 10 sessions with explicit
+implement strategies whose intended hold is ≤ ~15 sessions with explicit
 bounded exits: post-earnings-announcement drift traded inside its
 window, gap continuation/fade, short-term reversal, breakout retests,
 momentum bursts, event-window entries, days-scale pairs convergence.
 Long-horizon candidates aren't forbidden, but they are no longer the
-default hunting ground.
+default hunting ground. **An operator-seeded backlog of cited,
+engine-screened candidates lives at `state/research_candidates.md`** —
+work it inside this rank-3 slot, a few entries per Saturday, deleting
+entries as they are converted/rejected/blocked (log every verdict in
+the weekly log).
 
 **2. New-strategy design guideline.** Every NEW strategy you implement
 must declare `timeframe:` frontmatter (`swing` and/or `intraday` for
 short-horizon work) and an explicit bounded exit horizon in its RULES —
-a time stop (e.g. `max_hold_days` ≤ 10-15) alongside its target/stop
+a time stop (e.g. `max_hold_days` ≤ 15-20) alongside its target/stop
 exits. The time stop is a backtested strategy rule, not a runtime
 override; the batteries validate it like any other rule. Existing
 strategies are NOT retro-edited to add time stops except through the

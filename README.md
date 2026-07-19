@@ -117,8 +117,8 @@ python3 -m quant_trading_system.cli account     # hits Alpaca; needs valid creds
    ensure the prompt's absolute paths still match).
 
 **Prompt sets — long-hold vs short-term (2026-07-19):** the harness
-transitioned from holding longs to short-term trading (typical intended
-hold 1-10 trading days). Each of the three scheduled tasks (news, trader,
+transitioned from holding longs to short-term trading (days to a few
+weeks — typically ~2-15 trading days; swing, not day trading). Each of the three scheduled tasks (news, trader,
 research) now uses the `*_short_term.md` variant of its prompt
 (`daily_prompt_short_term.md`, `daily_news_prompt_short_term.md`,
 `weekly_research_prompt_short_term.md`); the originals are retained for

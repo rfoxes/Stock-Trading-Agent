@@ -132,12 +132,13 @@ only if the operator extends or refines the rule.
 ## P1 — SHORT-TERM TRADING DOCTRINE (operator directive, 2026-07-19)
 
 **The harness's operating horizon is now SHORT-TERM.** We look for,
-research, and trade setups measured in **days, not weeks-to-months** —
-the swing band: a typical intended hold of **1-10 trading days**, entered
-and managed on the once-daily post-close cadence (orders staged
-post-close, filled next session; positions re-evaluated daily).
-`timeframe: position` (multi-week/month buy-and-hold) is no longer the
-default posture of this harness.
+research, and trade setups measured in **days to a few weeks — typically
+~2-15 trading days** — entered and managed on the once-daily post-close
+cadence (orders staged post-close, filled next session; positions
+re-evaluated daily). This is swing trading, explicitly NOT intraday
+day-trading (the cadence can't do that anyway), and explicitly not
+multi-month holding: `timeframe: position` (multi-week/month
+buy-and-hold) is no longer the default posture of this harness.
 
 **What this does NOT mean — no calendar liquidations.** Nothing is ever
 sold *because* it has been held too long or because this directive
@@ -154,7 +155,7 @@ traces to a strategy rule, Sharpe decides every claim. The horizon
 preference is expressed only at the sanctioned discretion points:
 
 - **Research (Saturday)** sources and proposes short-horizon candidates
-  (intended hold ≤ 10 sessions, explicit bounded exits) and runs
+  (intended hold ≤ ~15 sessions, explicit bounded exits) and runs
   head-to-head challenges of short-horizon strategies against
   `position`-timeframe incumbents' claims. Verdicts still apply
   verbatim; the ≥5-trades / no-degenerate-0-trade-tiebreak guards still
