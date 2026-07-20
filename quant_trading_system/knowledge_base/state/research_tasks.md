@@ -24,17 +24,21 @@ workstream, (4) generic candidates. Concretely, starting this Saturday:
   the same Open Q#3 caution as before, so where both sides can't produce
   ≥5 trades, record-and-hold rather than churn). Incumbents that keep
   winning keep their claims.
-- **Sourcing:** the operator has ALREADY seeded a cited, engine-screened
-  candidate backlog at **`state/research_candidates.md`** (researched
-  2026-07-19: RSI(2) pullback, Double 7s, IBS-filter `_v2` on bollinger,
-  N-day washout reversal, gap+volume post-event drift [the replayable
-  PEAD proxy — also a rankable challenger for the nine event-driven
-  provisionals], turn-of-month on SPY/QQQ, 52wk-high momentum; plus a
-  considered-and-rejected list). Work it a few entries per Saturday in
-  the rank-3 slot — cheapest first (`_v2` update-path IBS filter), then
-  the high-frequency Tier 1. Batteries decide; delete entries as
-  verdicts land. New strategies must declare `timeframe:` + a time-stop
-  rule (holds ≤ ~15 sessions).
+- **Sourcing → ADJUDICATION:** the operator seeded AND IMPLEMENTED seven
+  short-horizon candidates on 2026-07-19 — mechanical `strategy.md` +
+  `strategy.py` folders at `status: testing` (battery/triage candidates;
+  cannot execute live). Index + per-entry adjudication commands:
+  **`state/research_candidates.md`**. The seven: `equity_rsi2_pullback`,
+  `equity_double_seven`, `equity_mean_reversion_bollinger_v2` (IBS
+  filter — evaluate-update vs the incumbent, cheapest test, run FIRST),
+  `equity_short_term_reversal`, `equity_post_event_drift` (the
+  REPLAYABLE PEAD proxy — after evaluate-add, run it as an
+  unrestricted-triage challenger on the event-driven provisionals),
+  `equity_turn_of_month` (SPY/QQQ only), `equity_52wk_high_momentum`.
+  Work a few per Saturday in the rank-3 slot; apply every verdict
+  verbatim; delete entries from the backlog as verdicts land. Do NOT
+  add-active or claim symbols for any of them outside triage /
+  head-to-head.
 - Provisional revalidation and gap-clearing are UNCHANGED and still come
   first. Batteries and thresholds unchanged; verdicts verbatim.
 

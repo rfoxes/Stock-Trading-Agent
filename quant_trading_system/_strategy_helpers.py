@@ -90,3 +90,52 @@ def average_volume(bars: pd.DataFrame, window: int = 20) -> float:
 def filter_existing(symbols: Iterable[str], positions: list[dict[str, Any]]) -> list[str]:
     """Return only the symbols you don't already have a position in."""
     return [s for s in symbols if not has_position(positions, s)]
+
+
+def position_age_days(strategy_id: str, symbol: str, run_date) -> int | None:
+    """Calendar days since `strategy_id` opened the current lot of `symbol`.
+
+    Live Alpaca positions carry no entry date, so derive it from the journal:
+    the entry is the earliest submitted buy that follows the most recent
+    `trade_closed` for the symbol (a re-entry resets the clock). Returns None
+    when no entry can be located — callers must NOT force a time-stop on
+    None, because the position's age is unproven. In backtests the journal is
+    empty, so this always returns None there; time stops that must be
+    sim-visible have to be derived from bars instead.
+
+    (Same logic as event_driven_catalyst's private helper, hoisted here so
+    new short-horizon strategies don't each re-implement it.)
+    """
+    import datetime as _dt
+
+    from quant_trading_system import journal as _journal
+
+    sym = symbol.upper()
+    try:
+        events = _journal.read_events(
+            days=180,
+            strategy_id=strategy_id,
+            types=["order_submitted", "trade_closed"],
+        )
+    except Exception:
+        return None
+    entry_ts: str | None = None
+    for e in events:  # oldest-first
+        if str(e.get("symbol", "")).upper() != sym:
+            continue
+        if e.get("type") == "trade_closed":
+            entry_ts = None  # position closed; clock resets for any re-entry
+        elif (
+            e.get("type") == "order_submitted"
+            and str(e.get("side", "")).lower() == "buy"
+            and e.get("result_status") == "submitted"
+            and entry_ts is None
+        ):
+            entry_ts = e.get("timestamp")
+    if not entry_ts:
+        return None
+    try:
+        entry_date = _dt.datetime.fromisoformat(entry_ts).date()
+    except ValueError:
+        return None
+    return (run_date - entry_date).days

@@ -2,13 +2,21 @@
 
 Seeded 2026-07-19 by operator-side research as part of the short-term
 transition (`manual.md` §P1, `research_manual.md` §"Short-horizon
-mandate"). **Owner: the Saturday research agent.** Work a few entries per
-Saturday inside the rank-3 slot (after provisionals and gaps). For each
-entry: implement `strategy.md` + `strategy.py`, run `cli propose-strategy`
-(or `cli evaluate-update` for the update-path entries), apply the battery
-verdict verbatim, log the outcome in the weekly log, then delete the entry
-from this file (converted, rejected, or blocked — all outcomes get logged
-and removed). **The battery decides. Nothing here is pre-approved.**
+mandate"). **Owner: the Saturday research agent.**
+
+**ALL SEVEN CANDIDATES ARE ALREADY IMPLEMENTED AS MECHANICAL STRATEGY
+FOLDERS (2026-07-19)** — `strategy.md` + `strategy.py` under
+`knowledge_base/strategies/equity/`, each at `status: testing` (cannot
+execute live — the runtime refuses non-active strategies — but IS a
+triage/battery candidate). Your job is adjudication, not implementation.
+Work a few entries per Saturday inside the rank-3 slot (after
+provisionals and gaps): run the battery listed on each entry
+(`cli evaluate-add <id>`, or `cli evaluate-update` for the v2), apply the
+verdict verbatim, log the outcome in the weekly log, then delete the
+entry from this file (validated, rejected, or blocked — all outcomes get
+logged and removed). A REJECTed strategy gets archived via
+`cli archive-strategy`, not deleted from disk. **The battery decides.
+Nothing here is pre-approved.**
 
 Every candidate below was screened for engine fit: daily bars only,
 signals computed post-close, entries fill next open, once-daily
@@ -21,6 +29,9 @@ bias is simplest. Intended holds: days to a few weeks. No intraday.
 ## Tier 1 — high trade frequency, cleanest engine fit
 
 ### 1. `equity_rsi2_pullback` — RSI(2) pullback in uptrend (Connors)
+- **IMPLEMENTED:** `strategies/equity/rsi2_pullback/` (testing).
+  Adjudicate: `cli evaluate-add equity_rsi2_pullback` on 2-3 liquid
+  large caps.
 - **Source:** Larry Connors & Cesar Alvarez, *Short Term Trading
   Strategies That Work* (2008); rules + long-run backtest evidence:
   https://www.quantifiedstrategies.com/rsi-2-strategy/ and
@@ -40,6 +51,8 @@ bias is simplest. Intended holds: days to a few weeks. No intraday.
   [swing]`, `gap_types: [mean_reversion]`.
 
 ### 2. `equity_double_seven` — Double 7s (Connors & Alvarez)
+- **IMPLEMENTED:** `strategies/equity/double_seven/` (testing).
+  Adjudicate: `cli evaluate-add equity_double_seven`.
 - **Source:** same book;
   https://www.quantifiedstrategies.com/larry-connors-double-seven-strategy-does-it-still-work/
   and the co-author's own follow-up:
@@ -58,6 +71,11 @@ bias is simplest. Intended holds: days to a few weeks. No intraday.
 
 ### 3. `equity_mean_reversion_bollinger_v2` — IBS filter on the
 existing Bollinger strategy (UPDATE PATH, not a new add)
+- **IMPLEMENTED:** `strategies/equity/mean_reversion_bollinger_v2/`
+  (testing) — incumbent's exact rules + IBS entry filter/exit
+  accelerator. Adjudicate: `cli evaluate-update
+  equity_mean_reversion_bollinger equity_mean_reversion_bollinger_v2`;
+  REPLACE/KEEP verbatim. Do NOT run the addition battery on this.
 - **Source:** Alexander Soffronow Pagonidis, *The IBS Effect: Mean
   Reversion in Equity ETFs* (2013):
   https://www.naaim.org/wp-content/uploads/2014/04/00V_Alexander_Pagonidis_The-IBS-Effect-Mean-Reversion-in-Equity-ETFs-1.pdf
@@ -83,6 +101,9 @@ existing Bollinger strategy (UPDATE PATH, not a new add)
 ## Tier 2 — solid literature, moderate frequency
 
 ### 4. `equity_short_term_reversal` — N-day washout reversal, long-only
+- **IMPLEMENTED:** `strategies/equity/short_term_reversal/` (testing).
+  Adjudicate: `cli evaluate-add equity_short_term_reversal`; if blocked
+  on the trade floor, loosen `decline_entry_pct` first.
 - **Source:** Lehmann (1990), *Fads, Martingales, and Market
   Efficiency*; net-of-costs large-cap evidence: De Groot, Huij & Zhou
   (2012), summarized at
@@ -105,6 +126,12 @@ existing Bollinger strategy (UPDATE PATH, not a new add)
 
 ### 5. `equity_post_event_drift` — gap+volume event-proxy drift
 (backtestable PEAD)
+- **IMPLEMENTED:** `strategies/equity/post_event_drift/` (testing) —
+  event day detected from bars (gap ≥4% + volume ≥2.5×20d + strong
+  close), session-counted time exit that works IN BACKTESTS. Adjudicate:
+  `cli evaluate-add equity_post_event_drift` on high-news names
+  (ARM/SMCI/MU/INTC cohort); then run it as an unrestricted-triage
+  challenger on the event-driven provisionals.
 - **Source (anomaly):** Ball & Brown (1968) lineage; modern survey:
   https://quantpedia.com/strategies/post-earnings-announcement-effect
   and https://quantpedia.com/50-years-in-pead-research/ (drift persists
@@ -132,6 +159,11 @@ existing Bollinger strategy (UPDATE PATH, not a new add)
   `gap_types: [earnings_window, event_catalyst, gap_play]`.
 
 ### 6. `equity_turn_of_month` — turn-of-the-month on SPY/QQQ
+- **IMPLEMENTED:** `strategies/equity/turn_of_month/` (testing;
+  frontmatter-restricted to SPY/QQQ). Calendar signals derive from
+  dates/bars, fully sim-replayable. Adjudicate: `cli evaluate-add
+  equity_turn_of_month` on SPY over the widest window; if validated,
+  head-to-head vs the trend-following placeholders on SPY/QQQ.
 - **Source:** Lakonishok & Smidt (1988) lineage; strategy page:
   https://quantpedia.com/strategies/turn-of-the-month-in-equity-indexes
   ; robustness: https://quantpedia.com/an-examination-of-the-turn-of-the-month-effect/
@@ -155,6 +187,11 @@ existing Bollinger strategy (UPDATE PATH, not a new add)
 ## Tier 3 — upper band (weeks), lower frequency; run after Tiers 1-2
 
 ### 7. `equity_52wk_high_momentum` — 52-week-high proximity breakout
+- **IMPLEMENTED:** `strategies/equity/fifty_two_week_high_momentum/`
+  (testing). Adjudicate: `cli evaluate-add equity_52wk_high_momentum`
+  (widest window — lowest trade frequency in the backlog); if the only
+  battery-relevant difference vs `equity_breakout_volume_confirmation`
+  is the anchor, switch to the evaluate-update path instead.
 - **Source:** George & Hwang (2004), *The 52-Week High and Momentum
   Investing*, Journal of Finance:
   https://www.bauer.uh.edu/tgeorge/papers/gh4-paper.pdf ; practitioner
