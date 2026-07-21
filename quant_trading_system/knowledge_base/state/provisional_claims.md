@@ -1,5 +1,15 @@
 ---
 provisional:
+- symbol: AMD
+  strategy_id: equity_event_driven_catalyst
+  gap_type: event_catalyst
+  sharpe: 0.0
+  baseline_sharpe: 0.5
+  provisional_since: '2026-07-21'
+  revalidate_by: '2026-08-04'
+  reason: "top candidate 'equity_event_driven_catalyst' has Sharpe 0.000 < baseline\
+    \ 0.500. No library strategy is good enough on this symbol \u2014 log for Saturday\
+    \ research to build a new template."
 - symbol: GS
   strategy_id: equity_event_driven_catalyst
   gap_type: earnings_window
@@ -10,6 +20,16 @@ provisional:
   reason: "top candidate 'equity_event_driven_catalyst' has Sharpe 0.000 < baseline\
     \ 0.500. No library strategy is good enough on this symbol \u2014 log for Saturday\
     \ research to build a new template."
+- symbol: IREN
+  strategy_id: equity_event_driven_catalyst
+  gap_type: event_catalyst
+  sharpe: 0.0
+  baseline_sharpe: 0.5
+  provisional_since: '2026-07-21'
+  revalidate_by: '2026-08-04'
+  reason: "top candidate 'equity_event_driven_catalyst' has Sharpe 0.000 < baseline\
+    \ 0.500. No library strategy is good enough on this symbol \u2014 log for Saturday\
+    \ research to build a new template."
 - symbol: MS
   strategy_id: equity_event_driven_catalyst
   gap_type: earnings_window
@@ -17,6 +37,16 @@ provisional:
   baseline_sharpe: 0.5
   provisional_since: '2026-07-15'
   revalidate_by: '2026-07-29'
+  reason: "top candidate 'equity_event_driven_catalyst' has Sharpe 0.000 < baseline\
+    \ 0.500. No library strategy is good enough on this symbol \u2014 log for Saturday\
+    \ research to build a new template."
+- symbol: NBIS
+  strategy_id: equity_event_driven_catalyst
+  gap_type: event_catalyst
+  sharpe: 0.0
+  baseline_sharpe: 0.5
+  provisional_since: '2026-07-21'
+  revalidate_by: '2026-08-04'
   reason: "top candidate 'equity_event_driven_catalyst' has Sharpe 0.000 < baseline\
     \ 0.500. No library strategy is good enough on this symbol \u2014 log for Saturday\
     \ research to build a new template."

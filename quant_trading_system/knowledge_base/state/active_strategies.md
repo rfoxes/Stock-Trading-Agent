@@ -77,17 +77,20 @@ strategies:
     on WULF with Sharpe 0.880 (vs baseline 0.50)'
 - id: equity_event_driven_catalyst
   symbols:
+  - AMD
   - AVGO
   - GS
+  - IREN
   - MS
   - MU
+  - NBIS
   - ORCL
   - PYPL
   - QCOM
   - RIVN
   - UNH
-  since: '2026-07-16'
-  reason: "PROVISIONAL/UNVALIDATED triage 2026-07-16: top candidate 'equity_event_driven_catalyst'\
+  since: '2026-07-21'
+  reason: "PROVISIONAL/UNVALIDATED triage 2026-07-21: top candidate 'equity_event_driven_catalyst'\
     \ has Sharpe 0.000 < baseline 0.500. No library strategy is good enough on this\
     \ symbol \u2014 log for Saturday research to build a new template. Attached best-available\
     \ equity_event_driven_catalyst for coverage; QUARANTINED from execution until\
