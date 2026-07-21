@@ -117,3 +117,12 @@ PYPL: financials
 
 # Added 2026-07-16 (news, promote-candidate)
 UNH: healthcare
+
+# Added 2026-07-21 (news, promote-candidate)
+NBIS: technology
+
+# Added 2026-07-21 (news, promote-candidate)
+IREN: technology
+
+# Added 2026-07-21 (news, promote-candidate)
+AMD: technology

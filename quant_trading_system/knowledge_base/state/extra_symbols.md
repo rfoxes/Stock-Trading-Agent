@@ -95,3 +95,12 @@ PYPL
 
 # Added 2026-07-16 (news, promote-candidate): Tier-0 news-subject + Tier-B #3 pattern: Q2 blowout adj EPS $6.38 vs $4.91, rev $112B, RAISED FY26 guidance to $19.50-20.00 (from >$18.25), lifted the Dow. Diversifying healthcare name (universe near-empty in healthcare ex-NUVL).
 UNH
+
+# Added 2026-07-21 (news, promote-candidate): Tier-0 news-subject: NVIDIA disclosed a 9.3% equity stake in Nebius (AI-cloud infra), NBIS +7%; recurring neocloud cohort name now with an anchor strategic investor
+NBIS
+
+# Added 2026-07-21 (news, promote-candidate): Tier-0 news-subject: raised AI Cloud annualized revenue forecast above $4B following $2.8B in new customer contracts; recurring neocloud cohort with a hard guidance-raise catalyst
+IREN
+
+# Added 2026-07-21 (news, promote-candidate): Tier-0 news-subject: Microsoft AI deal (7/20) + Advancing AI 2026 event (7/21), AMD +8%; long-recurring NVDA foil now clearing the hard-catalyst bar prior runs set
+AMD
