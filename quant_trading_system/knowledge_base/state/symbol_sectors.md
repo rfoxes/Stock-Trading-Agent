@@ -126,3 +126,9 @@ IREN: technology
 
 # Added 2026-07-21 (news, promote-candidate)
 AMD: technology
+
+# Added 2026-07-23 (news, promote-candidate)
+NOW: technology
+
+# Added 2026-07-23 (news, promote-candidate)
+STM: technology

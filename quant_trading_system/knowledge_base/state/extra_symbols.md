@@ -104,3 +104,9 @@ IREN
 
 # Added 2026-07-21 (news, promote-candidate): Tier-0 news-subject: Microsoft AI deal (7/20) + Advancing AI 2026 event (7/21), AMD +8%; long-recurring NVDA foil now clearing the hard-catalyst bar prior runs set
 AMD
+
+# Added 2026-07-23 (news, promote-candidate): Tier-B #3 (beat + raised guidance + >5% pop): ServiceNow Q2 EPS $0.90 vs $0.86, rev $3.99B +24%, subscription +24.5%, raised FY26 subscription guide to ~$15.77B, AI ACV >$1B; stock +7%
+NOW
+
+# Added 2026-07-23 (news, promote-candidate): Tier-0 news-subject (discrete guidance catalyst): STMicroelectronics Q2 beat (rev $3.49B +12.7%, EPS $0.31) but Q3 guide $3.70B mid slightly below consensus -> stock -14 to -18%; raised 2026 data-center rev forecast to >$1B
+STM
