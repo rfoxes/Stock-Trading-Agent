@@ -84,13 +84,15 @@ strategies:
   - MS
   - MU
   - NBIS
+  - NOW
   - ORCL
   - PYPL
   - QCOM
   - RIVN
+  - STM
   - UNH
-  since: '2026-07-21'
-  reason: "PROVISIONAL/UNVALIDATED triage 2026-07-21: top candidate 'equity_event_driven_catalyst'\
+  since: '2026-07-23'
+  reason: "PROVISIONAL/UNVALIDATED triage 2026-07-23: top candidate 'equity_event_driven_catalyst'\
     \ has Sharpe 0.000 < baseline 0.500. No library strategy is good enough on this\
     \ symbol \u2014 log for Saturday research to build a new template. Attached best-available\
     \ equity_event_driven_catalyst for coverage; QUARANTINED from execution until\

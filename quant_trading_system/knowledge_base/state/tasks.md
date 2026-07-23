@@ -1,14 +1,14 @@
 # Tasks for the next run
 
-**✅ 7/22 COMPLETE (single fire, canonical 16:03, Wednesday).** KEEP day on a mild, oil-pressured risk-off tape.
-Book unchanged (**META only**, cash $94,690.29, no open orders, META **+2.59%** — down from 7/21's +5.84% on the
-pullback, still green/trending). **Nothing closed → no reconciliation.** News brief **FRESH & on-time** (correctly
-dated 7/22); **NOTABLE — an event-dense but orderly, oil-pressured risk-off session, NOT halt-worthy** (Nasdaq
-−0.6%, S&P ~flat, VIX ~17, no >2% futures gap). Drivers: **GOOGL beat AMC** (Cloud +82%, "demand outpaces capacity")
-+ **TSLA mixed AMC** (rev beat, EPS miss, net income −57%) — **neither a held name**; fresh **Houthi Red Sea /
-Bab-el-Mandeb blockade → oil +3–3.4%** (Brent ~$94). Universe **unchanged at 40 — NO promotions** → **no triage this
-run**. `unclaimed_count 0`, `provisional_count 12` (unchanged, all quarantined). `cli execute` = clean no-op 0/0/0,
-all 12 provisionals skipped. See `last_handoff.md`. Replace this file (don't append) when you write the next version.
+**🔴 7/23 COMPLETE (single fire, canonical 16:03, Thursday). NOT a KEEP no-op — the META MACD EXIT FIRED.**
+`equity_momentum_macd_histogram` tripped its exit ("hist −1.8108 flipped negative") and `cli execute` **submitted a
+market DAY sell of the full 16-share META position** — order **`db566584-d77f-4b10-982c-12839ab4867d`**, status
+`accepted`/filled_qty 0, **rests for the 7/24 open.** Book was META-only + intact going in (cash $94,690.29 unchanged;
+NOT a wipe), news agent promoted **NOW + STM** (universe 40→42) → I triaged both to quarantined provisionals
+(`equity_event_driven_catalyst`, Sharpe 0.0, `revalidate_by 2026-08-06`). `unclaimed_count 0`, `provisional_count
+12→14`. Brief FRESH & on-time (2026-07-23), NOTABLE risk-off (Mag7 worst day since Apr 2025, Nasdaq −2.15%), NOT
+halt-worthy (VIX *eased* to 16.64, oil didn't gap futures >2%). See `last_handoff.md`. Replace this file (don't
+append) when you write the next version.
 
 ## ⚠️ READ FIRST — RUN EVERYTHING VIA THE VENV
 ```
@@ -16,21 +16,35 @@ all 12 provisionals skipped. See `last_handoff.md`. Replace this file (don't app
 ```
 Bare `python3` = Homebrew 3.14.5, no deps. The `.venv` (3.13.13) has deps + reaches the live broker.
 Note: CLI prints a `safety_gate_initialized` structlog line to **stdout** before the JSON — pipe through
-`grep '^{'` before parsing with python/jq.
+`grep '^{'` before parsing with python/jq. **`cli open-orders` is BROKEN whenever a live order exists**
+(`'dict' object has no attribute 'id'`) — and there IS one now (the META sell). Read open orders **client-direct**:
+`AlpacaClient(Settings(_env_file='.env')).get_open_orders()` → list of dicts, use `.get('id')`/`.get('status')`.
 
-## ⚠️ THU 7/23 CONTEXT (informational — INTC/ARM print, but none of it changes your run)
-- **INTC + ARM report Q2 tonight (7/23 AMC).** INTC is on `equity_breakout_volume_confirmation` (7 straight rev beats;
-  fresh Data-Center/AI layoffs; SK-Hynix denied buying its Ohio campus); ARM is claimed too — **neither is an
-  earnings-window responder** → both prints will be UNRESPONDED (the acute recurring earnings-window gap). This is
-  informational; you have no earnings-window responder to act on. If the news agent promotes any NEW name off a
-  reaction, triage it (do NOT `add-active`).
-- **Earnings cluster ahead:** INTC/ARM 7/23 AMC, **MSFT + META 7/29**, AMZN/AAPL 7/30, AMD/SPCX 8/4. GOOGL/TSLA
-  printed 7/22 AMC (both UNRESPONDED, both on `trend_following`). SMCI full audited report Aug 11.
-- **Live tails:** (1) **Houthi Red Sea blockade** — oil elevated (Brent +3.4% ~$94, WTI +3% ~$87); a >2% overnight
-  equity-futures gap is the halt-worthy line — was NOT there 7/22. Watch for escalation (full Bab-el-Mandeb closure =
-  ~7% of global supply). (2) **AI-capex-doubt** persists even after GOOGL's strong print — a dispersion regime (SMCI
-  +26% vs SNDK down under VIX ~17), not a panic. (3) **China chip-manufacturing curbs** (TSM/QCOM); USTR 25% Brazil
-  tariff (eff. 7/22); Bessent Chinese-AI-sanctions threat. Positions ride their own rules regardless.
+## 🔴🔴 TOP PRIORITY (Fri 7/24) — RECONCILE THE META FILL FROM THE ACTUAL FILL PRICE
+
+The resting META sell (`db566584-d77f-4b10-982c-12839ab4867d`, market DAY) fills at the **7/24 open**. Your run is
+post-close 7/24, hours after the open → under normal timing it WILL have filled. Do this, in order:
+
+1. **Snapshot first** (`account`, `positions`, open-orders client-direct). **Expected: META GONE (flat book), cash UP
+   by ~fill proceeds (≈ filled_avg_price × 16 ≈ ~$9.7k), equity ~flat.** This is **"cash UP + position vanished" =
+   legitimate fill/close — NOT a wipe** (a wipe is flat book + cash *UNCHANGED* + no `trade_closed`; here cash RISES).
+   Do NOT freeze.
+2. **Pull the ACTUAL fill client-direct:**
+   `AlpacaClient(Settings(_env_file='.env')).get_order('db566584-d77f-4b10-982c-12839ab4867d')` → dict; read
+   `status`/`filled_avg_price`/`filled_qty`/`filled_at`.
+3. **`log-closed` from the REAL fill, NOT today's +0.35% mark (the 7/9 MU sign-flip lesson):**
+   ```
+   cli log-closed equity_momentum_macd_histogram META <pnl_fraction>
+   ```
+   `pnl_fraction = (filled_avg_price − 605.275625) / 605.275625`. Overnight risk-off + Brent >$100 + META's Lina-Khan
+   item can move the open either way — the +0.35% mark ($607.37) is NOT the fill. **Cross-check:** cash rise should
+   ≈ `filled_avg_price × 16` to the penny → confirms a legit close AND a complete reconciliation.
+4. **GUARD — if the order is STILL resting AND META still shows held:** do NOT run `cli execute` blindly.
+   `equity_momentum_macd_histogram.evaluate()` will re-emit "sell META 16" (histogram still negative) → a SECOND
+   resting sell → **oversell into a short** when both fill. First cancel the stale order (or wait for the fill) and
+   reconcile; only then execute. (Normal market-order-at-open timing avoids this — but guard it.)
+5. After META closes, the book is **flat / all-cash (~$104k)**. No held position to manage; `event_driven_catalyst`
+   still claims AVGO/MU/ORCL (flat since 7/9) + provisionals.
 
 ## STANDING POLICY (P0) — MANDATORY-ATTACH DOCTRINE
 Every universe symbol MUST have a strategy (manual.md P0). Grades: **(a) VALIDATED** (cleared baseline Sharpe 0.5 in
@@ -40,107 +54,97 @@ trading provisional). After triage `unclaimed_count` should be **0**. Run `cli t
 for any NEW unclaimed symbol. Character-match / direct YAML edits to `active_strategies.md` are FORBIDDEN. Never use
 `cli add-active` to bypass triage.
 
-## To do next run (Thu 7/23 — book stable)
+## To do next run (Fri 7/24 — book turning over)
 
-1. **Read `last_handoff.md` + `news_brief.md` FIRST** (venv). **Date-check the brief** — must match 2026-07-23; if
-   not, treat as ABSENT, note the gap, fall back to the raw `news/daily_summary/2026-07-23.html` for a halt-worthy
-   safety scan (esp. any escalation of the Houthi/oil shock into a >2% futures gap). **Run `cli market-status`** +
-   `git log --oneline -5`; note the run TIME. If it double-fires (a 2nd fire same day — tell is a `[trader
-   2026-07-23]` commit already in git log + a handoff already narrating a completed 7/23 run), take NO action: don't
-   re-execute, don't re-triage.
-2. **Snapshot:** `account`, `positions`, `open-orders`, `regime`.
-   - **Expected book: META 16 ONLY** (avg $605.28), cash **~$94,690**, equity ~$104k (moves only on META's mark).
-     No resting orders. If instead FLAT with **cash UNCHANGED** + **no `trade_closed` events** → wipe → FREEZE (see
-     playbook). Nothing is currently pending to close, so a rising-cash vanish is not expected.
-3. **P0 check:** `cli list-active`. Expect `unclaimed_count 0`, `provisional_count 12` (AMD/IREN/NBIS `2026-08-04`;
-   GS `2026-07-28`; MS/PYPL `2026-07-29`; QCOM/SPCX/SYNA `2026-07-21 OVERDUE`; SKHY `2026-07-24`; RIVN `2026-07-27`;
-   UNH `2026-07-30`). All twelve are ALREADY claimed/quarantined — do NOT re-triage them; research owns validation.
-   Triage only any *new* unclaimed symbol. Do NOT `add-active`.
-4. **Execute (venv).** `cli execute` per standard workflow. META rides its MACD exit; event_driven_catalyst's live
-   claims (AVGO/MU/ORCL) are flat with no fresh *discrete single-name* entry catalyst → likely fires nothing.
-   Provisionals stay quarantined/skipped.
-5. **Library gaps — see list below (Saturday research owns them; the earnings-window assignment gap is the most
-   acute, live again 7/22 with real GOOGL+TSLA prints and again 7/23 with INTC/ARM).**
+1. **Read `last_handoff.md` + `news_brief.md` FIRST** (venv). **Date-check the brief** — must match 2026-07-24; if
+   not, treat as ABSENT, note the gap, fall back to raw `news/daily_summary/2026-07-24.html` for a halt-worthy safety
+   scan (esp. Houthi/oil escalation into a >2% overnight futures gap — Brent was >$100 on actual tanker strikes). Run
+   `cli market-status` + `git log --oneline -5`; note the run TIME. **Double-fire check:** if a `[trader 2026-07-24]`
+   commit is already in git log + a handoff already narrates a completed 7/24 run, take NO action (don't re-execute,
+   don't re-triage, don't re-log-closed).
+2. **Snapshot:** `account`, `positions`, open-orders (client-direct). **Then RECONCILE THE META FILL** — the whole
+   TOP-PRIORITY block above. Expected post-fill: flat book, cash ~$104k, day_trade_count possibly +1 if the sell and
+   any same-day buy paired (unlikely — no buy pending).
+3. **P0 check:** `cli list-active`. Expect `unclaimed_count 0`, `provisional_count 14` (AMD/IREN/NBIS `2026-08-04`;
+   NOW/STM `2026-08-06`; GS `2026-07-28`; MS/PYPL `2026-07-29`; QCOM/SPCX/SYNA `2026-07-21 OVERDUE`; SKHY `2026-07-24`
+   — overdue after today if no Sat 7/25 research; RIVN `2026-07-27`; UNH `2026-07-30`). All 14 ALREADY
+   claimed/quarantined — do NOT re-triage; research owns validation. Triage only any *new* unclaimed symbol. Do NOT
+   `add-active`.
+4. **Execute (venv).** After the META reconciliation, `cli execute` per standard workflow. With META closed, the MACD
+   strategy sees no META position → no re-emit. `event_driven_catalyst`'s live claims (AVGO/MU/ORCL) are flat with no
+   fresh *discrete single-name* entry catalyst → likely fires nothing. **Watch INTC:** its +7–13% AH pop on the
+   blowout *could* trip `equity_breakout_volume_confirmation` (reads price/volume) on a confirmed 7/24 session
+   breakout — that's within its mandate, let it fire or not on its own rule. Provisionals stay quarantined/skipped.
+5. **Library gaps — see list below (Saturday research owns them; the earnings-window assignment gap is the most acute,
+   now with a universe blowout (INTC) alongside GOOGL/TSLA/SMCI).**
 6. **`cli git-sync --agent trader --message "..."` (venv) as last action.**
-
-## Wipe playbook (KEEP for reference — full doctrine in manual.md "Recent feedback")
-Account FLAT with **cash UNCHANGED** + **no `trade_closed` events** → wipe signature → FREEZE (no execute, no
-log-closed), record last-good marks, flag operator. **Un-freeze on evidence** if a later snapshot shows positions
-restored to prior qty/avg-entry + no phantom closes + canonical post-close + fresh brief. Distinguish "cash unchanged
-+ vanished" (wipe → freeze) from "cash UP + vanished" (fills → reconcile via `log-closed` using ACTUAL `get_order`
-fill prices, NOT prior-day marks — see the 7/9 MU sign-flip lesson in manual.md). **Also distinguish a SKIPPED-RUN
-gap** (book INTACT at prior qty/avg-entry + cash unchanged + no closes + a multi-day hole in git log) → NOT a wipe,
-resume normally (7/21 skipped-run doctrine now in manual.md).
 
 ## Position watch
 
-- **META (+2.59%, avg $605.28) — the ONLY live position.** `equity_momentum_macd_histogram`-owned; rides its MACD
-  exit (not triggered — still trending green). Gave back part of its run on the 7/22 oil-pressured pullback but held
-  green. Its only 7/22 item — France's under-15 social-media ban (cross-listed SNAP/RDDT/X) — is modest/not
-  adverse-major → do NOT hand-manage on it or any capex/regulatory/positioning headline; all informational (no
-  responder). **META Q2 is 7/29** (on `momentum_macd`, not an earnings-window responder → the print itself will be
-  unresponded).
-- **AVGO / MU / ORCL — CLOSED & reconciled 7/9.** Not held. event_driven_catalyst still *claims* them (claim ≠
-  position); re-enters only on a fresh modeled discrete catalyst. ORCL's continued data-center-cost/OpenAI-exposure
-  pressure (commentary, carry from the cash-burn story) is not a directive to hand-manage.
+- **META (avg $605.28) — EXITING.** `equity_momentum_macd_histogram` fired its histogram-negative exit; a market DAY
+  sell of all 16 (`db566584…`) rests for the 7/24 open. Reconcile the fill (TOP-PRIORITY block). After it fills the
+  book is flat/all-cash. META Q2 is 7/29 — moot once the position is closed.
+- **AVGO / MU / ORCL — CLOSED & reconciled 7/9.** Not held. `event_driven_catalyst` still *claims* them (claim ≠
+  position); re-enters only on a fresh modeled discrete catalyst. **ORCL won a $6.99B/10-yr Navy/Pentagon IDIQ 7/23 —
+  event_driven_catalyst (which claims ORCL) fired NO entry on the award** (same as the 7/15 ORCL Japan-cloud tag).
+  Whether its `evaluate()` should fire on a contract award is a research question, not a hand-manage directive.
 
-## Library gaps + research items (carry to research_tasks.md — Saturday, if research runs)
+## Library gaps + research items (carry to research_tasks.md — Saturday 7/25, if research runs)
 
-All `responder: NONE` — informational, not tradable under the mandate. `gap-registry coverage_holes` is **empty**;
-every item is an activation/assignment/taxonomy gap (a rule/event-type not mapped to the symbol that had the event):
-- **Provisional/quarantined validations (TOP PRIORITY):** **12** — all on `equity_event_driven_catalyst` except as
-  noted: **AMD** (MS AI deal, `2026-08-04`), **IREN** ($2.8B contracts + >$4B guide, `2026-08-04`), **NBIS** (NVDA
-  9.3% stake, `2026-08-04`), **GS** (`2026-07-28`), **MS** (`2026-07-29`), **PYPL** ($53B M&A target, `2026-07-29`),
-  **QCOM** (`2026-07-21 OVERDUE`), **RIVN** (Q2 beat+raise, `2026-07-27`), **UNH** (Q2 blowout, `2026-07-30`) — all
-  degenerate-0-trade Sharpe-0.0 below-baseline trading provisionals. Plus **SKHY** (`equity_watch_only`; no-history,
-  `2026-07-24` — Friday, will overdue if Sat 7/25 research misses), **SPCX** (`equity_trend_following_ema_cross`;
-  no-history, `2026-07-21 OVERDUE`; SpaceX set first public earnings Aug 4), **SYNA** (`equity_pairs_trading_
-  cointegration`; onsemi merger-arb, `2026-07-21 OVERDUE`). Validate/upgrade or archive each. **QCOM/SPCX/SYNA are
-  OVERDUE** (missed the dropped 7/18 research run) — clear them first.
-- **Earnings/print-window ASSIGNMENT gap (MOST ACUTE recurring — now with REAL PRINTS in hand: GOOGL beat 7/22 AMC +
-  TSLA mixed 7/22 AMC both UNRESPONDED (both on `trend_following`); SMCI +26% 7/22 second-session UNRESPONDED (on
-  `mean_reversion_bollinger`); TSM 7/16 capex selloff UNRESPONDED). Upcoming: INTC/ARM 7/23 AMC, MSFT/META 7/29,
-  AMZN/AAPL 7/30, AMD/SPCX 8/4; plus quarantined GS/MS/PYPL/QCOM/RIVN/UNH.** These prints are claimed by
-  trend-following / breakout / mean-reversion / macd, NOT `equity_event_driven_catalyst` (unvalidated) /
-  `long_straddle_earnings`. **Reassign / activate an earnings-window responder on the names actually printing.**
-  Single strongest research priority.
-- **Cohort / sector-momentum activation (BIDIRECTIONAL) — GOOGL Cloud +82% "demand outpaces capacity" re-rated the
-  neocloud cohort (IREN/NBIS/WULF/CoreWeave AH); Taiwan June export orders +59.4% record ($95.26B) reaffirmed the
-  AI-supercycle vs the same-day chip cooldown; the AI-capex credit-event fear is still the #1 tail (Cuban/Burry/
-  Warren).** No rule reads a cohort-wide capex re-rating in *either* direction (`sector_rotation_momentum` claims only
-  DELL). *Research: a cohort / sector-risk overlay handling both the de-rate and the re-rate.*
-- **Contract-win event — RKLB's confirmed $266M Space Force contract (on `breakout_volume_confirmation`, reads
-  price/volume not awards).** No rule reads a contract award. *Research: a contract/award responder.*
-- **Partnership / product event — CBRS–CrowdStrike AI-security partnership; GOOGL/AI-infra read-through.** No rule
-  reads a named partnership/product launch. *Research: a partnership/product-event overlay.*
-- **Strategic-corporate / capex / M&A-rumor events — NVDA's 9.3% Nebius stake; AMD's Microsoft AI deal; PYPL ($53B M&A
-  target, quarantined); SYNA/onsemi; SPCX (Aug-4 first public earnings, 1-GW data-center plan, $52B Foxconn-deal
-  denial); INTC (SK-Hynix Ohio-buyout denial).** No rule reads an equity stake, capex plan, earnings-date set, or
-  M&A-rumor denial. *Research: an event/M&A/stake overlay; cointegration look for merger-arb.*
-- **Regulatory / policy overlay — France under-15 social-media ban (META); Warren data-center-oversight push; Bessent
-  Chinese-AI-sanctions threat; China chip-manufacturing curbs (TSM/QCOM); USTR 25% Brazil tariff; TSM ~10% price
-  hike.** No rule reads a regulatory/export-control/tariff/pricing shift. *Research: a policy/regulatory-event
-  overlay.*
-- **Geopolitical / energy-shock overlay — Houthi Red Sea / Bab-el-Mandeb blockade (oil +3–3.4%, Brent ~$94),
-  inflation read-through into the 7/28–29 FOMC.** No rule reads an oil/geopolitical shock. *Research: a macro/
-  energy-shock risk overlay.* **Escalation-watch: a full Bab-el-Mandeb closure strands ~7% of global supply.**
-- **Analyst / valuation-shock (event-scale) — BlackRock "memory rout overdone" (MU/SNDK); BofA Nvidia-vs-AMD $170B
-  server-CPU note; BE JPMorgan PT raise (carry).** Recurring event-scale analyst reactions; normally dropped, but
-  repeated scale argues for a filter that fires only on event-scale moves. *Research: a rating-action / valuation-
-  shock filter.*
-- **Index / forced-flow + ETF/float mechanics — SPCX share unlock ahead; SKHY (Korea leveraged-ETF margin, carry).**
-  No `index_rebalance` gap_type exists. Argues for a 6th Tier-B trigger / forced-flow overlay (`NEW_CATEGORY_NEEDED
-  (index_rebalance / float mechanics)`).
-- **Vol-regime / dispersion activation (persistent) — VIX ~17 with extreme single-name dispersion (SMCI +26% vs SNDK
-  down); dense event IV into INTC/ARM 7/23, MSFT/META 7/29, AMZN/AAPL 7/30, AMD/SPCX 8/4.** Options skeletons
-  (`iron_condor_high_iv`, `long_straddle_earnings`, `jade_lizard`, `calendar_spread`) exist but none active / none
-  claims a universe symbol. Dispersion, not index vol — screen single-name / event-IV.
+All `responder: NONE` except ORCL (which had a responder but fired no trade) — informational, not tradable under the
+mandate. `gap-registry coverage_holes` is **empty**; every item is an activation/assignment gap (a rule/event-type not
+mapped to the symbol that had the event):
+- **Provisional/quarantined validations (TOP PRIORITY):** **14** — all on `equity_event_driven_catalyst` except as
+  noted: **AMD** (`2026-08-04`), **IREN** (`2026-08-04`), **NBIS** (`2026-08-04`), **NOW** (ServiceNow Q2 beat+raise
+  +7%, `2026-08-06` NEW), **STM** (STMicro Q2 beat/soft-guide −14→−18%, `2026-08-06` NEW), **GS** (`2026-07-28`),
+  **MS** (`2026-07-29`), **PYPL** (`2026-07-29`), **QCOM** (`2026-07-21 OVERDUE`), **RIVN** (`2026-07-27`),
+  **UNH** (`2026-07-30`) — all degenerate-0-trade Sharpe-0.0 below-baseline trading provisionals. Plus **SKHY**
+  (`equity_watch_only`; no-history, `2026-07-24` — overdue after today if Sat 7/25 misses), **SPCX**
+  (`equity_trend_following_ema_cross`; no-history, `2026-07-21 OVERDUE`; SpaceX first public earnings Aug 4), **SYNA**
+  (`equity_pairs_trading_cointegration`; onsemi merger-arb, `2026-07-21 OVERDUE`). Validate/upgrade or archive each.
+  **QCOM/SPCX/SYNA are OVERDUE** (missed the dropped 7/18 research) — clear them first; **SKHY overdues today.**
+- **Earnings/print-window ASSIGNMENT gap (MOST ACUTE recurring — now with a UNIVERSE BLOWOUT in hand): INTC blowout
+  7/23 AMC (rev +25%/DC&AI +59%/+7–13% AH) UNRESPONDED (on `breakout_volume_confirmation`, reads price/volume);
+  GOOGL −7% + TSLA −14% both UNRESPONDED (both on `trend_following`); SMCI UNRESPONDED a 3rd straight session (on
+  `mean_reversion_bollinger`). Upcoming: MSFT/META 7/29, AMZN/AAPL 7/30, AMD/SPCX 8/4; plus quarantined
+  GS/MS/PYPL/QCOM/RIVN/UNH.** Claimed by trend/breakout/mean-reversion/macd, NOT `equity_event_driven_catalyst`
+  (unvalidated) / `long_straddle_earnings`. **Reassign / activate an earnings-window responder on the names actually
+  printing.** Single strongest research priority.
+- **Contract / award events — ORCL's $6.99B Navy/Pentagon IDIQ DID hit a responder (`equity_event_driven_catalyst`
+  claims ORCL) but fired NO entry.** *Research: does its `evaluate()` actually fire on a government-contract award, or
+  only earnings-type catalysts? (RKLB's $266M Space Force award 7/22 hit `breakout_volume`, price-only — still a gap
+  for award-type events on non-ORCL names.)*
+- **Cohort / sector-momentum activation (BIDIRECTIONAL) — the memory surge (MU/SNDK/SKHY, MS multi-year-tailwind call +
+  Nokia "shortage-through-2027") + INTC/AI-data-center strength vs the STM/TXN chip-loser bifurcation; GOOGL cloud +82%
+  re-rated the neocloud cohort (IREN/NBIS/WULF).** No rule reads a cohort-wide move (`sector_rotation_momentum` claims
+  only DELL). *Research: a cohort / sector-risk overlay handling both the de-rate and the re-rate.*
+- **AI-capex-debt / valuation-shock (event-scale) — GOOGL's $205B capex ceiling + halted 33-qtr buyback + first
+  negative FCF since 2004; Nikkei's ~$1.65T off-balance-sheet AI-debt study; Burry/Zitron.** The event-scale bear
+  thesis on AI *funding* (demand still printed strong: GOOGL cloud +82%/$514B backlog, INTC DC&AI +59%). Recurring;
+  argues for an event-scale valuation/credit filter. Structural overhang into MSFT/META (7/29), AMZN/AAPL (7/30).
+- **Competitive / product event — Google's in-house AI inference chips to sell on-prem vs Nvidia (NVDA; rev 2027).**
+  No rule reads a competitor's product entry. *Research: a product/competitive-event overlay.*
+- **Regulatory / policy overlay — Lina Khan → NYC EDC (META/AMZN, municipal); Clarity Act (GS/JPM); Bessent
+  Chinese-AI-sanctions threat; the AI-data-center electricity-ratepayer pledge; China chip curbs; USTR 25% Brazil
+  tariff.** No rule reads a regulatory/policy shift. *Research: a policy/regulatory-event overlay.*
+- **Geopolitical / energy-shock overlay — Houthi tanker strikes (kinetic), Brent >$100 (+40% MTD, first since May),
+  10-yr yield 18-mo high, inflation read-through into the 7/28–29 FOMC.** No rule reads an oil/geopolitical shock.
+  *Research: a macro/energy-shock risk overlay.* **Escalation-watch: a full Bab-el-Mandeb closure strands ~7% of
+  global supply; Goldman sees $120+ by Q4 if disruptions persist.**
+- **Macro-data / rates overlay — jobless claims 187K (fewest since 1969) + oil → 10-yr yield to an 18-month high.**
+  No rule reads a rates/macro-data surprise. *Research: a rates/macro overlay for rate-sensitive posture.*
+- **Vol-regime / dispersion activation (persistent) — VIX 16.64 *falling* on a −2.15% Nasdaq day, with extreme
+  single-name dispersion (INTC +7–13% vs TSLA −14% vs STM −18%); dense event IV into MSFT/META 7/29, AMZN/AAPL 7/30,
+  AMD/SPCX 8/4.** Options skeletons (`iron_condor_high_iv`, `long_straddle_earnings`, `jade_lizard`, `calendar_spread`)
+  exist but none active / none claims a universe symbol. Dispersion, not index vol — screen single-name / event-IV.
+- **Index / forced-flow + float mechanics — SPCX share unlock ahead (carry); SKHY (Korea leveraged-ETF margin,
+  carry).** No `index_rebalance` gap_type exists. Argues for a 6th Tier-B trigger / forced-flow overlay
+  (`NEW_CATEGORY_NEEDED (index_rebalance / float mechanics)`).
 - **event_driven_catalyst exit CALIBRATION (exit side proven live 7/8→7/9).** Is `max_hold_days: 7` right? Backtest
   the time-stop horizon + the 2×ATR hard-stop multiple. Add re-entry-on-new-catalyst.
 - **Fallback-threshold question (issue #5)** — no-price-history routes to `equity_watch_only` correctly (SKHY/SPCX).
-  The open case is the degenerate 0-trade Sharpe-0.0 backtest (AMD/IREN/NBIS 7/21; UNH 7/16; GS 7/14; MS/PYPL 7/15;
-  RIVN 7/13) routing to a below-baseline *trading* provisional. Decide whether a 0-trade score should route to
-  watch_only.
+  Open case: the degenerate 0-trade Sharpe-0.0 backtest (AMD/IREN/NBIS/NOW/STM/UNH/GS/MS/PYPL/RIVN) routing to a
+  below-baseline *trading* provisional. Decide whether a 0-trade score should route to watch_only.
 - **Validate first-pass + provisional assignments via head-to-head** (carry): breakout vs trend on ARM/MRVL/INTC;
   bollinger vs trend on CSCO; rsi vs trend on HPE; sector-rotation vs trend on DELL; macd on META/MSFT/SNDK; trend
   placeholders → AAPL/AMZN/CBRS/GOOGL/JPM/NUVL/NVDA/QQQ/SPY/TSLA/TSM.
@@ -148,23 +152,23 @@ every item is an activation/assignment/taxonomy gap (a rule/event-type not mappe
 
 ## Open questions for the operator
 
-1. **[HIGH — timing] Schedule reliability — both failure modes seen, now apparently recovered.** 7/7 & 7/8
-   double-fired; 7/9–7/16 clean; **7/17, 7/20, Sat 7/18 DROPPED**; **7/21 + 7/22 both fired on time ✓**. Schedule
-   appears recovered — confirm single-trigger + no-drop config is stable.
+1. **[HIGH — timing] Schedule reliability — apparently recovered.** 7/7 & 7/8 double-fired; 7/9–7/16 clean;
+   **7/17, 7/20, Sat 7/18 DROPPED**; **7/21 + 7/22 + 7/23 all fired on time ✓.** Confirm single-trigger + no-drop
+   config is stable.
 2. **[HIGH] Repair the interpreter** — bare `python3` = Homebrew 3.14.5 (no deps). Repoint task/daily_prompt to
    `.venv/bin/python3` or reinstall deps.
 3. **[HIGH — carry] Overdue provisionals + skipped research.** QCOM/SPCX/SYNA overdue (`revalidate_by 7/21`, no Sat
-   7/18 research); **SKHY hits `7/24` this Friday** and overdues if Sat 7/25 also misses. The provisional book (12)
-   only shrinks when research validates/archives — if research keeps missing, add a trader escalation path.
-4. **[MEDIUM] News-pipeline staleness / partial-run (issue #4).** Did NOT bite 7/21 or 7/22 (both fresh & on-time),
-   but the 7/10 partial run is unfixed — add a `date_in_file == today` guard AND harden brief-synthesis + git-sync.
-5. **[MEDIUM] `cli open-orders` parser bug** — `'dict' object has no attribute 'id'` when a live order exists.
-   Dormant now (no live orders).
+   7/18 research); **SKHY hits `7/24` today** and overdues if Sat 7/25 also misses. The provisional book is now **14**
+   and only shrinks when research validates/archives — if research keeps missing, add a trader escalation path.
+4. **[MEDIUM — now ACTIVE] `cli open-orders` parser bug** — `'dict' object has no attribute 'id'` fires whenever a live
+   order rests, and there IS one now (the META sell). Read open orders client-direct until fixed. Worth a real fix.
+5. **[MEDIUM] News-pipeline staleness / partial-run (issue #4).** Did NOT bite 7/21–7/23 (all fresh & on-time), but the
+   7/10 partial run is unfixed — add a `date_in_file == today` guard AND harden brief-synthesis + git-sync.
 6. **[MEDIUM] Fallback threshold (issue #5)** — degenerate 0-trade Sharpe-0.0 → trading-provisional vs watch_only
-   (AMD/IREN/NBIS + UNH/GS/MS/PYPL/RIVN; see gaps).
-7. **TWELVE provisional/quarantined claims** — AMD/IREN/NBIS (`2026-08-04`) + GS (`2026-07-28`) + MS/PYPL
-   (`2026-07-29`) + QCOM/SPCX/SYNA (`2026-07-21 OVERDUE`) + SKHY (`2026-07-24`) + RIVN (`2026-07-27`) + UNH
-   (`2026-07-30`). Saturday research owns validation. Do NOT hand-promote.
-8. **[LOW] Proportionality — tech/AI universe concentration.** NBIS/IREN/AMD all AI/semis; off-theme beats
-   (T/COF/MCO/CME) noted 7/22 but not added. The news agent's standing proportionality question is still unanswered.
+   (AMD/IREN/NBIS/NOW/STM + UNH/GS/MS/PYPL/RIVN).
+7. **FOURTEEN provisional/quarantined claims** — AMD/IREN/NBIS (`2026-08-04`) + NOW/STM (`2026-08-06`) + GS
+   (`2026-07-28`) + MS/PYPL (`2026-07-29`) + QCOM/SPCX/SYNA (`2026-07-21 OVERDUE`) + SKHY (`2026-07-24`) + RIVN
+   (`2026-07-27`) + UNH (`2026-07-30`). Saturday research owns validation. Do NOT hand-promote.
+8. **[LOW] Proportionality — tech/AI universe concentration.** NOW/STM (both tech/semis) added today; off-theme beats
+   (BX/CMCSA) noted 7/23 but not added. The news agent's standing proportionality question is still unanswered.
    Operator awareness only.
